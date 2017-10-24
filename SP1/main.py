@@ -46,14 +46,51 @@ def clone_repositories(url, path):
         Repo.clone_from(url[i], path[i])
 
 
-# Thanks to: https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-def iterate_through_java_files():
-    pathlist = Path(repo_subfolder).glob('**/*.java')
-    for path in pathlist:
-        # because path is object not string
-        path_in_str = str(path)
-        print(path_in_str)
+class IterateThroughFiles:
+    # Thanks to: https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
+    # Find file extensions (java/c/cc/cpp/m) that can be analysed by Infer.
+    def __init__(self):
+        self.files = []
 
+    # Java files
+    def find_java_files(self):
+        pathlist = Path(repo_subfolder).glob('**/*.java')
+        for path in pathlist:
+            # because path is object not string
+            path_in_str = str(path)
+            print(path_in_str)
+
+    # C files
+    def find_c_files(self):
+        pathlist = Path(repo_subfolder).glob('**/*.c')
+        for path in pathlist:
+            # because path is object not string
+            path_in_str = str(path)
+            print(path_in_str)
+
+    # C++ files
+    def find_cc_files(self):
+        pathlist = Path(repo_subfolder).glob('**/*.cc')
+        for path in pathlist:
+            # because path is object not string
+            path_in_str = str(path)
+            print(path_in_str)
+
+    # C++ files
+    def find_cpp_files(self):
+        pathlist = Path(repo_subfolder).glob('**/*.cpp')
+        for path in pathlist:
+            # because path is object not string
+            path_in_str = str(path)
+            print(path_in_str)
+
+    # Objective-C files
+    def find_m_files(self):
+        pathlist = Path(repo_subfolder).glob('**/*.m')
+        for path in pathlist:
+            # because path is object not string
+            path_in_str = str(path)
+            print(path_in_str)
 
 '''
 write_back = input("Would you like to clone all repositories in this csv?")
