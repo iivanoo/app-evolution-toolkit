@@ -1,1 +1,22 @@
-No issues found
+Found 2 issues
+
+HelloWorld/AppDelegate.m:18: error: MEMORY_LEAK
+   memory dynamically allocated to `shadowPath` by call to `CGPathCreateWithRect()` at line 18, column 28 is not reachable after line 18, column 5
+  16.   
+  17.   - (void)memory_leak_bug {
+  18. >     CGPathRef shadowPath = CGPathCreateWithRect(self.inputView.bounds, NULL);
+  19.   }
+  20.   
+
+HelloWorld/AppDelegate.m:23: error: RESOURCE_LEAK
+   resource acquired to `fp` by call to `fopen()` at line 23, column 10 is not released after line 23, column 5
+  21.   - (void)resource_leak_bug {
+  22.       FILE* fp;
+  23. >     fp = fopen("\test.txt", "r");
+  24.   }
+  25.   
+
+Summary of the reports
+
+    MEMORY_LEAK: 1
+  RESOURCE_LEAK: 1

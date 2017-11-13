@@ -13,15 +13,15 @@
 @end
 
 @implementation AppDelegate
-//
-//- (void)memory_leak_bug {
-//    CGPathRef shadowPath = CGPathCreateWithRect(self.inputView.bounds, NULL);
-//}
-//
-//- (void)resource_leak_bug {
-//    FILE* fp;
-//    fp = fopen("\test.txt", "r");
-//}
+
+- (void)memory_leak_bug {
+    CGPathRef shadowPath = CGPathCreateWithRect(self.inputView.bounds, NULL);
+}
+
+- (void)resource_leak_bug {
+    FILE* fp;
+    fp = fopen("\test.txt", "r");
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
