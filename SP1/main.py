@@ -6,20 +6,14 @@ Bob van den Berg
 Vrije Universiteit Amsterdam
 '''
 
+
+import os
 import csv
-from git import Repo
+import git
 from pathlib import Path
 
 
 ID = 0
-repo_subfolder = 'repo_subfolder/'
-
-
-def clone_repositories(repositories, repositories_url):
-    # example repositories[1] -> change into the for-loop above.
-    for i in range(1):
-        repositories = str(repositories)
-        path = repo_subfolder + repositories
 
 
 # Download GitHub repositories from a csv row:
@@ -42,7 +36,7 @@ def read_csv():
 
 def clone_repositories(url, path):
     # Skip first row (header) and clone the repositories. (Max 100 per run allowed by GitHub)
-    for i in range(1, 4):
+    for i in range(1, 10):
         Repo.clone_from(url[i], path[i])
 
 
@@ -52,45 +46,19 @@ class IterateThroughFiles:
     def __init__(self):
         self.files = []
 
-    # Java files
-    def find_java_files(self):
-        pathlist = Path(repo_subfolder).glob('**/*.java')
+    # Find Java, C, CC, CPP and M files
+    def find_infer_files(self, extensions):
+        file_list = []
+        pathlist = Path(repo_subfolder).glob('**/*.' + extensions)
         for path in pathlist:
             # because path is object not string
             path_in_str = str(path)
-            print(path_in_str)
+            file_list.append(path_in_str)
+        print(file_list)
 
-    # C files
-    def find_c_files(self):
-        pathlist = Path(repo_subfolder).glob('**/*.c')
-        for path in pathlist:
-            # because path is object not string
-            path_in_str = str(path)
-            print(path_in_str)
-
-    # C++ files
-    def find_cc_files(self):
-        pathlist = Path(repo_subfolder).glob('**/*.cc')
-        for path in pathlist:
-            # because path is object not string
-            path_in_str = str(path)
-            print(path_in_str)
-
-    # C++ files
-    def find_cpp_files(self):
-        pathlist = Path(repo_subfolder).glob('**/*.cpp')
-        for path in pathlist:
-            # because path is object not string
-            path_in_str = str(path)
-            print(path_in_str)
-
-    # Objective-C files
-    def find_m_files(self):
-        pathlist = Path(repo_subfolder).glob('**/*.m')
-        for path in pathlist:
-            # because path is object not string
-            path_in_str = str(path)
-            print(path_in_str)
+#    def append_infer_files_list(self, path_in_str):
+#        with open('csv/infer_files_list', "wb", encoding="utf8") as infer_files_list:
+#            infer_files_list.append(path_in_str)
 
 '''
 write_back = input("Would you like to clone all repositories in this csv?")
@@ -118,11 +86,6 @@ analyzer: the path in the file system where to find the main Python script for r
 '''
 
 '''
-#path for the analyser
-analyzer = "../SP2/analyzer.py"
-'''
-
-'''
 def write_bugs():
     # Write bugs.csv
     with open('csv/bugs.csv', 'w') as csvfile:
@@ -138,5 +101,28 @@ def write_bugs():
                          'START_COMMIT_MSG': 'test', 'START_COMMIT_TIMESTAMP': 'test'})
 '''
 
-#read_csv()
-iterate_through_java_files()
+#read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #)
+
+'''
+extensions = [
+            'java',
+            'c',
+            'cc',
+            'cpp',
+            'm',
+            'xml'
+        ]
+
+for i in extensions:
+    IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all java files recursively in the repo_subfolder.
+'''
+
+rootdir = 'repo_subfolder'
+
+for subdir, dirs, files in os.walk(rootdir):
+    if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
+        g = git.Git(str(subdir) + '\\' + str(dirs[0]))
+        loginfo = g.log()
+        print(loginfo)
+
+
