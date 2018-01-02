@@ -121,6 +121,7 @@ rootdir = 'repo_subfolder'
 
 for subdir, dirs, files in os.walk(rootdir):
     if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
+        # if g.working_dir !=
         g = git.Git(str(subdir) + '\\' + str(dirs[0]))
         loginfo = g.log()
         print(loginfo)
