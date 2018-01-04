@@ -85,25 +85,21 @@ analyzer: the path in the file system where to find the main Python script for r
 
 '''
 
-'''
 def write_bugs():
     # Write bugs.csv
     with open('csv/bugs.csv', 'w') as csvfile:
         fieldnames = ['ID', 'REPO_ID', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION', 'LHDIFF_LINE_TRACING', 'START_COMMIT_ID', 'START_COMMIT_MSG', 'START_COMMIT_TIMESTAMP']
         writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
-    
+        ID = 1
         # Write the fieldnames and then include the data.
         writer.writeheader()
         for repository in repositories[1:]:
             ID += 1
-            writer.writerow({'ID': ID, 'REPO_ID': reposotiry, 'FILE_PATH': 'test', 'LINE_NUMBER': 'test',
+            writer.writerow({'ID': ID, 'REPO_ID': repository, 'FILE_PATH': 'test', 'LINE_NUMBER': 'test',
                          'BUG_DESCRIPTION': 'test', 'LHDIFF_LINE_TRACING': 'test', 'START_COMMIT_ID': 'test',
                          'START_COMMIT_MSG': 'test', 'START_COMMIT_TIMESTAMP': 'test'})
-'''
 
-#read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #)
 
-'''
 extensions = [
             'java',
             'c',
@@ -113,17 +109,22 @@ extensions = [
             'xml'
         ]
 
-for i in extensions:
-    IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all java files recursively in the repo_subfolder.
-'''
+def search_files():
+    for i in extensions:
+        IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all java files recursively in the repo_subfolder.
 
-rootdir = 'repo_subfolder'
+def show_log_files():
+    rootdir = 'repo_subfolder'
 
-for subdir, dirs, files in os.walk(rootdir):
-    if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
-        # if g.working_dir !=
-        g = git.Git(str(subdir) + '\\' + str(dirs[0]))
-        loginfo = g.log()
-        print(loginfo)
+    for subdir, dirs, files in os.walk(rootdir):
+        if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
+            # if g.working_dir !=
+            g = git.Git(str(subdir) + '\\' + str(dirs[0]))
+            loginfo = g.log()
+            print(loginfo)
 
+#read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #)
+#write_bugs()
+#seach_files()
+#show_log_files()
 
