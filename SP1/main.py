@@ -10,7 +10,9 @@ Vrije Universiteit Amsterdam
 import os
 import csv
 import git
+from git import Repo
 from pathlib import Path
+
 
 
 ID = 0
@@ -36,7 +38,7 @@ def read_csv():
 
 def clone_repositories(url, path):
     # Skip first row (header) and clone the repositories. (Max 100 per run allowed by GitHub)
-    for i in range(1, 10):
+    for i in range(1, 2):
         Repo.clone_from(url[i], path[i])
 
 
@@ -49,7 +51,8 @@ class IterateThroughFiles:
     # Find Java, C, CC, CPP and M files
     def find_infer_files(self, extensions):
         file_list = []
-        pathlist = Path(repo_subfolder).glob('**/*.' + extensions)
+
+        pathlist = Path('repo_subfolder/').glob('**/*.' + extensions)
         for path in pathlist:
             # because path is object not string
             path_in_str = str(path)
@@ -118,13 +121,16 @@ def show_log_files():
 
     for subdir, dirs, files in os.walk(rootdir):
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
-            # if g.working_dir !=
+            a_repo = git.Repo(str(subdir) + '\\' + str(dirs[0]), odbt=git.GitCmdObjectDB);
             g = git.Git(str(subdir) + '\\' + str(dirs[0]))
             loginfo = g.log()
-            print(loginfo)
+
+            for commit in list(a_repo.iter_commits()):
+                g.checkout(commit)
+                #print(commit)
 
 #read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #)
 #write_bugs()
-#seach_files()
-#show_log_files()
+#search_files()
+show_log_files()
 
