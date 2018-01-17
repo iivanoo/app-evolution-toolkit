@@ -1,0 +1,24 @@
+[INFO] output of locale.getdefaultlocale(): ('en_US', 'utf_8_export')
+[INFO] encoding we chose in the end: ascii
+[INFO] Running command /usr/local/Cellar/infer/0.12.1/lib/infer/infer/bin/../lib/python/infer.py --analyzer infer -j 4 --project-root /Users/chris/Downloads/app-evolution-toolkit/SP2/Android/CrossRoads-master --out /Users/chris/Downloads/app-evolution-toolkit/SP2/Android/CrossRoads-master/infer-out -- ./gradlew build
+[INFO] Path to infer script /usr/local/Cellar/infer/0.12.1/lib/infer/infer/bin/../lib/python/infer.py (/usr/local/Cellar/infer/0.12.1/lib/infer/infer/lib/python/infer.py)
+[INFO] Platform: Darwin-16.0.0-x86_64-i386-64bit
+[INFO] PATH=/Users/chris/.rbenv/shims:/Users/chris/.rbenv/shims:/Library/Frameworks/Python.framework/Versions/3.6/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Users/chris/anaconda/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbinexport
+[INFO] SHELL=/bin/bash
+[INFO] PWD=/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/CrossRoads-master
+[INFO] Running with:
+
+------------------------------------------------------------
+Gradle 2.14.1
+------------------------------------------------------------
+
+Build time:   2016-07-18 06:38:37 UTC
+Revision:     d9e2113d9fb05a5caabba61798bdb8dfdca83719
+
+Groovy:       2.4.4
+Ant:          Apache Ant(TM) version 1.9.6 compiled on June 29 2015
+JVM:          1.8.0_25 (Oracle Corporation 25.25-b02)
+OS:           Mac OS X 10.12 x86_64
+
+
+[INFO] Capture phase was successful

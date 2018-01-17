@@ -10,8 +10,13 @@ Vrije Universiteit Amsterdam
 import os
 import csv
 import git
+import sys
 from git import Repo
 from pathlib import Path
+sys.path.insert(0, '../SP2')
+
+
+import InferTool
 
 
 
@@ -38,7 +43,7 @@ def read_csv():
 
 def clone_repositories(url, path):
     # Skip first row (header) and clone the repositories. (Max 100 per run allowed by GitHub)
-    for i in range(1, 2):
+    for i in range(2, 3):
         Repo.clone_from(url[i], path[i])
 
 
@@ -118,16 +123,25 @@ def search_files():
 
 def show_log_files():
     rootdir = 'repo_subfolder'
-
+    print("debug1")
     for subdir, dirs, files in os.walk(rootdir):
+        print("debug2")
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
-            a_repo = git.Repo(str(subdir) + '\\' + str(dirs[0]), odbt=git.GitCmdObjectDB);
-            g = git.Git(str(subdir) + '\\' + str(dirs[0]))
+            a_repo = git.Repo(str(subdir) + '/' + str(dirs[0]), odbt=git.GitCmdObjectDB);
+            g = git.Git(str(subdir) + '/' + str(dirs[0]))
             loginfo = g.log()
-
+            os.chdir(str(subdir) + '/' + str(dirs[0]))
             for commit in list(a_repo.iter_commits()):
+                print("debug3")
                 g.checkout(commit)
+                print("debug4")
                 #print(commit)
+                
+                #InferTool.inferAnalysis(str(dirs[0]))
+                InferTool.inferAnalysis("Android")
+                print("debug5")
+
+
 
 #read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #)
 #write_bugs()

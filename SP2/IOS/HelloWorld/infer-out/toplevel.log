@@ -1,0 +1,19 @@
+[INFO] output of locale.getdefaultlocale(): ('en_US', 'utf_8_export')
+[INFO] encoding we chose in the end: ascii
+[INFO] Running command /usr/local/Cellar/infer/0.12.1/lib/infer/infer/bin/../lib/python/infer.py --analyzer infer -j 4 --project-root /Users/chris/Downloads/app-evolution-toolkit/SP2/IOS/HelloWorld --out /Users/chris/Downloads/app-evolution-toolkit/SP2/IOS/HelloWorld/infer-out -- xcodebuild -target HelloWorld -configuration Debug -sdk iphonesimulator
+[INFO] Path to infer script /usr/local/Cellar/infer/0.12.1/lib/infer/infer/bin/../lib/python/infer.py (/usr/local/Cellar/infer/0.12.1/lib/infer/infer/lib/python/infer.py)
+[INFO] Platform: Darwin-16.0.0-x86_64-i386-64bit
+[INFO] PATH=/Users/chris/.rbenv/shims:/Users/chris/.rbenv/shims:/Library/Frameworks/Python.framework/Versions/3.6/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Users/chris/anaconda/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbinexport
+[INFO] SHELL=/bin/bash
+[INFO] PWD=/Users/chris/Downloads/app-evolution-toolkit/SP2/IOS/HelloWorld
+[INFO] Xcode version:
+Xcode 8.3.3
+Build version 8E3004b
+
+[INFO] clang version:
+Apple LLVM version 8.1.0 (clang-802.0.42)
+Target: x86_64-apple-darwin16.0.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+
+[INFO] Capture phase was successful

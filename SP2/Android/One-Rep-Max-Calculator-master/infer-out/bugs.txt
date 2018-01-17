@@ -1,0 +1,14 @@
+Found 1 issue
+
+app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/Main/MainActivity.java:108: error: RESOURCE_LEAK
+   resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 105 is not released after line 108
+**Note**: potential exception at line 106
+  106.           fos.write(7);   //DOH! What if exception?
+  107.           fos.close();
+  108. >     }
+  109.   
+  110.   
+
+Summary of the reports
+
+  RESOURCE_LEAK: 1

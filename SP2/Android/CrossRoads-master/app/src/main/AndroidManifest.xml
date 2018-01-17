@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.AndroidTechies.gamer.randomexcessvariable">
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="com.AndroidTechies.gamer.randomexcessvariable.start_screen"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.road_chooser">
+
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.honest_methods.honest_method">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.honest_methods.intro_honest" />
+        </activity>
+        <activity
+            android:name=".credits"
+            android:label="Credits" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.road_chooser" />
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.cheats.listofcheats">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.cheats.intro_cheats" />
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.cheats.cheats_content">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.cheats.listofcheats" />
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.honest_methods.onest_content">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.honest_methods.honest_method" />
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.cheats.intro_cheats"
+            android:label="Here's Why">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.road_chooser" />
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.honest_methods.intro_honest"
+            android:label="Here's Why">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.road_chooser" />
+        </activity>
+        <activity
+            android:name="com.AndroidTechies.gamer.randomexcessvariable.overflow.App_info"
+            android:label="Application info">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.road_chooser" />
+        </activity>
+        <activity android:name="com.AndroidTechies.gamer.randomexcessvariable.overflow.contact_us"
+            android:label="Contact">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.AndroidTechies.gamer.randomexcessvariable.road_chooser" />
+        </activity>
+    </application>
+
+</manifest>

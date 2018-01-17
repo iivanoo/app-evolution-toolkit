@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".road_chooser"
+    android:weightSum="1"
+    android:background="#000000">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageroad_easyroad"
+        android:adjustViewBounds="false"
+        android:onClick="easyroad"
+        android:background="@drawable/roadtrip" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageroad_lesstakenroad"
+        android:layout_below="@+id/imageroad_easyroad"
+        android:onClick="roadtrip"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/tuffroad" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="THE EASY ROAD"
+        android:id="@+id/textroad_easyroad"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:textColorHighlight="#fe0004"
+        android:layout_marginTop="86dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="THE ROAD LESS TAKEN"
+        android:id="@+id/textroad_lesstakenroad"
+        android:layout_alignTop="@+id/imageroad_lesstakenroad"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="86dp"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:textColorHighlight="#efba1c" />
+
+</RelativeLayout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/whychoosetheeasyroad"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="Why Choose the Easy Road?"/>
+    <item
+        android:id="@+id/whychoosetheroadlesstaken"
+        android:orderInCategory="2"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="Why Choose the Road Less Taken?"/>
+    <item
+        android:id="@+id/Submit"
+        android:orderInCategory="3"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="Submit a cheat"/>
+
+    <item
+        android:id="@+id/Feedback"
+        android:orderInCategory="4"
+        app:showAsAction="never"
+        android:title="Feedback"/>
+
+    <item
+        android:id="@+id/Contact"
+        android:orderInCategory="5"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="Contact"/>
+
+    <item
+        android:id="@+id/credits"
+        android:orderInCategory="6"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="Credits"/>
+    <item
+        android:id="@+id/App_info"
+        android:orderInCategory="7"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="Application info"/>
+
+</menu>

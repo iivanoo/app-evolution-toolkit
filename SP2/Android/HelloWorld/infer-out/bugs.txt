@@ -1,0 +1,14 @@
+Found 1 issue
+
+app/src/main/java/com/example/chris/helloworld/MainActivity.java:20: error: RESOURCE_LEAK
+   resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 17 is not released after line 20
+**Note**: potential exception at line 18
+  18.           fos.write(7);   //DOH! What if exception?
+  19.           fos.close();
+  20. >     }
+  21.   
+  22.   
+
+Summary of the reports
+
+  RESOURCE_LEAK: 1

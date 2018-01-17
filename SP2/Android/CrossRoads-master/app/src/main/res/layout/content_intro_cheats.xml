@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rel_cheats"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".cheats.intro_cheats"
+    android:background="@drawable/lifesahih">
+    <!--tools:showIn="@layout/activity_intro_cheats">-->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollintrocheats"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/intro_cheat"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:id="@+id/textintrocheats"
+                android:textColor="#000000"
+                android:typeface="serif" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:text="@string/intro_cheatdetails"
+                android:id="@+id/textintro_cheatdetails"
+                android:typeface="serif"
+                android:textColor="#000000" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

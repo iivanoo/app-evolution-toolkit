@@ -1,0 +1,9 @@
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/OneRepMaxTemplate.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/PercentRepMax.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/Main/MainActivity.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/Main/MainActivityMvp.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/Main/MainPresenter.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/Main/RecyclerViewAdapter.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/build/generated/source/r/debug/android/support/v7/appcompat/R.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/build/generated/source/r/debug/com/repmax/devlanding/onerepmaxcalculator/R.java
+/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/One-Rep-Max-Calculator-master/app/build/generated/source/buildConfig/debug/com/repmax/devlanding/onerepmaxcalculator/BuildConfig.java

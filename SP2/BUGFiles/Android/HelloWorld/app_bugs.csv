@@ -1,0 +1,1 @@
+"ID: 1","BUG_TYPE: RESOURCE_LEAK","FILE_PATH: app/src/main/java/com/example/chris/helloworld/MainActivity.java","LINE_NUMBER: 20","BUG_DESCRIPTION:    resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 17 is not released after line 20"

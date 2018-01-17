@@ -1,0 +1,337 @@
+<resources>
+    <string name="app_name">CrossRoads</string>
+    <string name="credits"><big>I would like to <b>thank</b></big></string>
+
+    <string name="creditnames">All my friends and the members of the <u>Android techies society</u> who helped me with this application.</string>
+
+    <string name="specialthanks"><b>Also Special Thanks and respect to my mentor-</b></string>
+    <string name="mentorname">
+        <big><b>Mr.Mukesh Sahu</b></big>
+    </string>
+    <string name="apprection">
+        Who helped me a lot with this application and also inspired me in life.
+</string>
+
+
+    <string-array name="description">
+        <item>This method works when you have the feeling “yaar sirf ek word pata hota toh pura answer bana deta”.\n
+            Ever wondered where to hide a chit?\n
+            The clothes are checked while entering the exam hall and the geometry box and writing on body parts can be checked by the invigilator. So where can you hide a chit that you can easily carry and no one will think to look?\n
+            In your spectacle case.\n
+            The case is opaque and contains protective layering on the insides. The chit with the important formulas can be hid in the lower or upper layering. This will never draw any attention because everyone carries a spectacle case these days.\n
+            In the exam hall you can turn over your layering to reveal the formulas on the pretext of taking your glasses or you can bring your stationary in the spectacle case, which gives you more chances of opening it up.\n\n
+            Note: To use this method,you need to have studied the formula you are looking up. This method will only help as a reminder to what you have already studied. Don’t just blindly go for it without studying anything. It also increases invigilator’s skepticism if you keep on staring at your spectacle case.\n
+        </item>
+        <item>This method is an extension to the previous method. It carries a certain amount of risk but if performed correctly can help in your performance in the examination. We all love going to toilets during examination for two reasons.\n
+A). we are free from the bounds of continuous writing as we have no idea what to write.\n
+B). we hope to find an angel of god in the toilet to help us pass assuming they exist.\n
+But as we know “God helps those who help themselves”. So don’t rely on others and take a stand. Stand up and go to toilet after you take a thorough reading of the question paper.\n
+            Chits can be easily smuggled into the exam room as there is very lenient checking on the gate and of course we are desperate. But the chits can be checked by the invigilator if he suspects you. So go to the toilet after a thorough reading of the question paper and occupy a western style sitting. Lock it if you can. \n
+            Now take out the chits and read all the answers and dispose them off in the flush. You can also read them and throw them away on the floor.  Who cares? The main risk is to not get caught while reading them and avoid invigilator’s suspicion.\n\n
+Note: Don’t take too much time in the toilet. It will make the invigilator suspicious and might get you into trouble.\n
+</item>
+        <item>We all have lovely friends who help us whether we need it or not. But the real test of friendship is when your friends help you in desperate times.\n
+            Will they? You can use some methods to be sure-\n
+•	Have an intelligent friend who owes you a some favors.\n
+•	Make sure he does not sit in your class i.e. he is not among the thirty of your batch.\n
+•	Be creative in blackmailing and make him feel he owes you a lot.\n
+Now that you have taken care of the above points, meet him early on the exam day and synchronize your watches. Set the same time to meet in toilet and discuss the answers and take
+            all the possible hints that will help you pass. And while going back to class, pray to god that you remember the shit your friend sold you.\n\n
+Note: this method fails when another asshole of your class listens to his bladder at the same time set by you and he goes to toilet instead of you. So it’s a gamble.\n
+</item>
+        <item>We are engineers. \n
+            So it is natural that we are creative at everything we do. Its exam time and time to utilize your creativity to swim through the ocean of exams.\n
+            Write small hints of difficult formulas or color codes in your geometry box or calculator or split the formula between the geometry and calculator.\n
+             E.g. - if you need the color code table for the resistors when you can draw the colors on your geometry. Try to avoid the invigilator’s and the flying’s suspicion.\n
+            This method can also extended to write important formulas on a stretchable band.\n
+            You can stretch the band, write important notes and when it is in unstretched state,it will look like a few black lines.
+            In exam you can stretch the band when the invigilator is not looking and look up the formulas.\n
+            It is one of the safest way to cheat. \n\n
+Note: just be creative and hope to not get caught.\n</item>
+    <item>Wearing shoes to the exam is boring. Why can’t we just go in slippers?\n
+Because even the shoes may help you to pass the exam. Most of the chits are carried in socks and shoes. They are rarely checked at the gate or in the exam.
+        We have 4 units for every subject in the final exam. Memorize all the topics in each units and arrange your chits or micro-copies unit-wise.
+        Hid the chit for unit 1 in the left sock, for unit 2 in the right sock,
+        for unit 3 in the left foot and for unit 4 in the right foot.  Now in the exam read the question and pull out the chit accordingly.\n\n
+Note: Try not to carry too many chits. It may lead to confusion.\n
+</item>
+        <item>
+            Make good friends with the person sitting in front of you. You might need him quiet more than you think.\n
+        In the exam don’t waste time explaining your friend sitting ahead of you the question you want to ask. He has to do his paper too, so he might probably ignore you.
+        It is quite a task to explain your friend the exact answer you want to copy. So give this method a try.\n
+        But beware-
+        If (exams==external; subject==any)\n
+        {\n
+        Your friend already knows it, then you should probably refrain from seeking his help. \n
+        }\n
+        Else ()\n
+        {\n
+        Explain him in detail to avoid confusion in exam.\n
+        }\n
+        Tap the shoulder of your friend indicating the question number. E.g. - if you want to seek help in question 1, tap his shoulder once. If its question 2, tap his shoulder twice
+        and so on.\n
+        Now wait for a second or two and tap his shoulder indicating the part you need help in. e.g. - if it’s the 3rd part, tap his shoulder thrice.\n
+        So if you want to ask help in the 5th part of first question, then you would tap his shoulder once and wait for a second and then tap his shoulder thrice. Now you can only hope
+        that he knows the answer.\n\n
+        Note: Probably throw him a party to thank his help.\n
+        </item>
+    <item>A true warrior is the one who never accepts defeat even when he knows the odds are stacked against him. He fights till his last breadth and hopes to win the battle by sheer confidence.\n
+        You thought this was a legend? \n
+        Look around. \n
+        You will find many true warriors sitting near you.\n
+        Respect them.\n
+        Here true warrior relates to the people who complete every answer even when they don\'t know what the hell is the question about. They just start by attempting the questions they
+        know and then when they are
+        finished within the first half hour, they start guessing. Their imagination power is so strong that they even connect the answer to a movie plot. The amount of brains
+        we use in exam to guess, if used on a normal day can help us build wonderful things but of course why would we waste our time on that?\n
+        And as some warriors win and some lose, these unsung
+        warriors sometimes pass and sometimes fail. But they deserve respect. It is rightly said “There is no shortage of talent. The only hurdle is to dig it out”.\n\n
+Note: just don\’t write entire movie plots or your dressing styles (for girls). The examiner is in hurry but he is not stupid.\n
+</item>
+    <item>For this you require a strong unity among your friends which is very rare.\n
+        All of your friends are ready to stab you from behind at the very first chance they get.\n
+        If you are still bent on using this technique, then this is how it goes-\n
+Gather you friends and make a plan to fake the invigilator call. When the invigilator reaches the student concerned, the others can glance a sneak-peek inside other\’s paper.
+        The friend can even fake a stomach ache or heart-attack to be completely sure to grab his attention. But be careful, the invigilator might have also downloaded
+        this app.\n\n
+Disclaimer: This method is best suited when you find everyone looking at each other\'s face during the exam, meaning no one knows anything. But try this at your own risk.\n
+        The developer is not responsible for any damage, backlogs caused thereafter.
+		</item>
+
+    <item> Who among us doesn’t like to drink Pepsi or coke but can they help us cheat?\n
+        YES.\n
+        How?\n
+        Peel out the label of the drink and write the hints on the inside of it and stick it again.\n
+        On the exam day, take the filled bottle confidently to the exam room. Now drink it slowly. The transparent plastic lets you peek inside the bottle to the label
+        and see the formulas.\n\n
+Note: keep the bottle down to avoid detection.
+</item>
+            <item>I am just explaining this method because I have to exhaust all my resources to help you. But I urge you to never try this in exams. This method is very
+                disgusting. And if you try it, make sure your friends never know because you know why.\n
+This method helps you smuggle your mobile inside the campus which helps you cheat. But make sure you keep it in silent mode with an active 3G plan (c’mon, switch to 3G now if you
+                are still using 2G).\n
+                Introduce your mobile to your crotch area and let them stay together for some time until you reach the exam hall. Now when you want, go to
+                the toilet and seek help from your crotch cuddled device . Make sure it doesn’t vibrate a lot. You might have other troubles if it does (if you know what I mean).\n\n
+Note: it’s really disgusting. That’s it.</item>
+    <item>You have desperately tried all the tricks that you thought could work but still when you look at the paper, it seems neat and clean (that’s right).\n
+        You are probably fucked. A back in any exam will lead you studying that subject again which is a nightmare.
+        There is not much that you can do at this time apart from praying to all
+        the known Hindu, Sikh, Muslim and even Greek gods. But even that would not help much.\n
+        What might help is writing a desperation cum flattery note to the examiner. Now writing of a flattery note is an art. The more convincing you sound, the more are your
+        chances of passing. \n
+        Try to be as desperate as you could possibly be (of course you are desperate). I have heard of cases where students cashed on the emotional side of the teacher and got good marks.\n
+        You may use the “charan sparsh”* technique and thank the teacher for
+        all the pain he or she took in checking your paper.Explain her how you just need 35-37 marks to pass and how failure will affect your future. You might even turn a gangster
+        if you fail this exam. \n
+        Whatever you write, be convincing!\n\n
+
+Note: the format and sample of flattery note can be personally requested from the developer with some thank you souvenirs.\n\n
+        *charan sparsh- It is a technique where you draw a picture of feet and a hand touching them. Of course the feet are of the teacher and the hand is yours.
+        No specific origin has been found for this technique. The technique was promoted by a guy who had written something like this in his exam-\n
+        "Consider them your feet and i am touching them. i just need 35 marks to pass or else my dad will sell our dog. The future of my dog is in your hands."
+		</item>
+        <item>
+		The exam papers which should officially get 10 min per paper sadly get evaluated in just 1 or 2 minutes because the examiner get paid per copy. So he tries to
+            check as many papers as he can in the given amount of time. So here are some helpful tips to crack exams.\n
+•	Never write point to point and precise answers (even if you know). Always revolve around a certain point and fill sheets.\n
+•	Read the unit wise solved questions of Bhavya or Akash.\n
+•	Solve the previous 4 year question papers.\n
+•	Micro Xerox are the best because they can smuggle a lot of information.\n
+•	Carry a dual tape and paste it to the question paper. When the flying comes in stick the chit to the other side of the question paper and put it in the air to assure him of
+            no funny business.\n
+•	Always have confidence while cheating. When you are nervous, the invigilator notices it and watches you more carefully.\n
+•	If in exam you are solving a unit and you don’t know one part of it and you know 1 part of another question in choice, then attempt it but make sure that both the questions
+            carry same marks.\n
+•	Even if you don’t know any answer fill out the sheet. There have been cases where people have got marks on writing songs in exams. A guy attempted a question something like
+            this-\n
+q) what is the difference between ac and dc voltage?\n
+            Ans: “the main difference is that AC voltage is taught in the subject Electrical Technology. Tera tera tera surror……..tere dhadkan, tere sanseen, tanhaan raatein,
+            tera tera tera suroor……..suroor which is also the DC voltage.\n
+And the student got 62 out of 75 marks.\n
+•	The answer sheets which are written in both blue and black may get checked twice, so try to use only blue pen.\n
+ </item>
+    </string-array><string-array name="honest_description">
+        <item>
+	     No one fights to loose.\n
+        Success is something everyone desires. But the hard work required for that success is something that frightens everyone.\n
+        On a normal day in college, fresher can be found sitting in classes, sophomores are found on stage, canteen or kulcha point and the seniors- missing. Around 55% of the
+            GTBIT students go to tuition.\n
+        You might not even know that your friends takes tuition. It’s not always bad to take extra help but some students do it just to get on the good side of the faculty in
+            charge (who gives that tuition) and get good marks in sessional and help for finals. \n
+            The practical exposure which is a very important part of engineering does not get
+            fulfilled. Students just take old files and copy the entire thing. The things that matter the most for career and placement are given the least importance. Nothing is
+            done practically, nothing is understood.\n
+        In the exams, sheets are filled with random things and marks are scored.
+		</item>
+        <item>A bad teacher is a myth.\n
+        A teacher who can communicate his or her knowledge well can be said to be a good teacher but there is nothing as a bad teacher.\n
+            Every teacher who comes to class tries his or her
+            best to explain the topic as simply as possible. Teachers are never reluctant to answer doubts. At all depends on the will of the student to learn. Every student has
+            his own pace of learning but not being able to understand the concept and blaming the same on a teacher is unfair.\n
+            It is just an excuse to skip a topic. A student
+            who is willing to learn will do whatever is required to understand the topic.\n
+        Blaming the teacher and not responding in class only makes the teacher loose his interest in teaching the topic and the topic ends up being insufferable and
+            impossible to understand. One has to study the topic at the end. In the exam you are the one who has to attempt the topic so it’s better to understand it as and when
+            you can with the help of the teacher.\n
+        So it can be done either the easy way by taking interest in the topic or else cramming the entire chapter a day before the exam and cursing the teacher.\n
+    </item>
+        <item> “Never count the semester by marks and subjects because marks are temperory and subjects change.
+            Always count it by the new things and facts you have learnt and the projects you have made.”\n
+            <br> -Mukesh Sahu sir</br>\n
+        Study around 30 minutes per subject daily. We get around 45-60 days before our first sessional. So try to understand the practical application of the concept you are
+            studying. It is not very hard if you study regularly. The main part that matters are the unsolved questions. Try solving as much of them as you can. In the end,
+            these are the ones that matter.\n
+            Solved questions never test your knowledge. Most of us cannot resist the urge to peek at the solution.\n
+        Solve different types of numerical. Solving similar pattern questions does not help much. Meditate in the morning. It will help you concentrate more. Use good books to
+            study.\n
+        “Some books help you get through exams while some books help you get through life.”\n</item>
+        <item>
+		 The first step of studying anything is knowing why we are studying it?\n
+        A concept memorized would be forgotten soon but a concept applied will remain with you forever. Try to find the applications of the things you study. I understand
+            that it’s not easy as
+            some of the concepts taught don’t have many applications but try to find the applications of as many as you can and if possible, apply them.\n
+        A huge amount of funds have been invested in our labs to make them equipped, so it’s our duty to gain as much from them as we can. \n
+            Apart from giving you helpful knowledge,
+            it will make you stand out and get noticed by the faculty which is most important as they will help you grow.\n
+</item>
+        <item>Problems?\n
+        Everyone has got them. They may be related to your subject or your life. Try to talk them out.\n
+        Who will listen?\n
+        Your teachers will. \n
+            The job of a teacher is not limited to just delivering a lecture. They always want their students to grow. And if any problems hinders their growth,
+            teachers are ready to do their best to solve it. The gratification of seeing a student achieving milestones and fulfilling their dreams is a feeling every teacher
+            cherishes.\n
+            No money can buy that feeling.\n
+            So don\’t be afraid to go to them. The advice they give contains years of experience mixed with the right wisdom pertaining your problem.\n
+            No problem is stupid. Problems may be getting bullied in class or having trouble with a classmate or getting bad grades and backs or having some other personal issues. \n
+            Try to talk it out with your teacher rather than your friends and seniors. You can talk to them too but it is wise to seek your mentor\'s advice.\n
+        Many of you would still consult only your seniors. You may consult them and when their solution doesn\’t work out, go to the teacher.\n
+            Just a word of caution-\n
+            if you are a fresher, the advice you get in the first year will shape your entire career. So no pressure, it\’s your call.</item>
+        <item>“The knowledge left unshared is as good as not knowing about it.”\n
+        I have seen many people having trouble expressing themselves. It’s nothing to be embarrassed of. We all have shortcomings and we are here to address them. \n
+            I myself being a third year student is still unable to express myself properly. Shyness does not help anyone.\n
+        Try talking to people. Some of us have great ideas but we are afraid to share because of the fear of being made fun of. Don\’t be afraid.\n
+            "Haters are gonna hate".\n
+            Some of us are frogs in a well and we are ready to push back anyone who tries to jump out of the well.\n
+            Well, don\'t let them push you.\n
+            You might have an idea that may become the next big thing. Talk to the teachers and other experienced faculties about your ideas. Some of them might not encourage you
+            as much as you want, but I promise no one will laugh at you.\n
+        Most of the reputed college like IITs, IIITs, and DTU all have students whose ideas have made them successful entrepreneurs. A spark is enough to create a fire,
+            don\’t let the spark inside you die. You might light fire in a few hearts.\n
+            There are special provisions for the students who would like to pursue any idea. They can get all the help they want from the faculties and college management.
+            If your idea is promising enough, you might even get financial help to develop the final patent of your idea.\n
+			</item>
+        <item>Good marks? Checked\n
+        80 percentile? Checked\n
+        Placement assured? Doubtful\n
+        70 percentile is everyone\’s need. Students work hard and score good just for a single goal.\n
+            To get a good placement from the campus. Most of us think that good marks and excellent credit score guarantees placement. I discussed the same with my mentor and here’s
+            what he had to say-\n
+        “I once had a student who was very good in studies. She was the topper of her class throughout and always scored well above 80. At the time of placement she was very
+            confident of getting a job letter in more than one company but to her utter surprise and shock, she could not even clear the written exam of the first 5 placement
+            companies that she appeared for.”\n
+        She went to sir and cried a lot. He calmed her down and asked her to solve a few unsolved questions but to her surprise she could not even solve a single unsolved question.\n
+        The free time after the exams is the most precious time. It is the time that makes all the difference.\n
+            In a normal college day everyone does not get much time to work or everybody works almost equally. But holidays are those days that will give you a lead with the
+            students who spend those days in movies and sleeping. To make your life better for the next 40 years, you have to make the best use of these 4 years.\n
+        Set your goals and make a plan to achieve them. Set deadlines for doing any work. If you have not discovered your goals yet, try to discover them now.
+            It is not too late.\n
+             Work for them. Do whatever you need to, to achieve them.\n
+            If you need to bunk classes for it, it is fine. If you need equipment to work on a project, it would be provided. Your goals will set the course of your life after these college
+            years.
+            The number of classes you have attended and the marks you score will just be a minor phenomenon.\n
+</item>
+        <item>Guys, I hope you have browsed through the easy road and the road less taken. Some of you must have found the cheats helpful (thank you to all who did) and some of you might
+            have your own ideas of cracking exams.\n
+            “At the end of the day, only marks matter” is the thinking most of us have. No one likes or wants to get a back in any subject.
+            If it’s hard to crack the first time, it’s very difficult to crack it next year in another semester.\n
+            But is cheating the solution? No, because at the end of it, you haven’t learned anything.\n
+            So what’s the point of all this? To what extent can you flaunt your marks, if you cannot answer the oral questions asked by the recruiter? Marks only get you to the
+            interview. You need knowledge to crack it. Be honest to yourself in whatever you do. Do something only if you want to do it, else leave it.
+            If you do things half-heartily, you are just wasting your time.\n
+        My mentor Mukesh Sahu sir always say that have a plan for what you want to do in life and work towards it. Don’t just waste your precious time in chasing marks.
+            And trust me, you won’t get far with cheating.\n
+            I am nobody to lecture you on the pros and cons of cheating but I just want to share what I feel. I have never used any cheating methods in the examination.
+            Sometimes we ask each other a few hints during exams, but no unfair means. I compiled those methods just for fun. I hope you never need to use any of the cheats in exams.\n
+            But still if you do, you have my blessings. Just don’t get caught.
+        </item>
+    </string-array>
+    <string name="title_activity_intro_cheats">Introdution</string>
+    <string name="intro_cheat"><i>Come to college but bunk class,\n
+                               Sit in canteen or in grass,\n
+                               Go and have fun in parks,\n
+                               Teachers will worry marks.\n</i><br>
+                                           -<b>Anuj Bansal</b></br></string>
+
+    <string name="intro_cheatdetails">
+        Exams are the stressful times that every student fears. Bunking classes, canteen wale chats, bunk wale movies,
+        so called <i>extra-curricular activities</i> and other important things consume the entire time of our semester.
+        So even willingly, we cannot spare quality time for studies. It’s sad our parents don’t understand this.\n
+This present generation has so much to do that we cannot be bothered to waste our time in some random books. But still some of us
+        have a bad habit to complete the files on time, submit all the assignments, answer all the questions in class and live a nerdy
+        life. To them I say, get a life pal. It’s not that we do not work hard and waste our time. We work very hard. The achievers
+        and toppers waste their entire nights studying books and books and books and books. But we the intelligent people utilize
+        our time to do something productive. We watch movies and TV series. We spend sleepless nights even the night before the exam
+        just to give employment to other people. The director, producer, creative team, production team, cast members etc. working hard
+        to make those movies and TV series. So we the engineers actually contribute a lot to the betterment of the society not caring
+        about food, water or sleep. Even then the teachers and our parents cuss us. But still we take all the insults and abuses quietly
+        never voicing our contribution. We are the silent unsung heroes that do so much for the society and do not ask or get anything
+        in return. Still we remain happy the entire semester.\n
+But at the end of the semester when the finals come, we unwillingly have to cease our important contribution to study for the stupid
+        exams. I understand the feelings of all my friends. We open the books and the pages stare at us as if challenging us to
+        understand what’s written on them. We put our best efforts to calm our minds and understand the feelings of the book but the
+        damn book makes it so hard. In frustration we seek the help of our helpful mobiles, laptops, TVs, and tablets to calm us down.
+        We talk to our friends who also say they haven’t studied anything. This gives a ray of hope.\n
+<i>I wont fail alone</i>\n
+Still we decide against all odds to at least study enough to pass but all in vain. In the end we get a lot of thoughts in our minds.
+        Some of them are-\n
+1.	<i>kaash exam cancel ho jaaye</i>\n
+2.	<i>Kaash kaheen se exam paper mil jaata. Kam se kam pass toh ho jaata.</i>\n
+3.	<i>kaash director ko diarrhea ho jaaye.</i>\n
+4.	<i>kaash paper set he na hua ho.</i>\n
+5.	<i>Kaash earthquake aa jaaye.</i>\n
+6.	<i>ya kam se kam tornado he aa jaye.</i>\n
+7.	<i>kaash tabiyat kharab ho jaaye mere.</i>\n
+8.	<i>kaash koi mil jaata jo yeh topic padha deta.</i>\n
+9.	<i>yaar bas ek din or mila hota tyaare ke liye. Tera bhai pakka top karta.</i>\n
+10.	<i>yaar kal official holiday declare ho jaana chahiye.</i>\n
+And some of us apart from praying for natural calamities also pray for the death of our elite leaders.\n
+
+11.	<i>kaash modi ji ke death ho jaaye ya kam se kam usse heart attack he aa jaaye.</i>\n
+12.	<i>kaash Arvind kejriwal ko kuch ho jaaye. Waise bhi uske odd- even ne dimag kharab kr rakha h.</i>\n
+And then we turn to our last resort.\n
+<i>hey bhagwan bas ye semester bacha le. Agle baar se pakka mehnat karunga. Tere  darshan karne aounga. Agle semester se tere roj puja karunga. Rooz nahaunga. Mom- dad se kabhi jhuth nahi bolunga. Jitni bhi ladkiyon ko cheat kiya h, sabse mafi maaang lunga. Teachers ke baat manunga. Pakka bhagwan. Aap bacha lena bhagwan. Or kuch nahi toh jo padha hai wohi paper me dal dena.</i>\n
+As if God has set the paper himself.\n
+And then when we realize that <i>god helps those who help themselves</i> we start to help ourselves. Our creativity wakes up and we invent new ways to <i>cheat</i>. The <b>Easy Road</b> explores some of the cheat codes I compiled that might be helpful for <i>cracking</i> the exam.\n
+    </string>
+    <string name="intro_honest"><i>“Two roads diverged in a wood, and I —\n
+                                 I took the one less traveled by,\n
+                                 and that has made all  the difference.”</i>\n
+                                                        -	<b><br>Robert frost</br></b></string>
+    <string name="intro_detailshonest">
+Welcome to GTBIT. A haven for Sikh minority and a safe spot for everyone with a state quota.\n
+Some of us are excited to have landed such a reputed college while some of us curse ourselves for having have to choose this college. We meet hot girls and cool boys some of who end up as our friends (or girlfriends/boyfriends). From being excited for the fresher’s party to being nervous at the campus placement, this is a 4 year long journey that defines a very important chapter of a pupil’s life. Careers are ruined and careers are made in college. As much as being the best time of everyone’s life, the college life is the wall of our future. The harder we work, the stronger the wall will be <i>(cliché line)</i>.\n
+Most of us who start our college life have no idea what the college is all about and what the various things we need to do and avoid during our tenure as a student. We have got students with different mentalities and different backgrounds. Some of us are very proud of our achievements and we think no one is better than us. While other just want to have fun and enjoy the college life.\n
+In the starting we are highly motivated that we will complete our graduation with a fancy degree and top the class in every semester. We think that the college life is similar to as portrayed in the movie 3 idiots. Some of us have so many innovative ideas that we want to pursue but when the reality strikes, one starts to think that studies are of no use and I just need to complete my degree. Further on, we develop a notion that nothing practical is taught in the college and we are on our own.\n
+We seek the advice of our seniors some of who guide us to leave studies and concentrate on getting marks- anyhow. Being confused and thinking that the seniors are always right because they have more experience, we take their advice and stop studying. It all becomes so easy- bunking classes, watching movies, spending all the time pranking our friends and at last during the exams resorting to solved question papers and cheating methods to get a score. It’s a very fair approach but where does it lead us?\n
+A survey showed that 76.8% of the engineers in India are unemployed.\n
+Why?\n
+Is that because there are shortage of jobs?\n
+Or because there are too many engineers?\n
+<b>Neither.</b>\n
+Because the percentage of students not placed are not qualified for the job. What good would you do a company if you do not have basic knowledge of your subjects?\n
+If you are an electrical/ electronics engineer and an interviewer asks you the difference between single stage and multi-stage amplifier or simply the working of an AC transformer, what would you say?\n
+You cannot show him your marks and say that you had answered those questions in the semester exam. It is no use crying at the end. We all got to have knowledge of what we study. Directly or indirectly, everything we learn helps us.\n\n
+<b>The road less taken</b> explores some of the methods that will help you to not only complete your degree but also assure you a good track record and a decent chance at campus placement.
+</string>
+    <string name="app_info">This app was developed by android developer Anuj Bansal in the year 2016. All the cheating methods
+        compiled here are just for the sake of humor. The developer is not responsible for any harm, backlogs or jealous friends
+        that may be caused as a result of using any of our methods. \n\n
+Also the developer wishes you the best for all your future prospects, may they start with cheating or with the road less taken.\n\n
+Contact us, send feedback, rate us on playstore or ask any query from the developer. He shall be happy to respond to it.
+</string>
+    <string name="contactpage_title">WRITE TO ME AT:</string>
+    <string name="for_any_queries_and_suggestions_about_the_application_send_them_in_through_the_feedback_page">FOR ANY QUERIES AND SUGGESTIONS ABOUT THE APPLICATION, SEND THEM IN THROUGH THE FEEDBACK PAGE.</string>
+    <string name="EMAIL">heathc2098@gmail.com</string>
+</resources>

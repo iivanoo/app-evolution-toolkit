@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.AndroidTechies.gamer.randomexcessvariable.honest_methods.Honest_customAdapter">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/image_honest"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_vertical_margin"
+        android:text="Whats Wrong?"
+        android:id="@+id/text_honestlist"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/image_honest"
+        android:layout_toEndOf="@+id/image_honest"
+        android:textColor="#000000"
+        android:textSize="17dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_vertical_margin"
+        android:text="Medium Text"
+        android:id="@+id/subtext_honestlist"
+        android:layout_below="@+id/text_honestlist"
+        android:layout_toRightOf="@+id/image_honest"
+        android:layout_toEndOf="@+id/image_honest"
+        android:textColor="#000000" />
+</RelativeLayout>
