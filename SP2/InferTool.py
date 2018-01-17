@@ -47,7 +47,7 @@ def loopedAnalysis():
 def inferAnalysis(appDir):
 	# os.chdir("../" + appDir )
 	# os.chdir(appDir)
-	print("debug6")
+	
 	removePreviousBuild()
 
 	if appDir[0:3] == "IOS":
@@ -59,7 +59,7 @@ def inferAnalysis(appDir):
 
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir):
-	print("debug7")
+	
 	writeLocalProperties()
 	FNULL = open(os.devnull, 'w')
 	print("Initializing analysis of " + appDir + " ...")

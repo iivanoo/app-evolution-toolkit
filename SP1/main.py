@@ -123,23 +123,23 @@ def search_files():
 
 def show_log_files():
     rootdir = 'repo_subfolder'
-    print("debug1")
+    
     for subdir, dirs, files in os.walk(rootdir):
-        print("debug2")
+        
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
             a_repo = git.Repo(str(subdir) + '/' + str(dirs[0]), odbt=git.GitCmdObjectDB);
             g = git.Git(str(subdir) + '/' + str(dirs[0]))
             loginfo = g.log()
             os.chdir(str(subdir) + '/' + str(dirs[0]))
             for commit in list(a_repo.iter_commits()):
-                print("debug3")
+                
                 g.checkout(commit)
-                print("debug4")
+                
                 #print(commit)
                 
                 #InferTool.inferAnalysis(str(dirs[0]))
                 InferTool.inferAnalysis("Android")
-                print("debug5")
+                
 
 
 
