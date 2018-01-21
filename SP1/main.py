@@ -13,6 +13,7 @@ import git
 import sys
 from git import Repo
 from pathlib import Path
+import subprocess
 sys.path.insert(0, '../SP2')
 
 
@@ -127,23 +128,26 @@ def show_log_files():
     for subdir, dirs, files in os.walk(rootdir):
         
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
-            a_repo = git.Repo(str(subdir) + '/' + str(dirs[0]), odbt=git.GitCmdObjectDB);
+            a_repo = git.Repo(str(subdir) + '/' + str(dirs[0]), odbt=git.GitCmdObjectDB)
             g = git.Git(str(subdir) + '/' + str(dirs[0]))
             loginfo = g.log()
             os.chdir(str(subdir) + '/' + str(dirs[0]))
-            for commit in list(a_repo.iter_commits()):
+            for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
                 
                 g.checkout(commit)
                 
-                #print(commit)
-                
+                print(commit)
+                subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
+                print('Done ')
+
+                #subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
                 #InferTool.inferAnalysis(str(dirs[0]))
-                InferTool.inferAnalysis("Android")
+                #InferTool.inferAnalysis("Android")
                 
 
 
 
-#read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #)
+#read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 #write_bugs()
 #search_files()
 show_log_files()
