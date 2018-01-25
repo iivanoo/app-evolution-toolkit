@@ -94,19 +94,30 @@ analyzer: the path in the file system where to find the main Python script for r
 
 '''
 
-def write_bugs():
+def write_header_for_bugs():
     # Write bugs.csv
     with open('csv/bugs.csv', 'w') as csvfile:
-        fieldnames = ['ID', 'REPO_ID', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION', 'LHDIFF_LINE_TRACING', 'START_COMMIT_ID', 'START_COMMIT_MSG', 'START_COMMIT_TIMESTAMP']
         writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
         ID = 1
-        # Write the fieldnames and then include the data.
+        # Write the fieldnames
         writer.writeheader()
-        for repository in repositories[1:]:
-            ID += 1
-            writer.writerow({'ID': ID, 'REPO_ID': repository, 'FILE_PATH': 'test', 'LINE_NUMBER': 'test',
-                         'BUG_DESCRIPTION': 'test', 'LHDIFF_LINE_TRACING': 'test', 'START_COMMIT_ID': 'test',
-                         'START_COMMIT_MSG': 'test', 'START_COMMIT_TIMESTAMP': 'test'})
+
+
+def write_bugs(bug_id, repository):
+    with open('../../../csv/bugs.csv', 'w') as csvfile:
+        fieldnames = ['ID', 'REPO_ID', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION', 'LHDIFF_LINE_TRACING', 'START_COMMIT_ID', 'START_COMMIT_MSG', 'START_COMMIT_TIMESTAMP']
+        writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
+        # Write the header.
+        writer.writeheader()
+        # Write the data.
+        writer.writerow({'ID': bug_id, 'REPO_ID': repository, 'FILE_PATH': 'test', 'LINE_NUMBER': 'test',
+                     'BUG_DESCRIPTION': 'test', 'LHDIFF_LINE_TRACING': 'test', 'START_COMMIT_ID': 'test',
+                     'START_COMMIT_MSG': 'test', 'START_COMMIT_TIMESTAMP': 'test'})
+
+
+# def write_lhdiff_input():
+#     with open('csv/lhdiff_input.csv', 'w') as csvfile:
+#         fieldnames = ['ID', 'REPO_ID', '']
 
 
 extensions = [
@@ -116,29 +127,35 @@ extensions = [
             'cpp',
             'm',
             'xml'
-        ]
+            ]
 
 def search_files():
     for i in extensions:
-        IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all java files recursively in the repo_subfolder.
+        IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all infer-compatible files recursively in the repo_subfolder.
 
-def show_log_files():
+def mine_repositories():
     rootdir = 'repo_subfolder'
-    
+    bug_id = 1
     for subdir, dirs, files in os.walk(rootdir):
-        
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:
-            a_repo = git.Repo(str(subdir) + '/' + str(dirs[0]), odbt=git.GitCmdObjectDB)
-            g = git.Git(str(subdir) + '/' + str(dirs[0]))
-            loginfo = g.log()
-            os.chdir(str(subdir) + '/' + str(dirs[0]))
+            repository = str(subdir) + '/' + str(dirs[0])
+            a_repo = git.Repo(repository, odbt=git.GitCmdObjectDB)
+            g = git.Git(repository)
+            # loginfo = g.log()
+            os.chdir(repository)
             for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
                 
-                g.checkout(commit)
+                #g.checkout(commit)
                 
                 print(commit)
-                subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
-                print('Done ')
+                #subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
+                # BUG TYPE
+                # BUG DESCRIPTION
+                write_bugs(bug_id, repository)
+                # if bug_has_been_found():
+                #     bug_id += 1
+                # else:
+                #     continue
 
                 #subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
                 #InferTool.inferAnalysis(str(dirs[0]))
@@ -147,8 +164,8 @@ def show_log_files():
 
 
 
-#read_csv()     # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
+#read_csv()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 #write_bugs()
-#search_files()
-show_log_files()
+#search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
+mine_repositories()     # Mining repositories
 
