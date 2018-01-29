@@ -21,6 +21,8 @@ def main():
 	#inferAnalysis(appDir)
 	loopedAnalysis()
 
+
+# Analysis mode that will loop between 2 folders, IOS and Android
 def loopedAnalysis():
 	start = time.time()
 	os.chdir("Android")
@@ -45,38 +47,49 @@ def loopedAnalysis():
 
 # Runs the infer analysis via terminal
 def inferAnalysis(appDir):
-	# os.chdir("../" + appDir )
-	# os.chdir(appDir)
-	
+	start = time.time()
 	removePreviousBuild()
-
-	if appDir[0:3] == "IOS":
-		inferAnalysisIOS()
+	# if appDir[0:3] == "IOS":
+	# 	inferAnalysisIOS()
 		
-	elif appDir[0:3] == "And":
+	# elif appDir[0:3] == "And":
+	# 	inferAnalysisAndroid(appDir)
+
+	if os.path.exists("gradlew"): 
 		inferAnalysisAndroid(appDir)
+
+	else:		# assumes if not android, it is ios, in ios analysis a check will be made to see if it is really an ios app
+		inferAnalysisIOS()
+
+	end = time.time()
+	print("Time elapsed: " + str(end-start) + " seconds")
+	
 		
 
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir):
-	
+
 	writeLocalProperties()
 	FNULL = open(os.devnull, 'w')
 	print("Initializing analysis of " + appDir + " ...")
-	subprocess.call('./gradlew clean', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
-	subprocess.call('infer run -- ./gradlew build', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
+	subprocess.call('./gradlew clean', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+	subprocess.call('infer run -- ./gradlew build', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
 	#readBugReport(appDir[8:])
 	readBugReport(appDir, "Android")
 
 # Infer analysis for iOS apps
 def inferAnalysisIOS():
 	appName = findProjectName()
-	callString = 'infer run --no-xcpretty -- xcodebuild -target ' + appName + ' -configuration Debug -sdk iphonesimulator'
-	test = 'infer run --no-xcpretty -- xcodebuild  -workspace Telegram.xcworkspace -scheme Telegram'
-	FNULL = open(os.devnull, 'w')
-	print("Initializing analysis of " + appName + " ...")
-	subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-	readBugReport(appName, "IOS")
+	if appName != "false":
+		callString = 'infer run --no-xcpretty -- xcodebuild -target ' + appName + ' -configuration Debug -sdk iphonesimulator'
+		test = 'infer run --no-xcpretty -- xcodebuild  -workspace Telegram.xcworkspace -scheme Telegram'
+		FNULL = open(os.devnull, 'w')
+		print("Initializing analysis of " + appName + " ...")
+		subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+		readBugReport(appName, "IOS")
+
+	else: 
+		print("No working app found")
 
 # Rewrites local.properties in order to make android builds work
 def writeLocalProperties(): 
@@ -94,6 +107,7 @@ def removePreviousBuild() :
 
 # reads the bug report, prepares it so it can be exported to csv file
 def readBugReport(appName, mode):
+	timestamp = str(time.time())
 	os.chdir(BUGDIRECTORY)
 	currDir = os.getcwd()
 	if os.path.isfile(BUGFILE):
@@ -107,12 +121,16 @@ def readBugReport(appName, mode):
 
 		# index for unique id
 		bugIndex = 1
+		
 
 		# separates the bug into different parts
 		for bug in splitReport:
 			bugsArray = bug.split('\n')
 			bugBundle = bugsArray[0].split(" error: ")
 			bugPath = bugBundle[0].split(":")
+
+			# Unique ID
+			uniqueID = timestamp + "___" + str(bugIndex)
 
 			# Bug File path
 			filePath = bugPath[0]
@@ -126,7 +144,7 @@ def readBugReport(appName, mode):
 			# Bug description
 			bugDescription = bugsArray[1]
 
-			bugsToCSVArray.append([str(bugIndex), bugType, filePath, lineNumber, bugDescription])
+			bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])
 
 
 			bugIndex+=1
@@ -137,13 +155,20 @@ def readBugReport(appName, mode):
 		print("- Analysis failed for " + appName)
 	os.chdir("..")
 
+def getBugDescription():
+
+
+def writeBugsToText():
 
 
 # writes the bugs to the csv file
 def writeBugsToCSV(bugs_array, currentDirectory, appName, mode):
 	os.chdir(BUGFILEDIR)
 	os.chdir(mode)
-	os.makedirs(appName)
+
+	if not os.path.isdir(appName):
+		os.makedirs(appName)
+
 	os.chdir(appName)
 	with open('app_bugs.csv', 'w', newline='') as csvfile:
 		writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
@@ -155,6 +180,8 @@ def findProjectName():
 	for file in os.listdir('.'):
 		if file.endswith('.xcodeproj'):
 			return str(file[0:-10])
+		else:
+			return "false"
 
 if __name__ == '__main__':
     main()
