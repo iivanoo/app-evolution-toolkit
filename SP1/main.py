@@ -103,22 +103,40 @@ def write_header_for_bugs():
         writer.writeheader()
 
 
-def write_bugs(bug_id, repository):
+def write_bugs_header(bug_id, repository):
     with open('../../../csv/bugs.csv', 'w') as csvfile:
-        fieldnames = ['ID', 'REPO_ID', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION', 'LHDIFF_LINE_TRACING', 'START_COMMIT_ID', 'START_COMMIT_MSG', 'START_COMMIT_TIMESTAMP']
+        fieldnames = [
+            'ID',
+            'REPO_ID',
+            'FILE_PATH',
+            'LINE_NUMBER',
+            'BUG_DESCRIPTION',
+            'LHDIFF_LINE_TRACING',
+            'START_COMMIT_ID',
+            'START_COMMIT_MSG',
+            'START_COMMIT_TIMESTAMP'
+        ]
         writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
         # Write the header.
         writer.writeheader()
+        # FOR FUTURE NEED, we use InferTool.readBugReport now.
         # Write the data.
-        writer.writerow({'ID': bug_id, 'REPO_ID': repository, 'FILE_PATH': 'test', 'LINE_NUMBER': 'test',
-                     'BUG_DESCRIPTION': 'test', 'LHDIFF_LINE_TRACING': 'test', 'START_COMMIT_ID': 'test',
-                     'START_COMMIT_MSG': 'test', 'START_COMMIT_TIMESTAMP': 'test'})
+        # writer.writerow({
+        #     'ID': bug_id,
+        #      'REPO_ID': repository,
+        #      'FILE_PATH': 'test',
+        #      'LINE_NUMBER': 'test',
+        #      'BUG_DESCRIPTION': 'test',
+        #      'LHDIFF_LINE_TRACING': 'test',
+        #      'START_COMMIT_ID': 'test',
+        #      'START_COMMIT_MSG': 'test',
+        #      'START_COMMIT_TIMESTAMP': 'test'
+        #      })
 
 
 # def write_lhdiff_input():
 #     with open('csv/lhdiff_input.csv', 'w') as csvfile:
 #         fieldnames = ['ID', 'REPO_ID', '']
-
 
 extensions = [
             'java',
@@ -128,7 +146,6 @@ extensions = [
             'm',
             'xml'
             ]
-
 def search_files():
     for i in extensions:
         IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all infer-compatible files recursively in the repo_subfolder.
@@ -151,21 +168,21 @@ def mine_repositories():
                 #subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
                 # BUG TYPE
                 # BUG DESCRIPTION
-                write_bugs(bug_id, repository)
+                #REMOVE write_bugs(bug_id, repository)
                 # if bug_has_been_found():
                 #     bug_id += 1
                 # else:
                 #     continue
 
                 #subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
-                #InferTool.inferAnalysis(str(dirs[0]))
+                InferTool.inferAnalysis(str(dirs[0]))
                 #InferTool.inferAnalysis("Android")
                 
 
 
 
 #read_csv()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
-#write_bugs()
+#write_bugs_header()
 #search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
 mine_repositories()     # Mining repositories
 
