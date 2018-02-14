@@ -1,7 +1,0 @@
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/src/main/java/afzkl/development/colorpickerview/dialog/ColorPickerDialog.java
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/src/main/java/afzkl/development/colorpickerview/drawable/AlphaPatternDrawable.java
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/src/main/java/afzkl/development/colorpickerview/preference/ColorPickerPreference.java
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/src/main/java/afzkl/development/colorpickerview/view/ColorPanelView.java
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/src/main/java/afzkl/development/colorpickerview/view/ColorPickerView.java
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/build/generated/source/r/release/afzkl/development/colorpickerview/R.java
-/Users/chris/Downloads/app-evolution-toolkit/SP2/Android/BudgetEnvelopes-master/colorPickerView/build/generated/source/buildConfig/release/afzkl/development/colorpickerview/BuildConfig.java
