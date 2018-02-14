@@ -14,6 +14,15 @@
 
 @implementation AppDelegate
 
+-(void)extra_spaces {
+    printf("hello, world!");
+}
+
+- (void)resource_leak_bug_2 {
+    FILE* fp2;
+    fp2 = fopen("\tester.txt", "r");
+}
+
 - (void)memory_leak_bug {
     CGPathRef shadowPath = CGPathCreateWithRect(self.inputView.bounds, NULL);
 }

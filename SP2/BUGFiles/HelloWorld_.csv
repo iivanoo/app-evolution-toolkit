@@ -1,0 +1,13 @@
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION
+1518379151.909004___1,MEMORY_LEAK,HelloWorld/AppDelegate.m,27,"   memory dynamically allocated to `shadowPath` by call to `CGPathCreateWithRect()` at line 27, column 28 is not reachable after line 27, column 5"
+1518379151.909004___2,RESOURCE_LEAK,HelloWorld/AppDelegate.m,32,"   resource acquired to `fp` by call to `fopen()` at line 32, column 10 is not released after line 32, column 5"
+1518379151.909004___3,RESOURCE_LEAK,HelloWorld/AppDelegate.m,23,"   resource acquired to `fp2` by call to `fopen()` at line 23, column 11 is not released after line 23, column 5"
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION
+1518379217.777466___1,MEMORY_LEAK,HelloWorld/AppDelegate.m,27,"   memory dynamically allocated to `shadowPath` by call to `CGPathCreateWithRect()` at line 27, column 28 is not reachable after line 27, column 5"
+1518379217.777466___2,RESOURCE_LEAK,HelloWorld/AppDelegate.m,32,"   resource acquired to `fp` by call to `fopen()` at line 32, column 10 is not released after line 32, column 5"
+1518379217.777466___3,RESOURCE_LEAK,HelloWorld/AppDelegate.m,23,"   resource acquired to `fp2` by call to `fopen()` at line 23, column 11 is not released after line 23, column 5"
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION
+ID,BUG_TYPE,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION

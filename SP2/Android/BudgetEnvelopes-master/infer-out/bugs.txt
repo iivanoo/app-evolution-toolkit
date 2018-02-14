@@ -1,0 +1,496 @@
+Found 58 issues
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/BudgetEnvelopes.java:103: error: CONTEXT_LEAK
+  Context android.content.Context may leak during method `com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.getAppContext`:
+```Static field com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.context |->
+Leaked android.content.Context```
+  101.    
+  102.       public static Context getAppContext() {
+  103. >         return BudgetEnvelopes.context;
+  104.       }
+  105.       
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/BudgetEnvelopes.java:131: error: CONTEXT_LEAK
+  Context com.marcuscalidus.budgetenvelopes.MainActivity may leak during method `com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.setOnTransactionUpdateListener`:
+```Static field com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.onTransactionUpdateListener |->
+Leaked com.marcuscalidus.budgetenvelopes.MainActivity```
+  129.   			OnTransactionUpdateListener onTransactionUpdateListener) {
+  130.   		BudgetEnvelopes.onTransactionUpdateListener = onTransactionUpdateListener;
+  131. > 	}
+  132.   	
+  133.   	public BudgetEnvelopesAsyncTask getRunningTask() {
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/MainActivity.java:210: error: CONTEXT_LEAK
+  Context com.marcuscalidus.budgetenvelopes.MainActivity may leak during method `com.marcuscalidus.budgetenvelopes.MainActivity.onResume`:
+```Static field com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.onTransactionUpdateListener |->
+Leaked com.marcuscalidus.budgetenvelopes.MainActivity```
+  208.   		
+  209.   		reinitGUI();		
+  210. > 	}
+  211.   
+  212.   	@Override
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/BaseDataObject.java:141: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 134 is not released after line 141
+  139.   		fields.add(FIELDNAME_CHANGED);
+  140.   		  
+  141. > 	    if (c.moveToFirst()) {
+  142.   	    	do {
+  143.   	    		fields.remove(c.getString(c.getColumnIndex("name")));
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/BaseDataObject.java:144: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 134 is not released after line 144
+  142.   	    	do {
+  143.   	    		fields.remove(c.getString(c.getColumnIndex("name")));
+  144. >             } while (c.moveToNext());
+  145.   	    }
+  146.   	     	     
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:260: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 257 is not released after line 260
+  258.    
+  259.           // looping through all rows and adding to list
+  260. >         if (c.moveToFirst()) {
+  261.               do {
+  262.                   EnvelopeDataObject fdo = new EnvelopeDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:266: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 257 is not released after line 266
+  264.                   if (honourSpaceAfterFlag && fdo.isSpace_After()) 
+  265.                   	envelope.add(null);
+  266. >             } while (c.moveToNext());
+  267.           }
+  268.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:233: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `return` by call to `rawQuery(...)` at line 227 is not released after line 233
+  231.   	      }	    	  
+  232.   	      
+  233. > 	      return null; 
+  234.   	}
+  235.   	
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:230: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 227 is not released after line 230
+  228.   	 
+  229.   	      if (c.moveToFirst()) {
+  230. > 	    	  return new EnvelopeDataObject(context, c);
+  231.   	      }	    	  
+  232.   	      
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:233: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `return` by call to `rawQuery(...)` at line 227 is not released after line 233
+  231.   	      }	    	  
+  232.   	      
+  233. > 	      return null; 
+  234.   	}
+  235.   	
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:230: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 227 is not released after line 230
+  228.   	 
+  229.   	      if (c.moveToFirst()) {
+  230. > 	    	  return new EnvelopeDataObject(context, c);
+  231.   	      }	    	  
+  232.   	      
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:340: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 337 is not released after line 340
+  338.    
+  339.           // looping through all rows and adding to list
+  340. >         if (c.moveToFirst()) {
+  341.               do {
+  342.               	EnvelopeDataObject fdo = new EnvelopeDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:344: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 337 is not released after line 344
+  342.               	EnvelopeDataObject fdo = new EnvelopeDataObject(context, c);
+  343.               	lst.add(fdo);
+  344. >             } while (c.moveToNext());
+  345.           }
+  346.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:278: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 275 is not released after line 278
+  276.   		
+  277.   		if (c.moveToFirst()) {
+  278. > 			result = c.getDouble(0) / 100.0;
+  279.   		}
+  280.   		return result;		
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/EnvelopeDataObject.java:277: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 275 is not released after line 277
+  275.   		Cursor c = db.rawQuery(selectQuery, null);
+  276.   		
+  277. > 		if (c.moveToFirst()) {
+  278.   			result = c.getDouble(0) / 100.0;
+  279.   		}
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/ExpenseDataObject.java:160: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 157 is not released after line 160
+  158.    
+  159.           // looping through all rows and adding to list
+  160. >         if (c.moveToFirst()) {
+  161.               do {
+  162.               	ExpenseDataObject fdo = new ExpenseDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/ExpenseDataObject.java:164: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 157 is not released after line 164
+  162.               	ExpenseDataObject fdo = new ExpenseDataObject(context, c);
+  163.                   expenses.add(fdo);
+  164. >             } while (c.moveToNext());
+  165.           }
+  166.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/ExpenseDataObject.java:142: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 139 is not released after line 142
+  140.    
+  141.           // looping through all rows and adding to list
+  142. >         if (c.moveToFirst()) {
+  143.               do {
+  144.               	ExpenseDataObject fdo = new ExpenseDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/ExpenseDataObject.java:146: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 139 is not released after line 146
+  144.               	ExpenseDataObject fdo = new ExpenseDataObject(context, c);
+  145.                   expenses.add(fdo);
+  146. >             } while (c.moveToNext());
+  147.           }
+  148.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/SettingsDataObject.java:83: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 80 is not released after line 83
+  81.    
+  82.           // looping through all rows and adding to list
+  83. >         if (c.moveToFirst()) {
+  84.               do {
+  85.               	SettingsDataObject fdo = new SettingsDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/SettingsDataObject.java:87: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 80 is not released after line 87
+  85.               	SettingsDataObject fdo = new SettingsDataObject(context, c);
+  86.               	lst.add(fdo);
+  87. >             } while (c.moveToNext());
+  88.           }
+  89.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/SettingsDataObject.java:69: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 66 is not released after line 69
+  67.    
+  68.           if (c.moveToFirst()) {
+  69. >         	return new SettingsDataObject(context, c); 
+  70.           } else {
+  71.           	return new SettingsDataObject(context, uuid, false);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/SettingsDataObject.java:71: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired by call to `rawQuery(...)` at line 66 is not released after line 71
+  69.           	return new SettingsDataObject(context, c); 
+  70.           } else {
+  71. >         	return new SettingsDataObject(context, uuid, false);
+  72.           }
+  73.   	}	
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/SettingsDataObject.java:69: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 66 is not released after line 69
+  67.    
+  68.           if (c.moveToFirst()) {
+  69. >         	return new SettingsDataObject(context, c); 
+  70.           } else {
+  71.           	return new SettingsDataObject(context, uuid, false);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/SettingsDataObject.java:71: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired by call to `rawQuery(...)` at line 66 is not released after line 71
+  69.           	return new SettingsDataObject(context, c); 
+  70.           } else {
+  71. >         	return new SettingsDataObject(context, uuid, false);
+  72.           }
+  73.   	}	
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:182: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `return` by call to `rawQuery(...)` at line 176 is not released after line 182
+  180.   	      }	    	  
+  181.   	      
+  182. > 	      return null; 
+  183.   	}
+  184.   	
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:179: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 176 is not released after line 179
+  177.   	 
+  178.   	      if (c.moveToFirst()) {
+  179. > 	    	  return new TransactionDataObject(context, c);
+  180.   	      }	    	  
+  181.   	      
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:371: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 368 is not released after line 371
+  369.    
+  370.           // looping through all rows and adding to list
+  371. >         if (c.moveToFirst()) {
+  372.               do {
+  373.               	TransactionDataObject fdo = new TransactionDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:375: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 368 is not released after line 375
+  373.               	TransactionDataObject fdo = new TransactionDataObject(context, c);
+  374.               	lst.add(fdo);
+  375. >             } while (c.moveToNext());
+  376.           }
+  377.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:234: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 231 is not released after line 234
+  232.    
+  233.           if (c.moveToFirst()) {
+  234. >             result.put(KEY_INCOME, c.getDouble(0));
+  235.           }
+  236.   		
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:245: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 243 is not released after line 245
+  243.           c = db.rawQuery(selectQuery, null);
+  244.   
+  245. >         if (c.moveToFirst()) {
+  246.           	result.put(KEY_EXPENSE, c.getDouble(0));
+  247.           }
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:233: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 231 is not released after line 233
+  231.           Cursor c = db.rawQuery(selectQuery, null);
+  232.    
+  233. >         if (c.moveToFirst()) {
+  234.               result.put(KEY_INCOME, c.getDouble(0));
+  235.           }
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:246: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 243 is not released after line 246
+  244.   
+  245.           if (c.moveToFirst()) {
+  246. >         	result.put(KEY_EXPENSE, c.getDouble(0));
+  247.           }
+  248.   		return result;
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:163: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 160 is not released after line 163
+  161.   	 
+  162.   	      if (c.moveToFirst()) {
+  163. > 	    	  if (!c.isNull(0)) {
+  164.   	    		  Calendar cal = Calendar.getInstance();
+  165.   	    		  cal.setTimeInMillis(c.getLong(0));
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:162: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 160 is not released after line 162
+  160.   	     Cursor c = db.rawQuery(selectQuery, null);
+  161.   	 
+  162. > 	      if (c.moveToFirst()) {
+  163.   	    	  if (!c.isNull(0)) {
+  164.   	    		  Calendar cal = Calendar.getInstance();
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:165: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 160 is not released after line 165
+  163.   	    	  if (!c.isNull(0)) {
+  164.   	    		  Calendar cal = Calendar.getInstance();
+  165. > 	    		  cal.setTimeInMillis(c.getLong(0));
+  166.   	    		  return cal.getTime();
+  167.   	    	  }
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:146: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 143 is not released after line 146
+  144.   	 
+  145.   	      if (c.moveToFirst()) {
+  146. > 	    	  if (!c.isNull(0)) {
+  147.   	    		  Calendar cal = Calendar.getInstance();
+  148.   	    		  cal.setTimeInMillis(c.getLong(0));
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:148: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 143 is not released after line 148
+  146.   	    	  if (!c.isNull(0)) {
+  147.   	    		  Calendar cal = Calendar.getInstance();
+  148. > 	    		  cal.setTimeInMillis(c.getLong(0));
+  149.   	    		  return cal.getTime();
+  150.   	    	  }
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:145: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 143 is not released after line 145
+  143.   	     Cursor c = db.rawQuery(selectQuery, null);
+  144.   	 
+  145. > 	      if (c.moveToFirst()) {
+  146.   	    	  if (!c.isNull(0)) {
+  147.   	    		  Calendar cal = Calendar.getInstance();
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:261: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 259 is not released after line 261
+  259.           Cursor c = db.rawQuery(selectQuery, null);
+  260.    
+  261. >         if (c.moveToFirst()) {
+  262.               do {
+  263.               	TransactionDataObject tdo = new TransactionDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:265: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 259 is not released after line 265
+  263.               	TransactionDataObject tdo = new TransactionDataObject(context, c);
+  264.                   transactions.add(tdo);
+  265. >             } while (c.moveToNext());
+  266.           }
+  267.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:209: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 203 is not released after line 209
+  207.               	TransactionDataObject tdo = new TransactionDataObject(context, c);
+  208.                   transactions.add(tdo);
+  209. >             } while (c.moveToNext());
+  210.           }
+  211.    
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/dataobjects/TransactionDataObject.java:205: error: RESOURCE_LEAK
+   resource of type `android.database.sqlite.SQLiteCursor` acquired to `c` by call to `rawQuery(...)` at line 203 is not released after line 205
+  203.           Cursor c = db.rawQuery(selectQuery, null);
+  204.    
+  205. >         if (c.moveToFirst()) {
+  206.               do {
+  207.               	TransactionDataObject tdo = new TransactionDataObject(context, c);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/envelopes/EnvelopeSettingsDialogFragment.java:183: error: NULL_DEREFERENCE
+  object `envelope` last assigned on line 176 could be null and is dereferenced at line 183
+  181.   
+  182.   		_colorPanelView = (ColorPanelView) v.findViewById(R.id.colorPanelView1);
+  183. > 		_colorPanelView.setColor(envelope.getTabColor());
+  184.   		_colorPanelView.setOnClickListener(this);
+  185.   		_colorPanelView.setOnHoverListener(TooltipHoverListener.getInstance());
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/envelopes/EnvelopeSettingsDialogFragment.java:228: error: NULL_DEREFERENCE
+  object `envelope` last assigned on line 225 could be null and is dereferenced at line 228
+  226.   				db.getReadableDatabase(), getActiveEnvelopeId());
+  227.   
+  228. > 		envelope.setTitle(_editEnvelopeLabel.getText().toString());
+  229.   		envelope.setTabColor(_colorPanelView.getColor());
+  230.           envelope.setIgnoreOnReset(_cbKeepBudgetOnReset.isChecked());
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/BudgetEnvelopesAsyncTask.java:378: error: RESOURCE_LEAK
+   resource of type `java.io.FileOutputStream` acquired to `outStream` by call to `FileOutputStream(...)` at line 372 is not released after line 378
+**Note**: potential exception at line 375
+  376.   	    inStream.close();
+  377.   	    outStream.close();
+  378. > 	}
+  379.   
+  380.   
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/BudgetEnvelopesAsyncTask.java:378: error: RESOURCE_LEAK
+   resource of type `java.io.FileInputStream` acquired to `inStream` by call to `FileInputStream(...)` at line 371 is not released after line 378
+**Note**: potential exception at line 375
+  376.   	    inStream.close();
+  377.   	    outStream.close();
+  378. > 	}
+  379.   
+  380.   
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/BudgetEnvelopesAsyncTask.java:410: error: RESOURCE_LEAK
+   resource of type `java.io.FileOutputStream` acquired by call to `FileOutputStream(...)` at line 396 is not released after line 410
+**Note**: potential exception at line 401
+  408.                   //remoteFile.discardContents(getGoogleApiClient(), contents).await();
+  409.   	        }
+  410. > 	        catch (Exception e) {
+  411.                   contents.discard(getGoogleApiClient());
+  412.   	        	//remoteFile.discardContents(getGoogleApiClient(), contents).await();
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/BudgetEnvelopesSyncService.java:92: error: CONTEXT_LEAK
+  Context com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesSyncService may leak during method `com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesSyncService.onConnected`:
+```Static field com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.instance |->
+com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.syncTask |->
+com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesAsyncTask.mOnExecuteListener |->
+com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesSyncService$1.this$0 |->
+Leaked com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesSyncService```
+  90.           });
+  91.           dbSyncTask.execute();
+  92. >     }
+  93.   
+  94.       @Override
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/DatabaseSyncAsyncTask.java:143: error: RESOURCE_LEAK
+   resource of type `java.io.FileOutputStream` acquired to `tokenStream` by call to `FileOutputStream(...)` at line 137 is not released after line 143
+**Note**: potential exception at line 139
+  141.   
+  142.           uploadFile(tokenFileName, remoteTokenName, "text/plain");
+  143. >     }
+  144.   
+  145.   	@Override
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/SyncActivity.java:159: error: CONTEXT_LEAK
+  Context com.marcuscalidus.budgetenvelopes.network.SyncActivity may leak during method `com.marcuscalidus.budgetenvelopes.network.SyncActivity.onConnected`:
+```Static field com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.instance |->
+com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.restoreTask |->
+com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesAsyncTask.mOnExecuteListener |->
+com.marcuscalidus.budgetenvelopes.network.SyncActivity$2.this$0 |->
+Leaked com.marcuscalidus.budgetenvelopes.network.SyncActivity```
+  157.   		}
+  158.   	 	
+  159. > 	}
+  160.   
+  161.   	@Override
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/network/SyncActivity.java:159: error: CONTEXT_LEAK
+  Context com.marcuscalidus.budgetenvelopes.network.SyncActivity may leak during method `com.marcuscalidus.budgetenvelopes.network.SyncActivity.onConnected`:
+```Static field com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.instance |->
+com.marcuscalidus.budgetenvelopes.BudgetEnvelopes.syncTask |->
+com.marcuscalidus.budgetenvelopes.network.BudgetEnvelopesAsyncTask.mOnExecuteListener |->
+com.marcuscalidus.budgetenvelopes.network.SyncActivity$1.this$0 |->
+Leaked com.marcuscalidus.budgetenvelopes.network.SyncActivity```
+  157.   		}
+  158.   	 	
+  159. > 	}
+  160.   
+  161.   	@Override
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/transactions/DistributionDialogFragment.java:136: error: NULL_DEREFERENCE
+  object `baseEnvelope` last assigned on line 135 could be null and is dereferenced at line 136
+  134.   		
+  135.   		EnvelopeDataObject baseEnvelope = EnvelopeDataObject.getBaseEnvelope(getActivity(), db);
+  136. > 		double toDistribute = baseEnvelope.getBudget();
+  137.   		double totalExpenses = baseEnvelope.getExpenses();
+  138.   		
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/transactions/DistributionDialogFragment.java:104: error: NULL_DEREFERENCE
+  object `baseEnvelope` last assigned on line 103 could be null and is dereferenced at line 104
+  102.   		
+  103.   		EnvelopeDataObject baseEnvelope = EnvelopeDataObject.getBaseEnvelope(getActivity(), db);
+  104. > 		double toDistribute = baseEnvelope.getBudget();
+  105.   		double totalExpenses = baseEnvelope.getExpenses();
+  106.   		
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/transactions/TransactionDialogFragment.java:202: error: NULL_DEREFERENCE
+  object `envelope` last assigned on line 169 could be null and is dereferenced at line 202
+  200.   		
+  201.   		TextView titleText = (TextView) v.findViewById(R.id.titleText);
+  202. > 		titleText.setText(typeString + " " +envelope.getTitle());
+  203.   
+  204.           ImageButton btnAttachment = (ImageButton) v.findViewById(R.id.btnAttachment);
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/transactions/TransactionListArrayAdapter.java:97: error: NULL_DEREFERENCE
+  object `envelope` last assigned on line 94 could be null and is dereferenced at line 97
+  95.   			sb.append(v.getContext().getResources().getString(R.string.transfer_from));
+  96.   			sb.append(" ");
+  97. > 			sb.append(envelope.toString());
+  98.   			envelope = EnvelopeDataObject.getById(v.getContext(), db.getReadableDatabase(), uuidTo);
+  99.   			sb.append(" -> ");
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/transactions/TransactionListArrayAdapter.java:100: error: NULL_DEREFERENCE
+  object `envelope` last assigned on line 98 could be null and is dereferenced at line 100
+  98.   			envelope = EnvelopeDataObject.getById(v.getContext(), db.getReadableDatabase(), uuidTo);
+  99.   			sb.append(" -> ");
+  100. > 			sb.append(envelope.toString());
+  101.   		}
+  102.   		
+
+budgetEnvelopes/src/main/java/com/marcuscalidus/budgetenvelopes/transactions/TransactionsFragment.java:94: error: NULL_DEREFERENCE
+  object `envelope` last assigned on line 93 could be null and is dereferenced by call to `getTransactionsBetween(...)` at line 94
+  92.   		
+  93.   			EnvelopeDataObject envelope = EnvelopeDataObject.getById(params[0], db.getReadableDatabase(), envelopeUuid);
+  94. > 			List<TransactionDataObject> tl = TransactionDataObject.getTransactionsBetween(params[0], db.getReadableDatabase(), envelope, fromDate, toDate);
+  95.   			
+  96.   			TransactionListArrayAdapter tlaa = new TransactionListArrayAdapter(params[0], tl, envelope, R.layout.list_item_transaction);
+
+Summary of the reports
+
+     RESOURCE_LEAK: 44
+  NULL_DEREFERENCE: 8
+      CONTEXT_LEAK: 6

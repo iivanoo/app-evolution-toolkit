@@ -6,11 +6,12 @@ the app folder. SDK and Build tools versions must match the app.
 """
 
 import os, sys, subprocess, shutil, csv, time
+from classes import Bug
 
 # Constants
 LOCALPROPERTIES = "local.properties"
 SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
-BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles"
+BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 BUGDIRECTORY = "infer-out/"
 BUGFILE = "bugs.txt"
 BUILDDIRECTORY = "build"
@@ -72,10 +73,10 @@ def inferAnalysisAndroid(appDir):
 	writeLocalProperties()
 	FNULL = open(os.devnull, 'w')
 	print("Initializing analysis of " + appDir + " ...")
-	subprocess.call('./gradlew clean', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-	subprocess.call('infer run -- ./gradlew build', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-	#readBugReport(appDir[8:])
-	readBugReport(appDir, "Android")
+	subprocess.call('./gradlew clean', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
+	subprocess.call('infer run -- ./gradlew build', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
+	readBugReport(appDir)
+	#readBugReport(appDir, "Android")
 
 # Infer analysis for iOS apps
 def inferAnalysisIOS():
@@ -86,7 +87,7 @@ def inferAnalysisIOS():
 		FNULL = open(os.devnull, 'w')
 		print("Initializing analysis of " + appName + " ...")
 		subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-		readBugReport(appName, "IOS")
+		readBugReport(appName)
 
 	else: 
 		print("No working app found")
@@ -106,7 +107,7 @@ def removePreviousBuild() :
 		shutil.rmtree(BUILDDIRECTORY, ignore_errors=False, onerror=None)	
 
 # reads the bug report, prepares it so it can be exported to csv file
-def readBugReport(appName, mode):
+def readBugReport(appName):
 	timestamp = str(time.time())
 	os.chdir(BUGDIRECTORY)
 	currDir = os.getcwd()
@@ -121,7 +122,7 @@ def readBugReport(appName, mode):
 
 		# index for unique id
 		bugIndex = 1
-		
+		commitIndex = 0
 
 		# separates the bug into different parts
 		for bug in splitReport:
@@ -144,44 +145,42 @@ def readBugReport(appName, mode):
 			# Bug description
 			bugDescription = bugsArray[1]
 
-			bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])
+			newBug = Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
+			bugsToCSVArray.append(newBug)
+
+			#bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])
 
 
 			bugIndex+=1
-		writeBugsToCSV(bugsToCSVArray, currDir, appName, mode)
+		
+		
+		writeBugsToCSV(bugsToCSVArray, currDir, appName)#, commitIndex)
 		print ("+ Analysis complete for " + appName)
 
 	else:
 		print("- Analysis failed for " + appName)
 	os.chdir("..")
 
-def getBugDescription():
-
-
-def writeBugsToText():
-
-
 # writes the bugs to the csv file
-def writeBugsToCSV(bugs_array, currentDirectory, appName, mode):
+
+def writeBugsToCSV(bugs_array, currentDirectory, appName):
 	os.chdir(BUGFILEDIR)
-	os.chdir(mode)
+	csvFileString = appName + "_" + ".csv"
 
-	if not os.path.isdir(appName):
-		os.makedirs(appName)
-
-	os.chdir(appName)
-	with open('app_bugs.csv', 'w', newline='') as csvfile:
-		writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+	with open(csvFileString, 'a', newline='') as csvfile:
+		fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']
+		writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
+		writer.writeheader()
 		for bug in bugs_array:
-			writer.writerow(["ID: " + bug[0]] + ["BUG_TYPE: " + bug[1]] + ["FILE_PATH: " + bug[2]] + ["LINE_NUMBER: " + bug[3]] + ["BUG_DESCRIPTION: " + bug[4]])
+			bug.writeBugs(writer)
+
 	os.chdir(currentDirectory)
 
 def findProjectName():
 	for file in os.listdir('.'):
 		if file.endswith('.xcodeproj'):
 			return str(file[0:-10])
-		else:
-			return "false"
+	return "false"
 
 if __name__ == '__main__':
     main()

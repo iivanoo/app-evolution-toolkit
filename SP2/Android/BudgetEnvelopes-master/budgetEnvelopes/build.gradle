@@ -1,0 +1,33 @@
+apply plugin: 'com.android.application'
+
+android {
+     compileSdkVersion 19
+    buildToolsVersion '25.0.0'
+    defaultConfig {
+        applicationId 'com.marcuscalidus.budgetenvelopes'
+        minSdkVersion 14
+        targetSdkVersion 19
+    }
+
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile project(':colorPickerView')
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile files('libs/multiwindow-v1.0.2.jar')
+    compile files('libs/sdk-v1.0.0.jar')
+    compile 'com.android.support:support-v13:20.0.0'
+    compile 'com.google.code.gson:gson:2.3'
+    compile 'com.google.code.findbugs:jsr305:3.0.0'
+    compile 'com.google.http-client:google-http-client-gson:1.19.0'
+    compile 'com.google.http-client:google-http-client:1.19.0'
+    compile 'com.google.http-client:google-http-client-android:1.19.0'
+    compile 'com.google.api-client:google-api-client:1.19.0'
+    compile 'com.google.api-client:google-api-client-android:1.19.0'
+    compile 'com.google.oauth-client:google-oauth-client:1.19.0'
+    compile 'com.google.apis:google-api-services-drive:v2-rev139-1.19.0'
+    compile files('libs/transcommu-android-sdk-v1.jar')
+    compile files('libs/transcommu-java-sdk-v1.jar')
+}
