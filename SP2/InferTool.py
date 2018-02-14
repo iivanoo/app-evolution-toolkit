@@ -30,7 +30,7 @@ def loopedAnalysis():
 	for dirs in os.listdir("."):
 		if os.path.isdir(dirs):
 			os.chdir(dirs)
-			inferAnalysisAndroid(dirs)
+			inferAnalysisAndroid(dirs, "1")
 			os.chdir("..")
 
 	os.chdir("..")
@@ -38,7 +38,7 @@ def loopedAnalysis():
 	for dirs in os.listdir("."):
 		if os.path.isdir(dirs):
 			os.chdir(dirs)
-			inferAnalysisIOS()
+			inferAnalysisIOS("1")
 			os.chdir("..")
 	os.chdir("..")
 
@@ -47,7 +47,7 @@ def loopedAnalysis():
 
 
 # Runs the infer analysis via terminal
-def inferAnalysis(appDir):
+def inferAnalysis(appDir, commitIndex):
 	start = time.time()
 	removePreviousBuild()
 	# if appDir[0:3] == "IOS":
@@ -57,10 +57,10 @@ def inferAnalysis(appDir):
 	# 	inferAnalysisAndroid(appDir)
 
 	if os.path.exists("gradlew"): 
-		inferAnalysisAndroid(appDir)
+		inferAnalysisAndroid(appDir, commitIndex)
 
 	else:		# assumes if not android, it is ios, in ios analysis a check will be made to see if it is really an ios app
-		inferAnalysisIOS()
+		inferAnalysisIOS(commitIndex)
 
 	end = time.time()
 	print("Time elapsed: " + str(end-start) + " seconds")
@@ -68,18 +68,18 @@ def inferAnalysis(appDir):
 		
 
 # Infer analysis for android apps
-def inferAnalysisAndroid(appDir):
+def inferAnalysisAndroid(appDir, commitIndex):
 
 	writeLocalProperties()
 	FNULL = open(os.devnull, 'w')
 	print("Initializing analysis of " + appDir + " ...")
 	subprocess.call('./gradlew clean', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 	subprocess.call('infer run -- ./gradlew build', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
-	readBugReport(appDir)
+	readBugReport(appDir, commitIndex)
 	#readBugReport(appDir, "Android")
 
 # Infer analysis for iOS apps
-def inferAnalysisIOS():
+def inferAnalysisIOS(commitIndex):
 	appName = findProjectName()
 	if appName != "false":
 		callString = 'infer run --no-xcpretty -- xcodebuild -target ' + appName + ' -configuration Debug -sdk iphonesimulator'
@@ -87,7 +87,7 @@ def inferAnalysisIOS():
 		FNULL = open(os.devnull, 'w')
 		print("Initializing analysis of " + appName + " ...")
 		subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-		readBugReport(appName)
+		readBugReport(appName, commitIndex)
 
 	else: 
 		print("No working app found")
@@ -107,7 +107,7 @@ def removePreviousBuild() :
 		shutil.rmtree(BUILDDIRECTORY, ignore_errors=False, onerror=None)	
 
 # reads the bug report, prepares it so it can be exported to csv file
-def readBugReport(appName):
+def readBugReport(appName, commitIndex):
 	timestamp = str(time.time())
 	os.chdir(BUGDIRECTORY)
 	currDir = os.getcwd()
@@ -122,7 +122,6 @@ def readBugReport(appName):
 
 		# index for unique id
 		bugIndex = 1
-		commitIndex = 0
 
 		# separates the bug into different parts
 		for bug in splitReport:
@@ -154,7 +153,7 @@ def readBugReport(appName):
 			bugIndex+=1
 		
 		
-		writeBugsToCSV(bugsToCSVArray, currDir, appName)#, commitIndex)
+		writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
 		print ("+ Analysis complete for " + appName)
 
 	else:
@@ -163,9 +162,10 @@ def readBugReport(appName):
 
 # writes the bugs to the csv file
 
-def writeBugsToCSV(bugs_array, currentDirectory, appName):
-	os.chdir(BUGFILEDIR)
-	csvFileString = appName + "_" + ".csv"
+def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
+	#os.chdir(BUGFILEDIR)
+	os.chdir("..")
+	csvFileString = commitIndex + ".csv"
 
 	with open(csvFileString, 'a', newline='') as csvfile:
 		fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']

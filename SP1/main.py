@@ -181,7 +181,7 @@ def mine_repositories():
 
 
 
-#read_csv()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
+read_csv()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 #write_bugs_header()
 #search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
 mine_repositories()     # Mining repositories
