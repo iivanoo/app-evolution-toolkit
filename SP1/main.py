@@ -104,26 +104,61 @@ def mine_repositories():
     bug_id = 1
     write_csv_header_for_bugs_csv()
     for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
-        print(subdir)
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
-            repository = str(subdir) + '/' + str(dirs[0])   # Here we have the git folder string equal to repository.
-            a_repo = git.Repo(repository, odbt=git.GitCmdObjectDB)
-            g = git.Git(repository)
+            #print(subdir)
+            repository_path = get_repository_path(subdir, dirs)
+            a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
+            g = git.Git(repository_path)
             # loginfo = g.log()
-            os.chdir(repository)
-            #commit_checkout_iterator(bug_id,g,a_repo,subdir,dirs,files)   # Iterate each commit of a repository.
+            os.chdir(repository_path)
+            commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
-def commit_checkout_iterator(bug_id,g,dirs,a_repo,repository):
+def get_repository_path(subdir, dirs):
+    repository_path = str(subdir) + '\\' + str(dirs[0])  # Here we have the git folder string equal to repository.
+    return repository_path
+
+def get_repository_name(repository_path):
+    repository_name = repository_path.split('repo_subfolder\\')
+    return str(repository_name[-1])
+
+def get_commit_csv_name(repository_path, subdir, commit_index):
+    repository_name = repository_path.split(subdir)
+    return str(repository_name[-1]) + '_' + str(commit_index) + '.csv'
+
+def read_repository_csv_location(repository_path, subdir, commit_index):
+    DATA_PATH = Path(os.getcwd())
+    print(DATA_PATH)
+    path = str(DATA_PATH) + str(get_commit_csv_name(repository_path, subdir, commit_index))
+    print(path)
+    return path
+
+def read_commit_csv(repository_path, subdir, commit_index):
+    # The csv to be read from is example: TedHoryczun/One-Rep-Max-Calculator/One-Rep-Max-Calculator_1.csv
+    file_to_open = read_repository_csv_location(repository_path, subdir, commit_index)
+    with open(file_to_open, 'r') as repository_commit_csvfile:
+        for row in repository_commit_csvfile:
+            data = row.split(',')
+            id = data[0]
+            bug_type = data[1]
+            file_path = data[2]
+            line_number = data[3]
+            bug_description = data[4]
+            print(id, bug_type, file_path, line_number, bug_description)
+
+def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
-    for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        search_files()
+    read_commit_csv(repository_path, dirs, commit_index)
+
+    get_commit_csv_name(repository_path, dirs,commit_index)
+    # for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         # g.checkout(commit)
-        csv.reader(repository + '/csv_for_app_evolution_toolkit_folder')
+        # read_commit_csv(repository)
+        # csv.reader(repository + '/csv_for_app_evolution_toolkit_folder')
         # write_bugs(bug_id,repository)
-        print(commit)
-        str(dirs[0])
-        #InferTool.inferAnalysis(str(dirs[0]), str(commit_index))
-        commit_index += 1
+        # print(commit)
+        # str(dirs[0])
+        # InferTool.inferAnalysis(str(dirs[0]), str(commit_index))
+        # commit_index += 1
         # subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
         # BUG TYPE
         # BUG DESCRIPTION
@@ -135,6 +170,7 @@ def commit_checkout_iterator(bug_id,g,dirs,a_repo,repository):
 
         # subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
         # InferTool.inferAnalysis("Android")
+
 
 
 #read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
