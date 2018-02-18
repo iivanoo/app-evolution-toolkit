@@ -10,9 +10,10 @@ Vrije Universiteit Amsterdam
 import os
 import csv
 import git
-import sys
 from git import Repo
 from pathlib import Path
+from shutil import copy
+import sys
 import glob
 #import InferTool
 
@@ -40,6 +41,7 @@ def clone_repositories(url, path):
     for i in range(2, 3):
         Repo.clone_from(url[i], path[i])
 
+
 fieldnames = [
     'ID',
     'REPO_ID',
@@ -52,10 +54,12 @@ fieldnames = [
     'START_COMMIT_TIMESTAMP'
 ]
 
+
 def bugs_csv_location():
     cwd = os.getcwd()
     DATA_FOLDER = Path(cwd + "/csv")
     return DATA_FOLDER / "bugs.csv"
+
 
 def write_csv_header_for_bugs_csv():
     # Write bugs.csv
@@ -74,6 +78,7 @@ def write_csv_header_for_bugs_csv():
         ]
         writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
         writer.writeheader()
+
 
 def write_bugs(bug_id, repository):
     file_to_open = bugs_csv_location()
@@ -113,17 +118,21 @@ def mine_repositories():
             os.chdir(repository_path)
             commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
+
 def get_repository_path(subdir, dirs):
     repository_path = str(subdir) + '\\' + str(dirs[0])  # Here we have the git folder string equal to repository.
     return repository_path
+
 
 def get_repository_name(repository_path):
     repository_name = repository_path.split('repo_subfolder\\')
     return str(repository_name[-1])
 
+
 def get_commit_csv_name(repository_path, subdir, commit_index):
     repository_name = repository_path.split(subdir)
     return str(repository_name[-1]) + '_' + str(commit_index) + '.csv'
+
 
 def read_repository_csv_location(repository_path, subdir, commit_index):
     DATA_PATH = Path(os.getcwd())
@@ -132,25 +141,76 @@ def read_repository_csv_location(repository_path, subdir, commit_index):
     print(path)
     return path
 
+
 def read_commit_csv(repository_path, subdir, commit_index):
     # The csv to be read from is example: TedHoryczun/One-Rep-Max-Calculator/One-Rep-Max-Calculator_1.csv
     file_to_open = read_repository_csv_location(repository_path, subdir, commit_index)
+    bug_list = []
     with open(file_to_open, 'r') as repository_commit_csvfile:
         for row in repository_commit_csvfile:
-            data = row.split(',')
-            id = data[0]
-            bug_type = data[1]
-            file_path = data[2]
-            line_number = data[3]
-            bug_description = data[4]
-            print(id, bug_type, file_path, line_number, bug_description)
+            row = row.strip('\n')   # Maybe not very neat.
+            bug_list.append(row)
+        return bug_list
+
+
+def bug_list_splitter(bug_list):
+    bug_id = []
+    bug_type = []
+    file_path = []
+    line_number = []
+    bug_description = []
+    for data in bug_list[1:]:
+        data = data.split(',')
+        bug_id.append(data[0])
+        bug_type.append(data[1])
+        file_path.append(data[2])
+        line_number.append(data[3])
+        bug_description.append(data[4])
+    return bug_id, bug_type, file_path, line_number, bug_description
+
+
+def copy_to_old_folder(relevant_files):
+    lhdiff_old_path = Path("../../../LHDiff/old_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
+    #if not os.path.exists(lhdiff_old_path):
+    #    os.makedirs(lhdiff_old_path)
+    #else:
+    #    print('already there')
+    if isinstance(relevant_files, list):
+        for file_path in relevant_files:    # If one file, it does a for-loop over a string. Therefore if-statement.
+            src = Path(file_path)
+            copy(src, lhdiff_old_path)
+    else:
+        src = Path(relevant_files)
+        copy(src, lhdiff_old_path)
+
 
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
-    read_commit_csv(repository_path, dirs, commit_index)
-
-    get_commit_csv_name(repository_path, dirs,commit_index)
+    # # FOR LOOP HERE:
     # for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
+        # g.checkout(commit)
+
+        # # RUN INFER AND CREATE CSV
+        # InferTool.inferAnalysis("Android")
+
+        # # GET CSV PATH AND READ CSV
+    get_commit_csv_name(repository_path, dirs, commit_index)
+    bug_list = read_commit_csv(repository_path, dirs, commit_index)
+
+    bug_list_splitted = bug_list_splitter(bug_list)
+    print(bug_list_splitted)
+        # # READ FROM bug_list FILE_PATH
+
+        # # COPY RELEVANT FILES IN OLD-FOLDER
+    relevant_files = bug_list_splitted[2][0]
+    print(relevant_files)
+    copy_to_old_folder(relevant_files)
+        # # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
+
+        # # PUT DATA IN bugs.csv, CLEAR OLD_FOLDER AND PUT NEW_FOLDER CONTENTS IN OLD_FOLDER, CLEAR NEW_FOLDER
+        # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
+    #print(bug_list_splitted)
+
         # g.checkout(commit)
         # read_commit_csv(repository)
         # csv.reader(repository + '/csv_for_app_evolution_toolkit_folder')
@@ -169,13 +229,24 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         #     continue
 
         # subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
-        # InferTool.inferAnalysis("Android")
 
 
+# Example 1
 
-#read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
-#write_csv_header_for_bugs_csv()
-#search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
+# Path
+# C:\Users\Bob\PycharmProjects\app-evolution-toolkit\SP1\repo_subfolder\TedHoryczun\One-Rep-Max-Calculator\app\src\main\java\com\repmax\devlanding\onerepmaxcalculator\calculator\OneRepMaxTemplate.java
+# Relative Path
+# SP1/repo_subfolder/TedHoryczun/One-Rep-Max-Calculator/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/OneRepMaxTemplate.java
+
+# Example file 2
+# Path
+# C:\Users\Bob\PycharmProjects\app-evolution-toolkit\SP1\repo_subfolder\TedHoryczun\One-Rep-Max-Calculator\app\src\main\java\com\repmax\devlanding\onerepmaxcalculator\calculator\PercentRepMax.java
+# Relative Path
+# SP1/repo_subfolder/TedHoryczun/One-Rep-Max-Calculator/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/PercentRepMax.java
+
+# read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
+# write_csv_header_for_bugs_csv()
+# search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
 mine_repositories()     # Mining repositories
 
 
