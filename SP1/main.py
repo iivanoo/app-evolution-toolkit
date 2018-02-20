@@ -171,10 +171,10 @@ def bug_list_splitter(bug_list):
 
 def copy_to_old_folder(relevant_files):
     lhdiff_old_path = Path("../../../LHDiff/old_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
-    #if not os.path.exists(lhdiff_old_path):
-    #    os.makedirs(lhdiff_old_path)
-    #else:
-    #    print('already there')
+    if not os.path.exists(lhdiff_old_path):                 # If this folder doesn't exist: create it.
+        os.makedirs(lhdiff_old_path)
+    else:
+        print('already there')
     if isinstance(relevant_files, list):
         for file_path in relevant_files:    # If one file, it does a for-loop over a string. Therefore if-statement.
             src = Path(file_path)
