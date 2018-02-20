@@ -192,10 +192,22 @@ def clear_old_files_folder():
 
 
 def clear_new_files_folder():
-    lhdiff_old_path = str(Path("../../../LHDiff/new_files/*"))
-    files = glob.glob(lhdiff_old_path)
+    lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
+    files = glob.glob(lhdiff_new_path)
     for file in files:
         os.remove(file)
+
+
+def copy_new_files_to_old_files_folder():
+    lhdiff_old_path = str(Path("../../../LHDiff/old_files"))
+    lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
+    files = glob.glob(lhdiff_new_path)
+    for file in files:
+        print(file)
+        copy(file, lhdiff_old_path)
+    # copy(lhdiff_new_path, lhdiff_old_path)
+
+    print(lhdiff_new_path)
 
 
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
@@ -226,7 +238,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # # CLEAR OLD_FOLDER
     # clear_old_files_folder()
         # # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
-
+    # copy_new_files_to_old_files_folder()
         # # CLEAR NEW_FOLDER
     # clear_new_files_folder()
 
