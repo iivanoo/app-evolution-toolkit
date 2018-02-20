@@ -191,6 +191,13 @@ def clear_old_files_folder():
         os.remove(file)
 
 
+def clear_new_files_folder():
+    lhdiff_old_path = str(Path("../../../LHDiff/new_files/*"))
+    files = glob.glob(lhdiff_old_path)
+    for file in files:
+        os.remove(file)
+
+
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
     # # FOR LOOP HERE:
@@ -217,8 +224,11 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # # PUT DATA IN bugs.csv
     # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # # CLEAR OLD_FOLDER
-    clear_old_files_folder()
-        # # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER, CLEAR NEW_FOLDER
+    # clear_old_files_folder()
+        # # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
+
+        # # CLEAR NEW_FOLDER
+    # clear_new_files_folder()
 
     #print(bug_list_splitted)
 
