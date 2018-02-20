@@ -203,11 +203,7 @@ def copy_new_files_to_old_files_folder():
     lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
     files = glob.glob(lhdiff_new_path)
     for file in files:
-        print(file)
         copy(file, lhdiff_old_path)
-    # copy(lhdiff_new_path, lhdiff_old_path)
-
-    print(lhdiff_new_path)
 
 
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
