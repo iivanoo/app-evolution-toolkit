@@ -216,9 +216,18 @@ def copy_new_files_to_old_files_folder():
 
 
 def call_lhdiff():
-    lhdiff_path = Path('SP1/LHDiff/lhdiff.jar')
-    subprocess.call(['java', '-jar', 'C:\\Users\\BovandenBerg\\PycharmProjects\\app-evolution-toolkit\\app-evolution-toolkit\SP1\\LHDiff\\lhdiff.jar', 'help'])
-
+    #lhdiff = str(Path('SP1/LHDiff/lhdiff.jar'))
+    lhdiff = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
+    oldfile = str(Path('../../../../SP1/LHDiff/old_files/ApplicationTest.java'))    # Might need to do this iteratively.
+    newfile = str(Path('../../../../SP1/LHDiff/new_files/ApplicationTest.java'))
+    lhdiff_output = subprocess.check_output(['java', '-jar', lhdiff, oldfile, newfile])
+    print(lhdiff_output)
+    data = lhdiff_output.split( )
+    print(data)
+    for i in data[9:]:
+        print(i)
+    # subprocess.call(['java', '-jar', lhdiff, '-ob', oldfile, newfile]) # For more data
+    # subprocess.call(['java', '-jar', lhdiff, 'help')                   # For help
 
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
@@ -234,15 +243,14 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     bug_list = read_commit_csv(repository_path, dirs, commit_index)
 
     bug_list_splitted = bug_list_splitter(bug_list)
-    print(bug_list_splitted)
+    # print(bug_list_splitted)
         # # READ FROM bug_list FILE_PATH
 
         # # COPY RELEVANT FILES IN OLD-FOLDER
     relevant_files = bug_list_splitted[2][0]
-    print(relevant_files)
+    # print(relevant_files)
     copy_to_old_folder(relevant_files)         # possible bug: Need to check if this works with the repo_subfolder walk.
         # # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-    print('test1')
     if there_are_files_in_new_files_folder():
         call_lhdiff()
         # subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
