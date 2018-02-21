@@ -13,6 +13,7 @@ import git
 from git import Repo
 from pathlib import Path
 from shutil import copy
+import subprocess
 import sys
 import glob
 #import InferTool
@@ -184,6 +185,14 @@ def copy_to_old_folder(relevant_files):
         copy(src, lhdiff_old_path)
 
 
+def there_are_files_in_new_files_folder():
+    lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
+    files = glob.glob(lhdiff_new_path)
+    if len(files) >= 1:
+        return True
+    else:
+        print('no files in new folder')
+
 def clear_old_files_folder():
     lhdiff_old_path = str(Path("../../../LHDiff/old_files/*"))
     files = glob.glob(lhdiff_old_path)
@@ -204,6 +213,11 @@ def copy_new_files_to_old_files_folder():
     files = glob.glob(lhdiff_new_path)
     for file in files:
         copy(file, lhdiff_old_path)
+
+
+def call_lhdiff():
+    lhdiff_path = Path('SP1/LHDiff/lhdiff.jar')
+    subprocess.call(['java', '-jar', 'C:\\Users\\BovandenBerg\\PycharmProjects\\app-evolution-toolkit\\app-evolution-toolkit\SP1\\LHDiff\\lhdiff.jar', 'help'])
 
 
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
@@ -228,7 +242,10 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     print(relevant_files)
     copy_to_old_folder(relevant_files)         # possible bug: Need to check if this works with the repo_subfolder walk.
         # # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-
+    print('test1')
+    if there_are_files_in_new_files_folder():
+        call_lhdiff()
+        # subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
         # # PUT DATA IN bugs.csv
     # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # # CLEAR OLD_FOLDER
@@ -237,6 +254,11 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     # copy_new_files_to_old_files_folder()
         # # CLEAR NEW_FOLDER
     # clear_new_files_folder()
+        # # RESTART ON NEXT COMMIT IN FOR-LOOP
+
+
+
+
 
     #print(bug_list_splitted)
 
@@ -257,21 +279,23 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # else:
         #     continue
 
-        # subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
+
 
 
 # Example 1
-
+#
 # Path
 # C:\Users\Bob\PycharmProjects\app-evolution-toolkit\SP1\repo_subfolder\TedHoryczun\One-Rep-Max-Calculator\app\src\main\java\com\repmax\devlanding\onerepmaxcalculator\calculator\OneRepMaxTemplate.java
 # Relative Path
 # SP1/repo_subfolder/TedHoryczun/One-Rep-Max-Calculator/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/OneRepMaxTemplate.java
-
+#
 # Example file 2
 # Path
 # C:\Users\Bob\PycharmProjects\app-evolution-toolkit\SP1\repo_subfolder\TedHoryczun\One-Rep-Max-Calculator\app\src\main\java\com\repmax\devlanding\onerepmaxcalculator\calculator\PercentRepMax.java
 # Relative Path
 # SP1/repo_subfolder/TedHoryczun/One-Rep-Max-Calculator/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/PercentRepMax.java
+
+
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()
