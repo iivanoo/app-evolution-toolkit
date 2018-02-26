@@ -93,20 +93,15 @@ def write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdi
         # Write the data.
         writer.writerow({
             'ID': bug_id,
-             'REPO_ID': repository,
-             'FILE_PATH': file_path,
-             'LINE_NUMBER': line_number,
-             'BUG_DESCRIPTION': bug_description,
-             'LHDIFF_LINE_TRACING': lhdiff_line_tracing,
-             'START_COMMIT_ID': start_commit_id,
-             'START_COMMIT_MSG': start_commit_msg,
-             'START_COMMIT_TIMESTAMP': start_commit_timestamp
-             })
-
-
-# def write_lhdiff_input():
-#     with open('csv/lhdiff_input.csv', 'w') as csvfile:
-#         fieldnames = ['ID', 'REPO_ID', '']
+            'REPO_ID': repository,
+            'FILE_PATH': file_path,
+            'LINE_NUMBER': line_number,
+            'BUG_DESCRIPTION': bug_description,
+            'LHDIFF_LINE_TRACING': lhdiff_line_tracing,
+            'START_COMMIT_ID': start_commit_id,
+            'START_COMMIT_MSG': start_commit_msg,
+            'START_COMMIT_TIMESTAMP': start_commit_timestamp
+            })
 
 
 def mine_repositories():
@@ -115,7 +110,6 @@ def mine_repositories():
     write_csv_header_for_bugs_csv()
     for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
-            #print(subdir)
             repository_path = get_repository_path(subdir, dirs)
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
@@ -125,8 +119,6 @@ def mine_repositories():
             # difinfo = g.diff('--find-renames')
             # This one should do:
             # print(g.log('--name-only'))
-
-            # print(difinfo)
             os.chdir(repository_path)
             # print(a_repo)
             commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
@@ -233,7 +225,7 @@ def call_lhdiff(relevant_file, relevant_files_loc):
             print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
         # else:
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
-            # write back to bugs.csv. NEEDS TO BE BUGTESTED
+            # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
 
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
@@ -286,10 +278,6 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # CLEAR NEW_FOLDER
     # clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
-
-
-    # print(bug_list_splitted)
-
 
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
