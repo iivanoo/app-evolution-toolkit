@@ -18,6 +18,10 @@ import sys
 import glob
 #import InferTool
 
+LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
+LHDIFF_OLD_PATH = str(Path("../../../LHDiff/old_files/"))
+LHDIFF_NEW_PATH = str(Path("../../../LHDiff/new_files/*"))
+
 
 # Download GitHub repositories from a csv row:
 def read_csv_and_clone_github_repositories():
@@ -174,9 +178,8 @@ def bug_list_splitter(bug_list):
 
 
 def copy_to_old_folder(relevant_file):
-    lhdiff_old_path = Path("../../../LHDiff/old_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
-    if not os.path.exists(lhdiff_old_path):                 # If this folder doesn't exist: create it.
-        os.makedirs(lhdiff_old_path)
+    if not os.path.exists(LHDIFF_OLD_PATH):                 # If this folder doesn't exist: create it.
+        os.makedirs(LHDIFF_OLD_PATH)
     # else:
     #     print('LHDiff/old_files folder already exists')
 
@@ -189,13 +192,12 @@ def copy_to_old_folder(relevant_file):
     # else:
 
     src = Path(relevant_file)
-    copy(src, lhdiff_old_path)
+    copy(src, LHDIFF_OLD_PATH)
 
 
 def copy_to_new_folder(relevant_file):
-    lhdiff_new_path = Path("../../../LHDiff/new_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
-    if not os.path.exists(lhdiff_new_path):                 # If this folder doesn't exist: create it.
-        os.makedirs(lhdiff_new_path)
+    if not os.path.exists(LHDIFF_NEW_PATH):                 # If this folder doesn't exist: create it.
+        os.makedirs(LHDIFF_NEW_PATH)
     # else:
     #     print('LHDiff/new_files folder already exists')
 
@@ -207,60 +209,50 @@ def copy_to_new_folder(relevant_file):
     #         #     print('IT DOES THE IF')
     # else:
     src = Path(relevant_file)
-    copy(src, lhdiff_new_path)
+    copy(src, LHDIFF_NEW_PATH)
 
 def there_are_files_in_new_files_folder():
-    lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
-    files = glob.glob(lhdiff_new_path)
+    files = glob.glob(LHDIFF_NEW_PATH + '*')
     if len(files) >= 1:
         return True
     else:
         print('no files in new folder')
 
 def clear_old_files_folder():
-    lhdiff_old_path = str(Path("../../../LHDiff/old_files/*"))
-    files = glob.glob(lhdiff_old_path)
+    files = glob.glob(LHDIFF_OLD_PATH + '*')
     for file in files:
         os.remove(file)
 
 
 def clear_new_files_folder():
-    lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
-    files = glob.glob(lhdiff_new_path)
+    files = glob.glob(LHDIFF_NEW_PATH + '*')
     for file in files:
         os.remove(file)
 
 
 def copy_new_files_to_old_files_folder():
-    lhdiff_old_path = str(Path("../../../LHDiff/old_files"))
-    lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
-    files = glob.glob(lhdiff_new_path)
+    files = glob.glob(LHDIFF_NEW_PATH + '*')
     for file in files:
-        copy(file, lhdiff_old_path)
+        copy(file, LHDIFF_OLD_PATH)
 
 
 def call_lhdiff(relevant_file, relevant_files_loc):
-    lhdiff = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
-    # NEED FOR LOOP HERE forgoing through the list of relevant_files_loc
-
     oldfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
     newfile = str(Path('../../../../SP1/LHDiff/new_files/' + relevant_file))        # NEEDS TO BE NEW-FILES
-    # BUG: Both files have to be named exactly the same. git log should be checked for name-changes before.
-
-    lhdiff_output = subprocess.check_output(['java', '-jar', lhdiff, oldfile, newfile])
-    # print(lhdiff_output)
+    # BUG: Both files have to be named exactly the same. git log should be checked for name-changes.
+    lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
-    # print(data)
-    for old_and_new_loc in data[9:]:
+    for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
         old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')
         # print(old_and_new_loc)
         old_file_loc = int(old_and_new_loc[0])
         new_file_loc = int(old_and_new_loc[1])
-        if old_file_loc == int(relevant_files_loc):
-            print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
+        if old_file_loc == relevant_files_loc:  # This needs to be changed into new_file_loc or relevant_files_loc?
+            print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
+        # else:
+        #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
+            # write back to bugs.csv. NEEDS TO BE BUGTESTED
 
-        # print(old_file_loc)
-        # print(new_file_loc)
 
         # if old_and_new_loc[0] == returned_infer_line:   # THIS SHOULD BE AN INFER LINE
         #     print(old_and_new_loc)
@@ -286,7 +278,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     bug_list = read_commit_csv(repository_path, dirs, commit_index)
     #print(bug_list)
     bug_list_splitted = bug_list_splitter(bug_list)
-    #print(bug_list_splitted)
+    print(bug_list_splitted)
         # READ FROM bug_list FILE_PATH
 
         # COPY RELEVANT FILES IN OLD-FOLDER
@@ -324,9 +316,6 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # RESTART ON NEXT COMMIT IN FOR-LOOP
 
 
-
-
-
     #print(bug_list_splitted)
 
         # g.checkout(commit)
@@ -345,24 +334,6 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         #     bug_id += 1
         # else:
         #     continue
-
-
-
-
-# Example 1
-#
-# Path
-# C:\Users\Bob\PycharmProjects\app-evolution-toolkit\SP1\repo_subfolder\TedHoryczun\One-Rep-Max-Calculator\app\src\main\java\com\repmax\devlanding\onerepmaxcalculator\calculator\OneRepMaxTemplate.java
-# Relative Path
-# SP1/repo_subfolder/TedHoryczun/One-Rep-Max-Calculator/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/OneRepMaxTemplate.java
-#
-# Example file 2
-# Path
-# C:\Users\Bob\PycharmProjects\app-evolution-toolkit\SP1\repo_subfolder\TedHoryczun\One-Rep-Max-Calculator\app\src\main\java\com\repmax\devlanding\onerepmaxcalculator\calculator\PercentRepMax.java
-# Relative Path
-# SP1/repo_subfolder/TedHoryczun/One-Rep-Max-Calculator/app/src/main/java/com/repmax/devlanding/onerepmaxcalculator/calculator/PercentRepMax.java
-
-
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()
