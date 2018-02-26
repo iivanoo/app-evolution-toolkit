@@ -115,8 +115,11 @@ def mine_repositories():
             repository_path = get_repository_path(subdir, dirs)
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
-            # loginfo = g.log()
+            # loginfo = g.log('--find-renames')
+            # difinfo = g.diff('--find-renames')
+            # print(difinfo)
             os.chdir(repository_path)
+            # print(a_repo)
             commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
 
@@ -137,9 +140,9 @@ def get_commit_csv_name(repository_path, subdir, commit_index):
 
 def read_repository_csv_location(repository_path, subdir, commit_index):
     DATA_PATH = Path(os.getcwd())
-    print(DATA_PATH)
+    # print(DATA_PATH)
     path = str(DATA_PATH) + str(get_commit_csv_name(repository_path, subdir, commit_index))
-    print(path)
+    # print(path)
     return path
 
 
@@ -175,7 +178,7 @@ def copy_to_old_folder(relevant_files):
     if not os.path.exists(lhdiff_old_path):                 # If this folder doesn't exist: create it.
         os.makedirs(lhdiff_old_path)
     else:
-        print('already there')
+        print('LHDiff/old_files folder already exists')
     if isinstance(relevant_files, list):
         for file_path in relevant_files:    # If one file, it does a for-loop over a string. Therefore if-statement.
             src = Path(file_path)
@@ -183,6 +186,21 @@ def copy_to_old_folder(relevant_files):
     else:
         src = Path(relevant_files)
         copy(src, lhdiff_old_path)
+
+
+def copy_to_new_folder(relevant_files):
+    lhdiff_new_path = Path("../../../LHDiff/new_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
+    if not os.path.exists(lhdiff_new_path):                 # If this folder doesn't exist: create it.
+        os.makedirs(lhdiff_new_path)
+    else:
+        print('LHDiff/new_files folder already exists')
+    if isinstance(relevant_files, list):
+        for file_path in relevant_files:    # If one file, it does a for-loop over a string. Therefore if-statement.
+            src = Path(file_path)
+            copy(src, lhdiff_new_path)
+    else:
+        src = Path(relevant_files)
+        copy(src, lhdiff_new_path)
 
 
 def there_are_files_in_new_files_folder():
@@ -215,54 +233,89 @@ def copy_new_files_to_old_files_folder():
         copy(file, lhdiff_old_path)
 
 
-def call_lhdiff():
-    #lhdiff = str(Path('SP1/LHDiff/lhdiff.jar'))
+def call_lhdiff(relevant_file, relevant_files_loc):
     lhdiff = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
-    oldfile = str(Path('../../../../SP1/LHDiff/old_files/ApplicationTest.java'))    # Might need to do this iteratively.
-    newfile = str(Path('../../../../SP1/LHDiff/new_files/ApplicationTest.java'))
+    # NEED FOR LOOP HERE forgoing through the list of relevant_files_loc
+
+    oldfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
+    newfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
+    #oldfile = str(Path('../../../../SP1/LHDiff/old_files/ApplicationTest.java'))    # Might need to do this iteratively.
+    #newfile = str(Path('../../../../SP1/LHDiff/new_files/ApplicationTest.java'))
     lhdiff_output = subprocess.check_output(['java', '-jar', lhdiff, oldfile, newfile])
-    print(lhdiff_output)
-    data = lhdiff_output.split( )
-    print(data)
-    for i in data[9:]:
-        print(i)
+    # print(lhdiff_output)
+    data = lhdiff_output.split()
+    # print(data)
+    for old_and_new_loc in data[9:]:
+        old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')
+        # print(old_and_new_loc)
+        old_file_loc = int(old_and_new_loc[0])
+        new_file_loc = int(old_and_new_loc[1])
+        if old_and_new_loc[0] == relevant_files_loc:
+            print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
+
+        # print(old_file_loc)
+        # print(new_file_loc)
+
+        # if old_and_new_loc[0] == returned_infer_line:   # THIS SHOULD BE AN INFER LINE
+        #     print(old_and_new_loc)
+
+        # for e in i:
+        #     int(e)
+        #     print(e)
     # subprocess.call(['java', '-jar', lhdiff, '-ob', oldfile, newfile]) # For more data
     # subprocess.call(['java', '-jar', lhdiff, 'help')                   # For help
 
+
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
-    # # FOR LOOP HERE:
+    # FOR LOOP HERE:
     # for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         # g.checkout(commit)
 
-        # # RUN INFER AND CREATE CSV
+        # RUN INFER AND CREATE CSV
         # InferTool.inferAnalysis("Android")
 
-        # # GET CSV PATH AND READ CSV
+        # GET CSV PATH AND READ CSV
     get_commit_csv_name(repository_path, dirs, commit_index)
     bug_list = read_commit_csv(repository_path, dirs, commit_index)
-
+    #print(bug_list)
     bug_list_splitted = bug_list_splitter(bug_list)
-    # print(bug_list_splitted)
-        # # READ FROM bug_list FILE_PATH
+    #print(bug_list_splitted)
+        # READ FROM bug_list FILE_PATH
 
-        # # COPY RELEVANT FILES IN OLD-FOLDER
+        # COPY RELEVANT FILES IN OLD-FOLDER
     relevant_files = bug_list_splitted[2][0]
+    relevant_files_loc = bug_list_splitted[3][0]
+    relevant_files_list = []
+    for i in range(len(bug_list_splitted)-2):
+        # HERE IT IS MINUS 2 BECAUSE THE HEADER AND EMPTY LAST LINE NEEDS TO BE DELETED. POSSIBLE BUG DEPENDING ON CSV INPUT.
+        # Might be able to remove newlines and headers from csv with a split or strip.
+        # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
+        file_path = bug_list_splitted[2][i]
+        file_name = bug_list_splitted[2][i].split('/')[-1]
+        line_of_code = bug_list_splitted[3][i]
+        relevant_files_list.append([file_path, file_name, line_of_code])
+
+    #print(relevant_files_list)
     # print(relevant_files)
-    copy_to_old_folder(relevant_files)         # possible bug: Need to check if this works with the repo_subfolder walk.
-        # # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-    if there_are_files_in_new_files_folder():
-        call_lhdiff()
-        # subprocess.call(['java', '-jar', 'C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/lhdiff.jar'])
-        # # PUT DATA IN bugs.csv
+    for i in range(len(relevant_files_list)):
+        print('scanning file: %s with bug in loc %s' % (relevant_files_list[i][1], relevant_files_list[i][2]))
+        if commit_index == 1:
+            copy_to_old_folder(relevant_files_list[i][0])         # possible bug: Need to check if this works with the repo_subfolder walk.
+        else:
+            copy_to_new_folder(relevant_files_list[i][0])
+            # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
+        if there_are_files_in_new_files_folder():
+            call_lhdiff(relevant_files_list[i][1], relevant_files_list[i][2])
+        # PUT DATA IN bugs.csv
     # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-        # # CLEAR OLD_FOLDER
+        # CLEAR OLD_FOLDER
     # clear_old_files_folder()
-        # # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
+        # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
     # copy_new_files_to_old_files_folder()
-        # # CLEAR NEW_FOLDER
+        # CLEAR NEW_FOLDER
     # clear_new_files_folder()
-        # # RESTART ON NEXT COMMIT IN FOR-LOOP
+        # RESTART ON NEXT COMMIT IN FOR-LOOP
 
 
 
