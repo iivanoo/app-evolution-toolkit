@@ -20,7 +20,7 @@ import glob
 
 LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
 LHDIFF_OLD_PATH = str(Path("../../../LHDiff/old_files/"))
-LHDIFF_NEW_PATH = str(Path("../../../LHDiff/new_files/*"))
+LHDIFF_NEW_PATH = str(Path("../../../LHDiff/new_files/"))
 
 
 # Download GitHub repositories from a csv row:
@@ -119,7 +119,8 @@ def mine_repositories():
             repository_path = get_repository_path(subdir, dirs)
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
-            # loginfo = g.log('--find-renames')
+            # print(g.log('--stat'))            # Trying some gitpython stuff out here
+            # print(g.log('--find-renames'))
             # difinfo = g.diff('--find-renames')
             # print(difinfo)
             os.chdir(repository_path)
@@ -178,17 +179,6 @@ def bug_list_splitter(bug_list):
 def copy_to_old_folder(relevant_file):
     if not os.path.exists(LHDIFF_OLD_PATH):                 # If this folder doesn't exist: create it.
         os.makedirs(LHDIFF_OLD_PATH)
-    # else:
-    #     print('LHDiff/old_files folder already exists')
-
-    # old code probably not needed anymore.
-    # if isinstance(relevant_file, list):
-    #     for file_path in relevant_file:    # If one file, it does a for-loop over a string. Therefore if-statement.
-    #         src = Path(file_path)
-    #         copy(src, lhdiff_old_path)
-    #     print('IT DOES THE IF')
-    # else:
-
     src = Path(relevant_file)
     copy(src, LHDIFF_OLD_PATH)
 
@@ -196,16 +186,6 @@ def copy_to_old_folder(relevant_file):
 def copy_to_new_folder(relevant_file):
     if not os.path.exists(LHDIFF_NEW_PATH):                 # If this folder doesn't exist: create it.
         os.makedirs(LHDIFF_NEW_PATH)
-    # else:
-    #     print('LHDiff/new_files folder already exists')
-
-    # old code probably not needed anymore
-    # if isinstance(relevant_file, list):
-    #     for file_path in relevant_file:    # If one file, it does a for-loop over a string. Therefore if-statement.
-    #         src = Path(file_path)
-    #         copy(src, lhdiff_new_path)
-    #         #     print('IT DOES THE IF')
-    # else:
     src = Path(relevant_file)
     copy(src, LHDIFF_NEW_PATH)
 
@@ -235,8 +215,8 @@ def copy_new_files_to_old_files_folder():
 
 
 def call_lhdiff(relevant_file, relevant_files_loc):
-    oldfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
-    newfile = str(Path('../../../../SP1/LHDiff/new_files/' + relevant_file))        # NEEDS TO BE NEW-FILES
+    oldfile = str(Path(LHDIFF_OLD_PATH + '/' + relevant_file))
+    newfile = str(Path(LHDIFF_NEW_PATH + '/' + relevant_file))      # NEEDS TO BE BUGTESTED / CHANGED FOR MISSING BUG OR FILE.
     # BUG: Both files have to be named exactly the same. git log should be checked for name-changes.
     lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
@@ -276,7 +256,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     bug_list = read_commit_csv(repository_path, dirs, commit_index)
     #print(bug_list)
     bug_list_splitted = bug_list_splitter(bug_list)
-    print(bug_list_splitted)
+    # print(bug_list_splitted)
         # READ FROM bug_list FILE_PATH
 
         # COPY RELEVANT FILES IN OLD-FOLDER
