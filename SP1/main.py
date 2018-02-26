@@ -85,23 +85,23 @@ def write_csv_header_for_bugs_csv():
         writer.writeheader()
 
 
-def write_bugs(bug_id, repository):
+def write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp):
     file_to_open = bugs_csv_location()
     with open(file_to_open, 'a') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
         # FOR FUTURE NEED, we use InferTool.readBugReport now.
         # Write the data.
-        # writer.writerow({
-        #     'ID': bug_id,
-        #      'REPO_ID': repository,
-        #      'FILE_PATH': 'test',
-        #      'LINE_NUMBER': 'test',
-        #      'BUG_DESCRIPTION': 'test',
-        #      'LHDIFF_LINE_TRACING': 'test',
-        #      'START_COMMIT_ID': 'test',
-        #      'START_COMMIT_MSG': 'test',
-        #      'START_COMMIT_TIMESTAMP': 'test'
-        #      })
+        writer.writerow({
+            'ID': bug_id,
+             'REPO_ID': repository,
+             'FILE_PATH': file_path,
+             'LINE_NUMBER': line_number,
+             'BUG_DESCRIPTION': bug_description,
+             'LHDIFF_LINE_TRACING': lhdiff_line_tracing,
+             'START_COMMIT_ID': start_commit_id,
+             'START_COMMIT_MSG': start_commit_msg,
+             'START_COMMIT_TIMESTAMP': start_commit_timestamp
+             })
 
 
 # def write_lhdiff_input():
@@ -119,9 +119,13 @@ def mine_repositories():
             repository_path = get_repository_path(subdir, dirs)
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
+            # Remove this later
             # print(g.log('--stat'))            # Trying some gitpython stuff out here
-            # print(g.log('--find-renames'))
+            # print(g.log('--find-renames'))    # git log --name-only (--stat --ignore-blank-lines)
             # difinfo = g.diff('--find-renames')
+            # This one should do:
+            # print(g.log('--name-only'))
+
             # print(difinfo)
             os.chdir(repository_path)
             # print(a_repo)
