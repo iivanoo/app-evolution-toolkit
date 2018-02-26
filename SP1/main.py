@@ -244,9 +244,9 @@ def call_lhdiff(relevant_file, relevant_files_loc):
     # NEED FOR LOOP HERE forgoing through the list of relevant_files_loc
 
     oldfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
-    newfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))        # NEEDS TO BE NEW-FILES
-    #oldfile = str(Path('../../../../SP1/LHDiff/old_files/ApplicationTest.java'))    # Might need to do this iteratively.
-    #newfile = str(Path('../../../../SP1/LHDiff/new_files/ApplicationTest.java'))
+    newfile = str(Path('../../../../SP1/LHDiff/new_files/' + relevant_file))        # NEEDS TO BE NEW-FILES
+    # BUG: Both files have to be named exactly the same. git log should be checked for name-changes before.
+
     lhdiff_output = subprocess.check_output(['java', '-jar', lhdiff, oldfile, newfile])
     # print(lhdiff_output)
     data = lhdiff_output.split()
@@ -256,7 +256,7 @@ def call_lhdiff(relevant_file, relevant_files_loc):
         # print(old_and_new_loc)
         old_file_loc = int(old_and_new_loc[0])
         new_file_loc = int(old_and_new_loc[1])
-        if old_and_new_loc[0] == relevant_files_loc:
+        if old_file_loc == int(relevant_files_loc):
             print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
 
         # print(old_file_loc)
@@ -300,17 +300,19 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         line_of_code = bug_list_splitted[3][i]
         relevant_files_list.append([file_path, file_name, line_of_code])
 
-    # print(relevant_files_list)
+    # print(relevant_files_list);
     for i in range(len(relevant_files_list)):
-        print('scanning file: %s with bug in loc %s' % (relevant_files_list[i][1], relevant_files_list[i][2]))
+        file_path = relevant_files_list[i][0]
+        file_name = relevant_files_list[i][1]
+        line_of_code = relevant_files_list[i][2]
+        print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
         if commit_index == 1:
-            copy_to_old_folder(relevant_files_list[i][0])         # possible bug: Need to check if this works with the repo_subfolder walk.
+            copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
         else:
             copy_to_new_folder(relevant_files_list[i][0])
             # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
         if there_are_files_in_new_files_folder():
-            print(relevant_files_list[i][1])
-            call_lhdiff(relevant_files_list[i][1], relevant_files_list[i][2])
+            call_lhdiff(file_name, line_of_code)
         # PUT DATA IN bugs.csv
     # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
