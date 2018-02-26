@@ -144,9 +144,7 @@ def get_commit_csv_name(repository_path, subdir, commit_index):
 
 def read_repository_csv_location(repository_path, subdir, commit_index):
     DATA_PATH = Path(os.getcwd())
-    # print(DATA_PATH)
     path = str(DATA_PATH) + str(get_commit_csv_name(repository_path, subdir, commit_index))
-    # print(path)
     return path
 
 
