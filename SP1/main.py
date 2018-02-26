@@ -225,7 +225,7 @@ def call_lhdiff(relevant_file, relevant_files_loc):
     lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
     for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
-        old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')
+        old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
         # print(old_and_new_loc)
         old_file_loc = int(old_and_new_loc[0])
         new_file_loc = int(old_and_new_loc[1])
