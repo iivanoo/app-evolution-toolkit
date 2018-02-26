@@ -173,35 +173,41 @@ def bug_list_splitter(bug_list):
     return bug_id, bug_type, file_path, line_number, bug_description
 
 
-def copy_to_old_folder(relevant_files):
+def copy_to_old_folder(relevant_file):
     lhdiff_old_path = Path("../../../LHDiff/old_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
     if not os.path.exists(lhdiff_old_path):                 # If this folder doesn't exist: create it.
         os.makedirs(lhdiff_old_path)
-    else:
-        print('LHDiff/old_files folder already exists')
-    if isinstance(relevant_files, list):
-        for file_path in relevant_files:    # If one file, it does a for-loop over a string. Therefore if-statement.
-            src = Path(file_path)
-            copy(src, lhdiff_old_path)
-    else:
-        src = Path(relevant_files)
-        copy(src, lhdiff_old_path)
+    # else:
+    #     print('LHDiff/old_files folder already exists')
+
+    # old code probably not needed anymore.
+    # if isinstance(relevant_file, list):
+    #     for file_path in relevant_file:    # If one file, it does a for-loop over a string. Therefore if-statement.
+    #         src = Path(file_path)
+    #         copy(src, lhdiff_old_path)
+    #     print('IT DOES THE IF')
+    # else:
+
+    src = Path(relevant_file)
+    copy(src, lhdiff_old_path)
 
 
-def copy_to_new_folder(relevant_files):
+def copy_to_new_folder(relevant_file):
     lhdiff_new_path = Path("../../../LHDiff/new_files")     # This goes up to SP1 (SP1/repo_subfolder/user/repo)
     if not os.path.exists(lhdiff_new_path):                 # If this folder doesn't exist: create it.
         os.makedirs(lhdiff_new_path)
-    else:
-        print('LHDiff/new_files folder already exists')
-    if isinstance(relevant_files, list):
-        for file_path in relevant_files:    # If one file, it does a for-loop over a string. Therefore if-statement.
-            src = Path(file_path)
-            copy(src, lhdiff_new_path)
-    else:
-        src = Path(relevant_files)
-        copy(src, lhdiff_new_path)
+    # else:
+    #     print('LHDiff/new_files folder already exists')
 
+    # old code probably not needed anymore
+    # if isinstance(relevant_file, list):
+    #     for file_path in relevant_file:    # If one file, it does a for-loop over a string. Therefore if-statement.
+    #         src = Path(file_path)
+    #         copy(src, lhdiff_new_path)
+    #         #     print('IT DOES THE IF')
+    # else:
+    src = Path(relevant_file)
+    copy(src, lhdiff_new_path)
 
 def there_are_files_in_new_files_folder():
     lhdiff_new_path = str(Path("../../../LHDiff/new_files/*"))
@@ -238,7 +244,7 @@ def call_lhdiff(relevant_file, relevant_files_loc):
     # NEED FOR LOOP HERE forgoing through the list of relevant_files_loc
 
     oldfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
-    newfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))
+    newfile = str(Path('../../../../SP1/LHDiff/old_files/' + relevant_file))        # NEEDS TO BE NEW-FILES
     #oldfile = str(Path('../../../../SP1/LHDiff/old_files/ApplicationTest.java'))    # Might need to do this iteratively.
     #newfile = str(Path('../../../../SP1/LHDiff/new_files/ApplicationTest.java'))
     lhdiff_output = subprocess.check_output(['java', '-jar', lhdiff, oldfile, newfile])
@@ -284,8 +290,6 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # READ FROM bug_list FILE_PATH
 
         # COPY RELEVANT FILES IN OLD-FOLDER
-    relevant_files = bug_list_splitted[2][0]
-    relevant_files_loc = bug_list_splitted[3][0]
     relevant_files_list = []
     for i in range(len(bug_list_splitted)-2):
         # HERE IT IS MINUS 2 BECAUSE THE HEADER AND EMPTY LAST LINE NEEDS TO BE DELETED. POSSIBLE BUG DEPENDING ON CSV INPUT.
@@ -296,8 +300,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         line_of_code = bug_list_splitted[3][i]
         relevant_files_list.append([file_path, file_name, line_of_code])
 
-    #print(relevant_files_list)
-    # print(relevant_files)
+    # print(relevant_files_list)
     for i in range(len(relevant_files_list)):
         print('scanning file: %s with bug in loc %s' % (relevant_files_list[i][1], relevant_files_list[i][2]))
         if commit_index == 1:
@@ -306,15 +309,16 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
             copy_to_new_folder(relevant_files_list[i][0])
             # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
         if there_are_files_in_new_files_folder():
+            print(relevant_files_list[i][1])
             call_lhdiff(relevant_files_list[i][1], relevant_files_list[i][2])
         # PUT DATA IN bugs.csv
     # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
-    # clear_old_files_folder()
+    #clear_old_files_folder()
         # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
-    # copy_new_files_to_old_files_folder()
+    #copy_new_files_to_old_files_folder()
         # CLEAR NEW_FOLDER
-    # clear_new_files_folder()
+    #clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
 
 
