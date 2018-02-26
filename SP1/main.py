@@ -232,16 +232,6 @@ def call_lhdiff(relevant_file, relevant_files_loc):
             # write back to bugs.csv. NEEDS TO BE BUGTESTED
 
 
-        # if old_and_new_loc[0] == returned_infer_line:   # THIS SHOULD BE AN INFER LINE
-        #     print(old_and_new_loc)
-
-        # for e in i:
-        #     int(e)
-        #     print(e)
-    # subprocess.call(['java', '-jar', lhdiff, '-ob', oldfile, newfile]) # For more data
-    # subprocess.call(['java', '-jar', lhdiff, 'help')                   # For help
-
-
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
     # FOR LOOP HERE:
@@ -286,32 +276,17 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # PUT DATA IN bugs.csv
     # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
-    #clear_old_files_folder()
+    # clear_old_files_folder()
         # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
-    #copy_new_files_to_old_files_folder()
+    # copy_new_files_to_old_files_folder()
         # CLEAR NEW_FOLDER
-    #clear_new_files_folder()
+    # clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
 
 
-    #print(bug_list_splitted)
+    # print(bug_list_splitted)
 
-        # g.checkout(commit)
-        # read_commit_csv(repository)
-        # csv.reader(repository + '/csv_for_app_evolution_toolkit_folder')
-        # write_bugs(bug_id,repository)
-        # print(commit)
-        # str(dirs[0])
-        # InferTool.inferAnalysis(str(dirs[0]), str(commit_index))
-        # commit_index += 1
-        # subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
-        # BUG TYPE
-        # BUG DESCRIPTION
-        # REMOVE write_bugs(bug_id, repository)
-        # if bug_has_been_found():
-        #     bug_id += 1
-        # else:
-        #     continue
+
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()
@@ -390,5 +365,24 @@ output_folder_path: the folder in the file system where to put all the other gen
 
 analyzer: the path in the file system where to find the main Python script for running the static analyzer
 (Infer in the case of SP2, but it can be any)
+'''
+
+'''
+        # g.checkout(commit)
+        # read_commit_csv(repository)
+        # csv.reader(repository + '/csv_for_app_evolution_toolkit_folder')
+        # write_bugs(bug_id,repository)
+        # print(commit)
+        # str(dirs[0])
+        # InferTool.inferAnalysis(str(dirs[0]), str(commit_index))
+        # commit_index += 1
+        # subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
+        # BUG TYPE
+        # BUG DESCRIPTION
+        # REMOVE write_bugs(bug_id, repository)
+        # if bug_has_been_found():
+        #     bug_id += 1
+        # else:
+        #     continue
 
 '''
