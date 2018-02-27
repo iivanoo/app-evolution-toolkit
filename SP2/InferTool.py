@@ -6,7 +6,8 @@ the app folder. SDK and Build tools versions must match the app.
 """
 
 import os, sys, subprocess, shutil, csv, time
-from classes import Bug
+from SP2 import classes
+#from classes import Bug
 
 # Constants
 LOCALPROPERTIES = "local.properties"
@@ -144,7 +145,7 @@ def readBugReport(appName, commitIndex):
 			# Bug description
 			bugDescription = bugsArray[1]
 
-			newBug = Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
+			newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
 			bugsToCSVArray.append(newBug)
 
 			#bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])

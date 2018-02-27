@@ -16,7 +16,7 @@ from shutil import copy
 import subprocess
 import sys
 import glob
-#import InferTool
+from SP2 import InferTool
 
 LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
 LHDIFF_OLD_PATH = str(Path("../../../LHDiff/old_files/"))
@@ -114,7 +114,7 @@ def mine_repositories():
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
             # Remove this later
-            # print(g.log('--stat'))            # Trying some gitpython stuff out here
+            print(g.log('--stat'))            # Trying some gitpython stuff out here
             # print(g.log('--find-renames'))    # git log --name-only (--stat --ignore-blank-lines)
             # difinfo = g.diff('--find-renames')
             # This one should do:
@@ -231,52 +231,55 @@ def call_lhdiff(relevant_file, relevant_files_loc):
 def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
     commit_index = 1
     # FOR LOOP HERE:
-    # for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
+    for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         # g.checkout(commit)
+        print(commit)
+        # print(g.log(commit)) doesnt work
+        # print(g.show(commit)) doesnt work
 
         # RUN INFER AND CREATE CSV
-        # InferTool.inferAnalysis("Android")
+        InferTool.inferAnalysis("Android")
 
         # GET CSV PATH AND READ CSV
-    get_commit_csv_name(repository_path, dirs, commit_index)
-    bug_list = read_commit_csv(repository_path, dirs, commit_index)
-    #print(bug_list)
-    bug_list_splitted = bug_list_splitter(bug_list)
-    # print(bug_list_splitted)
+        get_commit_csv_name(repository_path, dirs, commit_index)
+        bug_list = read_commit_csv(repository_path, dirs, commit_index)
+        # print(bug_list)
+        bug_list_splitted = bug_list_splitter(bug_list)
+        # print(bug_list_splitted)
         # READ FROM bug_list FILE_PATH
 
         # COPY RELEVANT FILES IN OLD-FOLDER
-    relevant_files_list = []
-    for i in range(len(bug_list_splitted)-2):
+        relevant_files_list = []
+        for i in range(len(bug_list_splitted)-2):
         # HERE IT IS MINUS 2 BECAUSE THE HEADER AND EMPTY LAST LINE NEEDS TO BE DELETED. POSSIBLE BUG DEPENDING ON CSV INPUT.
         # Might be able to remove newlines and headers from csv with a split or strip.
         # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
-        file_path = bug_list_splitted[2][i]
-        file_name = bug_list_splitted[2][i].split('/')[-1]
-        line_of_code = bug_list_splitted[3][i]
-        relevant_files_list.append([file_path, file_name, line_of_code])
+            file_path = bug_list_splitted[2][i]
+            file_name = bug_list_splitted[2][i].split('/')[-1]
+            line_of_code = bug_list_splitted[3][i]
+            relevant_files_list.append([file_path, file_name, line_of_code])
 
-    # print(relevant_files_list);
-    for i in range(len(relevant_files_list)):
-        file_path = relevant_files_list[i][0]
-        file_name = relevant_files_list[i][1]
-        line_of_code = relevant_files_list[i][2]
-        print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
-        if commit_index == 1:
-            copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
-        else:
-            copy_to_new_folder(relevant_files_list[i][0])
+        # print(relevant_files_list);
+        for i in range(len(relevant_files_list)):
+            file_path = relevant_files_list[i][0]
+            file_name = relevant_files_list[i][1]
+            line_of_code = relevant_files_list[i][2]
+            print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
+            if commit_index == 1:
+                copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
+            else:
+                copy_to_new_folder(relevant_files_list[i][0])
             # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-        if there_are_files_in_new_files_folder():
-            call_lhdiff(file_name, line_of_code)
+            if there_are_files_in_new_files_folder():
+                call_lhdiff(file_name, line_of_code)
         # PUT DATA IN bugs.csv
-    # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
+        # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
-    # clear_old_files_folder()
+        # clear_old_files_folder()
         # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
-    # copy_new_files_to_old_files_folder()
+        # copy_new_files_to_old_files_folder()
         # CLEAR NEW_FOLDER
-    # clear_new_files_folder()
+        # clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
 
 
