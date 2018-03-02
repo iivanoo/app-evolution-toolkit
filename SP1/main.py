@@ -111,7 +111,7 @@ def mine_repositories():
     write_csv_header_for_bugs_csv()
     for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
-            repository_path = get_repository_path(subdir, dirs)
+            repository_path = Path(get_repository_path(subdir, dirs))
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
             # Remove this later
@@ -261,7 +261,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # print(g.show(commit)) doesnt work
 
         # RUN INFER AND CREATE CSV
-        #InferTool.inferAnalysis("Android", str(commit_index))
+        InferTool.inferAnalysis("Android", str(commit_index))
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
@@ -273,6 +273,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
 
         # COPY RELEVANT FILES IN OLD-FOLDER
         relevant_files_list = []
+        print(relevant_files_list)
         for i in range(len(bug_list_splitted[0])):
             # For i in all bugs found in the csv
             # Might be able to remove newlines and headers from csv with a split or strip.
