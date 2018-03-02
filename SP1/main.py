@@ -13,10 +13,11 @@ import git
 from git import Repo
 from pathlib import Path
 from shutil import copy
+import shutil
 import subprocess
 import sys
 import glob
-from SP2 import InferTool
+from SP2 import InferTool # Might give an error outside IDE
 
 LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
 LHDIFF_OLD_PATH = str(Path("../../../LHDiff/old_files/"))
@@ -186,6 +187,7 @@ def copy_to_new_folder(relevant_file):
     src = Path(relevant_file)
     copy(src, LHDIFF_NEW_PATH)
 
+
 def there_are_files_in_new_files_folder():
     files = glob.glob(LHDIFF_NEW_PATH + '*')
     if len(files) >= 1:
@@ -193,10 +195,11 @@ def there_are_files_in_new_files_folder():
     else:
         print('no files in new folder')
 
+'''
 def clear_old_files_folder():
     files = glob.glob(LHDIFF_OLD_PATH + '*')
     for file in files:
-        os.remove(file)
+        os.remove(os.path.abspath(file))
 
 
 def clear_new_files_folder():
@@ -207,6 +210,25 @@ def clear_new_files_folder():
 
 def copy_new_files_to_old_files_folder():
     files = glob.glob(LHDIFF_NEW_PATH + '*')
+    for file in files:
+        copy(file, LHDIFF_OLD_PATH)
+'''
+
+
+def clear_old_files_folder():
+    files = glob.glob(str(Path(LHDIFF_OLD_PATH + '/*')))
+    for file in files:
+        os.remove(file)
+
+
+def clear_new_files_folder():
+    files = glob.glob(str(Path(LHDIFF_NEW_PATH + '/*')))
+    for file in files:
+        os.remove(file)
+
+
+def copy_new_files_to_old_files_folder():
+    files = glob.glob(str(Path(LHDIFF_NEW_PATH + '/*')))
     for file in files:
         copy(file, LHDIFF_OLD_PATH)
 
@@ -239,28 +261,28 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # print(g.show(commit)) doesnt work
 
         # RUN INFER AND CREATE CSV
-        InferTool.inferAnalysis("Android", str(commit_index))
+        #InferTool.inferAnalysis("Android", str(commit_index))
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
         bug_list = read_commit_csv(repository_path, dirs, commit_index)
         # print(bug_list)
         bug_list_splitted = bug_list_splitter(bug_list)
-        # print(bug_list_splitted)
+
         # READ FROM bug_list FILE_PATH
 
         # COPY RELEVANT FILES IN OLD-FOLDER
         relevant_files_list = []
-        for i in range(len(bug_list_splitted)-2):
-        # HERE IT IS MINUS 2 BECAUSE THE HEADER AND EMPTY LAST LINE NEEDS TO BE DELETED. POSSIBLE BUG DEPENDING ON CSV INPUT.
-        # Might be able to remove newlines and headers from csv with a split or strip.
-        # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
+        for i in range(len(bug_list_splitted[0])):
+            # For i in all bugs found in the csv
+            # Might be able to remove newlines and headers from csv with a split or strip.
+            # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
+            print(bug_list_splitted[2])
             file_path = bug_list_splitted[2][i]
             file_name = bug_list_splitted[2][i].split('/')[-1]
             line_of_code = bug_list_splitted[3][i]
             relevant_files_list.append([file_path, file_name, line_of_code])
 
-        # print(relevant_files_list);
         for i in range(len(relevant_files_list)):
             file_path = relevant_files_list[i][0]
             file_name = relevant_files_list[i][1]
@@ -271,17 +293,19 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
                 copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
             else:
                 copy_to_new_folder(relevant_files_list[i][0])
-            # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-            if there_are_files_in_new_files_folder():
                 call_lhdiff(file_name, line_of_code)
+
+                # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
+            #if there_are_files_in_new_files_folder():
+
         # PUT DATA IN bugs.csv
         # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
-        # clear_old_files_folder()
+        clear_old_files_folder()
         # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
-        # copy_new_files_to_old_files_folder()
+        copy_new_files_to_old_files_folder()
         # CLEAR NEW_FOLDER
-        # clear_new_files_folder()
+        clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
 
 
