@@ -114,7 +114,8 @@ def mine_repositories():
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
             # Remove this later
-            print(g.log('--stat'))            # Trying some gitpython stuff out here
+            git_log_string = str(g.log('--stat'))
+            print(git_log_string)# Trying some gitpython stuff out here
             # print(g.log('--find-renames'))    # git log --name-only (--stat --ignore-blank-lines)
             # difinfo = g.diff('--find-renames')
             # This one should do:
@@ -136,7 +137,7 @@ def get_repository_name(repository_path):
 
 def get_commit_csv_name(repository_path, subdir, commit_index):
     repository_name = repository_path.split(subdir)
-    return str(repository_name[-1]) + '_' + str(commit_index) + '.csv'
+    return str(repository_name[-1]) + '_' + str(commit_index) + '.csv'  # For example repo_1.csv -> HelloWorld_1.csv
 
 
 def read_repository_csv_location(repository_path, subdir, commit_index):
@@ -238,7 +239,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # print(g.show(commit)) doesnt work
 
         # RUN INFER AND CREATE CSV
-        InferTool.inferAnalysis("Android")
+        InferTool.inferAnalysis("Android", str(commit_index))
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
@@ -266,6 +267,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
             line_of_code = relevant_files_list[i][2]
             print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
             if commit_index == 1:
+                print(file_path)
                 copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
             else:
                 copy_to_new_folder(relevant_files_list[i][0])
