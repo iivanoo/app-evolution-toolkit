@@ -105,6 +105,39 @@ def write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdi
             })
 
 
+def get_commit_author_date(git_log_string):
+    splitted_git_log = []
+    for i in range(0, len(git_log_string), 3):
+        commit_author_date = git_log_string[i].splitlines()
+        commit_from_git_log = commit_author_date[0].split('commit ')[-1]
+        author_from_git_log = commit_author_date[1].split('Author: ')[-1]
+        date_from_git_log = commit_author_date[2].split('Date:  ')[-1]
+        message_from_commit = git_log_string[i+1].split('    ')[-1]
+        changed_files = get_file_changes_for_commit(git_log_string, i)
+        splitted_git_log.append([commit_from_git_log, author_from_git_log, date_from_git_log, message_from_commit, changed_files])
+    return splitted_git_log
+
+
+def get_file_changes_for_commit(git_log_string, i):
+    file_changes = []
+    files_log_per_commit = git_log_string[i+2].splitlines()     # Still need to add at which commit file was changed.
+    for e in range(0, len(files_log_per_commit)):
+        if commit_has_changed_files(files_log_per_commit[e]):
+            changed_file_name = files_log_per_commit[e].replace('}', "{").split('{')[1]
+            changed_file = changed_file_name.split(' => ')
+            changed_file_from = changed_file[0]
+            changed_file_to = changed_file[1]
+            file_changes.append([changed_file_from, changed_file_to])
+    return file_changes
+
+
+def get_git_log_data(g):
+    git_log_string = str(g.log('--stat'))
+    git_log_string = git_log_string.split('\n\n')
+    commit_author_date_message_changedfiles = get_commit_author_date(git_log_string)
+    return commit_author_date_message_changedfiles
+
+
 def commit_has_changed_files(files_log_per_commit):
     if ' => ' in str(files_log_per_commit):
         return True
@@ -120,35 +153,12 @@ def mine_repositories():
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
             # Remove this later
-            git_log_string = str(g.log('--stat'))
-            git_log_string = git_log_string.split('\n\n')
+            commit_author_date_message_changedfiles = get_git_log_data(g)
+            print(commit_author_date_message_changedfiles)
 
-            for i in range(0, len(git_log_string), 3):
-                commit_author_date = git_log_string[i].splitlines()
-                commit_from_git_log = commit_author_date[0].split('commit ')[-1]
-                author_from_git_log = commit_author_date[1].split('Author: ')[-1]
-                date_from_git_log = commit_author_date[2].split('Date:  ')[-1]
-                # print(commit_from_git_log, author_from_git_log, date_from_git_log)
-
-            for i in range(1, len(git_log_string), 3):
-                commit_message_from_git_log = git_log_string[i].split('    ')[-1]
-                # print(commit_message_from_git_log)
-
-            for i in range(2, len(git_log_string), 3):
-                files_log_per_commit = git_log_string[i].splitlines()
-                # if commit_has_changed_files(files_log_per_commit):
-                #     print(files_log_per_commit.split('{'))
-                print(files_log_per_commit)
-
-
-            # Trying some gitpython stuff out here
-            # print(g.log('--find-renames'))    # git log --name-only (--stat --ignore-blank-lines)
-            # difinfo = g.diff('--find-renames')
-            # This one should do:
-            # print(g.log('--name-only'))
             os.chdir(repository_path)
             # print(a_repo)
-            #commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
+            # commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
 
 def get_repository_path(subdir, dirs):
@@ -289,6 +299,8 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
             file_name = bug_list_splitted[2][i].split('/')[-1]
             line_of_code = bug_list_splitted[3][i]
             relevant_files_list.append([file_path, file_name, line_of_code])
+
+
 
         for i in range(len(relevant_files_list)):
             file_path = relevant_files_list[i][0]
