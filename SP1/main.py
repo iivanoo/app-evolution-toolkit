@@ -105,25 +105,50 @@ def write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdi
             })
 
 
+def commit_has_changed_files(files_log_per_commit):
+    if ' => ' in str(files_log_per_commit):
+        return True
+
+
 def mine_repositories():
     rootdir = 'repo_subfolder'
     bug_id = 1
     write_csv_header_for_bugs_csv()
     for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
-            repository_path = Path(get_repository_path(subdir, dirs))
+            repository_path = get_repository_path(subdir, dirs)
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
             # Remove this later
             git_log_string = str(g.log('--stat'))
-            print(git_log_string)# Trying some gitpython stuff out here
+            git_log_string = git_log_string.split('\n\n')
+
+            for i in range(0, len(git_log_string), 3):
+                commit_author_date = git_log_string[i].splitlines()
+                commit_from_git_log = commit_author_date[0].split('commit ')[-1]
+                author_from_git_log = commit_author_date[1].split('Author: ')[-1]
+                date_from_git_log = commit_author_date[2].split('Date:  ')[-1]
+                # print(commit_from_git_log, author_from_git_log, date_from_git_log)
+
+            for i in range(1, len(git_log_string), 3):
+                commit_message_from_git_log = git_log_string[i].split('    ')[-1]
+                # print(commit_message_from_git_log)
+
+            for i in range(2, len(git_log_string), 3):
+                files_log_per_commit = git_log_string[i].splitlines()
+                # if commit_has_changed_files(files_log_per_commit):
+                #     print(files_log_per_commit.split('{'))
+                print(files_log_per_commit)
+
+
+            # Trying some gitpython stuff out here
             # print(g.log('--find-renames'))    # git log --name-only (--stat --ignore-blank-lines)
             # difinfo = g.diff('--find-renames')
             # This one should do:
             # print(g.log('--name-only'))
             os.chdir(repository_path)
             # print(a_repo)
-            commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
+            #commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
 
 def get_repository_path(subdir, dirs):
@@ -194,25 +219,6 @@ def there_are_files_in_new_files_folder():
         return True
     else:
         print('no files in new folder')
-
-'''
-def clear_old_files_folder():
-    files = glob.glob(LHDIFF_OLD_PATH + '*')
-    for file in files:
-        os.remove(os.path.abspath(file))
-
-
-def clear_new_files_folder():
-    files = glob.glob(LHDIFF_NEW_PATH + '*')
-    for file in files:
-        os.remove(file)
-
-
-def copy_new_files_to_old_files_folder():
-    files = glob.glob(LHDIFF_NEW_PATH + '*')
-    for file in files:
-        copy(file, LHDIFF_OLD_PATH)
-'''
 
 
 def clear_old_files_folder():
