@@ -19,8 +19,8 @@ import sys
 import glob
 import time
 import dateutil.parser
-
-from SP2 import InferTool # Might give an error outside IDE
+sys.path.insert(0, '../SP2')
+import InferTool # Might give an error outside IDE
 
 LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
 LHDIFF_OLD_PATH = str(Path("../../../LHDiff/old_files/"))
@@ -175,7 +175,7 @@ def mine_repositories():
 
 
 def get_repository_path(subdir, dirs):
-    repository_path = str(subdir) + '\\' + str(dirs[0])  # Here we have the git folder string equal to repository.
+    repository_path = str(subdir) + '/' + str(dirs[0])  # Here we have the git folder string equal to repository.
     return repository_path
 
 
@@ -269,6 +269,7 @@ def call_lhdiff(relevant_file, relevant_files_loc):
     lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
     for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
+        print(old_and_new_loc)
         old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
         # print(old_and_new_loc)
         old_file_loc = int(old_and_new_loc[0])
@@ -284,7 +285,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs):
     commit_index = 1
     # FOR LOOP HERE:
     for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
+        g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
 
         # RUN INFER AND CREATE CSV
@@ -331,13 +332,14 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs):
         # PUT DATA IN bugs.csv
         # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
-        clear_old_files_folder()
+        if commit_index >= 2:
+            clear_old_files_folder()
         # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
         copy_new_files_to_old_files_folder()
         # CLEAR NEW_FOLDER
         clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
-
+        commit_index += 1
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()

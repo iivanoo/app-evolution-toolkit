@@ -6,7 +6,7 @@ the app folder. SDK and Build tools versions must match the app.
 """
 
 import os, sys, subprocess, shutil, csv, time
-from SP2 import classes
+import classes
 #from classes import Bug
 
 # Constants
@@ -105,7 +105,11 @@ def writeLocalProperties():
 # removes older build of iOS app, to ensure latest build is used
 def removePreviousBuild() : 
 	if os.path.isdir(BUILDDIRECTORY):
-		shutil.rmtree(BUILDDIRECTORY, ignore_errors=False, onerror=None)	
+		shutil.rmtree(BUILDDIRECTORY, ignore_errors=False, onerror=None)
+
+def removeInferOutFolder() : 
+	if os.path.isdir(BUGDIRECTORY):
+		shutil.rmtree(BUGDIRECTORY, ignore_errors=False, onerror=None)	
 
 # reads the bug report, prepares it so it can be exported to csv file
 def readBugReport(appName, commitIndex):
@@ -159,7 +163,7 @@ def readBugReport(appName, commitIndex):
 
 	else:
 		print("- Analysis failed for " + appName)
-	os.chdir("..")
+	###os.chdir("..")
 
 # writes the bugs to the csv file
 
@@ -167,7 +171,8 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 	#os.chdir(BUGFILEDIR)
 	os.chdir("..")
 	cwd = os.getcwd()
-	csvFileString = cwd.split('\\')[-1] + '_' + commitIndex + ".csv"
+	print(cwd)
+	csvFileString = cwd.split('/')[-1] + '_' + commitIndex + ".csv"
 
 	with open(csvFileString, 'a', newline='') as csvfile:
 		fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']
@@ -175,7 +180,8 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 		for bug in bugs_array:
 			bug.writeBugs(writer)
 
-	os.chdir(currentDirectory)
+	removeInferOutFolder()
+	#####os.chdir(currentDirectory)
 
 def findProjectName():
 	for file in os.listdir('.'):
