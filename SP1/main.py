@@ -154,24 +154,24 @@ def get_git_log_data(g):
 def commit_has_changed_files(files_log_per_commit):
     if ' => ' in str(files_log_per_commit):
         return True
-
+    else:
+        return False
 
 def mine_repositories():
     rootdir = 'repo_subfolder'
-    bug_id = 1
     write_csv_header_for_bugs_csv()
     for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
             repository_path = get_repository_path(subdir, dirs)
             a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
-            # Remove this later
+
             commit_author_date_message_changedfiles = get_git_log_data(g)
             # print(commit_author_date_message_changedfiles)                  # STILL NEED TO WORK THIS OUT
 
             os.chdir(repository_path)
             # print(a_repo)
-            commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
+            commit_checkout_iterator(g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
 
 def get_repository_path(subdir, dirs):
@@ -280,14 +280,12 @@ def call_lhdiff(relevant_file, relevant_files_loc):
             # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
 
-def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
+def commit_checkout_iterator(g, a_repo, repository_path, dirs):
     commit_index = 1
     # FOR LOOP HERE:
     for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        # g.checkout(commit)
+        # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
-        # print(g.log(commit)) doesnt work
-        # print(g.show(commit)) doesnt work
 
         # RUN INFER AND CREATE CSV
         InferTool.inferAnalysis("Android", str(commit_index))
@@ -295,7 +293,7 @@ def commit_checkout_iterator(bug_id, g, a_repo, repository_path, dirs):
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
         bug_list = read_commit_csv(repository_path, dirs, commit_index)
-        # print(bug_list)
+        print(bug_list)
         bug_list_splitted = bug_list_splitter(bug_list)
 
         # READ FROM bug_list FILE_PATH
