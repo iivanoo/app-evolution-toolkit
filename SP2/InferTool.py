@@ -172,7 +172,6 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 	with open(csvFileString, 'a', newline='') as csvfile:
 		fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']
 		writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
-		writer.writeheader()
 		for bug in bugs_array:
 			bug.writeBugs(writer)
 

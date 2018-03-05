@@ -17,6 +17,9 @@ import shutil
 import subprocess
 import sys
 import glob
+import time
+import dateutil.parser
+
 from SP2 import InferTool # Might give an error outside IDE
 
 LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
@@ -109,12 +112,21 @@ def get_commit_author_date(git_log_string):
     splitted_git_log = []
     for i in range(0, len(git_log_string), 3):
         commit_author_date = git_log_string[i].splitlines()
+
         commit_from_git_log = commit_author_date[0].split('commit ')[-1]
+
         author_from_git_log = commit_author_date[1].split('Author: ')[-1]
+
         date_from_git_log = commit_author_date[2].split('Date:  ')[-1]
+        dt = dateutil.parser.parse(date_from_git_log)
+        unix_date_from_git_log = time.mktime(dt.timetuple())
+
         message_from_commit = git_log_string[i+1].split('    ')[-1]
+
         changed_files = get_file_changes_for_commit(git_log_string, i)
-        splitted_git_log.append([commit_from_git_log, author_from_git_log, date_from_git_log, message_from_commit, changed_files])
+
+        splitted_git_log.append([commit_from_git_log, author_from_git_log, unix_date_from_git_log, message_from_commit, changed_files])
+
     return splitted_git_log
 
 
@@ -133,6 +145,7 @@ def get_file_changes_for_commit(git_log_string, i):
 
 def get_git_log_data(g):
     git_log_string = str(g.log('--stat'))
+    git_log_time = g.log()
     git_log_string = git_log_string.split('\n\n')
     commit_author_date_message_changedfiles = get_commit_author_date(git_log_string)
     return commit_author_date_message_changedfiles
@@ -154,11 +167,11 @@ def mine_repositories():
             g = git.Git(repository_path)
             # Remove this later
             commit_author_date_message_changedfiles = get_git_log_data(g)
-            print(commit_author_date_message_changedfiles)
+            # print(commit_author_date_message_changedfiles)                  # STILL NEED TO WORK THIS OUT
 
             os.chdir(repository_path)
             # print(a_repo)
-            # commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
+            commit_checkout_iterator(bug_id, g, a_repo, repository_path, subdir)   # Iterate each commit of a repository.
 
 
 def get_repository_path(subdir, dirs):
