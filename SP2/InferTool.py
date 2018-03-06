@@ -132,30 +132,32 @@ def readBugReport(appName, commitIndex):
 		for bug in splitReport:
 			bugsArray = bug.split('\n')
 			bugBundle = bugsArray[0].split(" error: ")
-			bugPath = bugBundle[0].split(":")
+			if len(bugBundle) > 1:
+				
+				bugPath = bugBundle[0].split(":")
 
-			# Unique ID
-			uniqueID = timestamp + "___" + str(bugIndex)
+				# Unique ID
+				uniqueID = timestamp + "___" + str(bugIndex)
 
-			# Bug File path
-			filePath = bugPath[0]
-			
-			# Bug line number
-			lineNumber = bugPath[1]
-			
-			# Bug type
-			bugType = bugBundle[1]
-			
-			# Bug description
-			bugDescription = bugsArray[1]
+				# Bug File path
+				filePath = bugPath[0]
+				
+				# Bug line number
+				lineNumber = bugPath[1]
+				
+				# Bug type
+				bugType = bugBundle[1]
+				
+				# Bug description
+				bugDescription = bugsArray[1]
 
-			newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
-			bugsToCSVArray.append(newBug)
+				newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
+				bugsToCSVArray.append(newBug)
 
-			#bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])
+				#bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])
 
 
-			bugIndex+=1
+				bugIndex+=1
 		
 		
 		writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
