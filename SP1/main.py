@@ -20,7 +20,7 @@ import glob
 import time
 import dateutil.parser
 sys.path.insert(0, '../SP2')
-import InferTool # Might give an error outside IDE
+import InferTool    # Might give an error outside IDE
 
 LHDIFF_PATH = str(Path('../../../../SP1/LHDiff/lhdiff.jar'))
 LHDIFF_OLD_PATH = str(Path("../../../LHDiff/old_files/"))
@@ -108,54 +108,88 @@ def write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdi
             })
 
 
-def get_commit_author_date(git_log_string):
+def get_commit_author_date_message_changed_files(git_log_string, git_log_file_changes):
     splitted_git_log = []
-    for i in range(0, len(git_log_string), 3):
+    for i in range(0, len(git_log_string), 2):
         commit_author_date = git_log_string[i].splitlines()
-
         commit_from_git_log = commit_author_date[0].split('commit ')[-1]
-
         author_from_git_log = commit_author_date[1].split('Author: ')[-1]
-
         date_from_git_log = commit_author_date[2].split('Date:  ')[-1]
         dt = dateutil.parser.parse(date_from_git_log)
         unix_date_from_git_log = time.mktime(dt.timetuple())
 
         message_from_commit = git_log_string[i+1].split('    ')[-1]
+        changed_files = get_file_changes_for_commit(git_log_file_changes, i)
 
-        changed_files = get_file_changes_for_commit(git_log_string, i)
-
-        splitted_git_log.append([commit_from_git_log, author_from_git_log, unix_date_from_git_log, message_from_commit, changed_files])
+        splitted_git_log.append([commit_from_git_log, author_from_git_log, unix_date_from_git_log, message_from_commit])
 
     return splitted_git_log
 
 
-def get_file_changes_for_commit(git_log_string, i):
+def get_file_changes_for_commit(git_log_file_changes, i):
     file_changes = []
-    files_log_per_commit = git_log_string[i+2].splitlines()     # Still need to add at which commit file was changed.
-    for e in range(0, len(files_log_per_commit)):
-        if commit_has_changed_files(files_log_per_commit[e]):
-            changed_file_name = files_log_per_commit[e].replace('}', "{").split('{')[1]
-            changed_file = changed_file_name.split(' => ')
-            changed_file_from = changed_file[0]
-            changed_file_to = changed_file[1]
-            file_changes.append([changed_file_from, changed_file_to])
-    return file_changes
+    files_log_per_commit = git_log_file_changes.split('\n\n')     # Still need to add at which commit file was changed.
+    # print(files_log_per_commit)
+    for e in range(0, len(files_log_per_commit), 3):
+        commit = files_log_per_commit[e]
+
+    for e in range(1, len(files_log_per_commit), 3):
+        # print(files_log_per_commit)
+        renamed_files = files_log_per_commit[e].splitlines()
+        for i in range(0, len(renamed_files), 2):       #To get the commit out
+
+            renamed_files_splitted = renamed_files[i].split('\t')
+            print(renamed_files_splitted)
+            if renamed_files_splitted[0][:1] == 'M':
+                file_was = 'modified'
+            elif renamed_files_splitted[0][:1] == 'A':
+                file_was = 'added'
+            elif renamed_files_splitted[0][:1] == 'D':
+                file_was = 'deleted'
+            elif renamed_files_splitted[0][:1] == 'R':
+                file_was = 'renamed'
+            else:
+                file_was = 'none'
+            print(file_was)
+
+    for e in range(2, len(files_log_per_commit), 3):
+        # print(files_log_per_commit)
+        for i in files_log_per_commit[e].splitlines():
+            i = i.split('\t')
+            if i[0] == 'M':
+                file_was = 'modified'
+            elif i[0] == 'A':
+                file_was = 'added'
+            elif i[0] == 'D':
+                file_was = 'deleted'
+            elif i[0] == 'R':
+                file_was = 'renamed'
+            else:
+                file_was = 'none'
+            print(file_was)
+
+        # if commit_has_changed_files(files_log_per_commit[e]):
+        #     changed_file_name = files_log_per_commit[e].replace('}', "{").split('{')[1]
+        #     changed_file = changed_file_name.split(' => ')
+        #     changed_file_from = changed_file[0]
+        #     changed_file_to = changed_file[1]
+        #     file_changes.append([changed_file_from, changed_file_to])
+    # return file_changes
 
 
 def get_git_log_data(g):
-    git_log_string = str(g.log('--stat'))
-    git_log_time = g.log()
+    git_log_string = str(g.log())
+    git_log_file_changes = str(g.log("--name-status", "--format='%H'"))
     git_log_string = git_log_string.split('\n\n')
-    commit_author_date_message_changedfiles = get_commit_author_date(git_log_string)
+    commit_author_date_message_changedfiles = get_commit_author_date_message_changed_files(git_log_string, git_log_file_changes)
     return commit_author_date_message_changedfiles
 
-
-def commit_has_changed_files(files_log_per_commit):
-    if ' => ' in str(files_log_per_commit):
-        return True
-    else:
-        return False
+#
+# def commit_has_changed_files(files_log_per_commit):
+#     if ' => ' in str(files_log_per_commit):
+#         return True
+#     else:
+#         return False
 
 def mine_repositories():
     rootdir = 'repo_subfolder'
@@ -269,13 +303,13 @@ def call_lhdiff(relevant_file, relevant_files_loc):
     lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
     for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
-        print(old_and_new_loc)
+        # print(old_and_new_loc)
         old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
         # print(old_and_new_loc)
         old_file_loc = int(old_and_new_loc[0])
         new_file_loc = int(old_and_new_loc[1])
-        if old_file_loc == relevant_files_loc:  # This needs to be changed into new_file_loc or relevant_files_loc?
-            print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
+        # if old_file_loc == relevant_files_loc:  # This needs to be changed into new_file_loc or relevant_files_loc?
+        #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
         # else:
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
             # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
@@ -285,28 +319,28 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs):
     commit_index = 1
     # FOR LOOP HERE:
     for commit in list(a_repo.iter_commits()):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
-        print(commit)
+        #g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
+        # print(commit)
 
         # RUN INFER AND CREATE CSV
-        InferTool.inferAnalysis("Android", str(commit_index))
+        # InferTool.inferAnalysis("Android", str(commit_index))
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
         bug_list = read_commit_csv(repository_path, dirs, commit_index)
-        print(bug_list)
+        # print(bug_list)
         bug_list_splitted = bug_list_splitter(bug_list)
 
         # READ FROM bug_list FILE_PATH
 
         # COPY RELEVANT FILES IN OLD-FOLDER
         relevant_files_list = []
-        print(relevant_files_list)
+        # print(relevant_files_list)
         for i in range(len(bug_list_splitted[0])):
             # For i in all bugs found in the csv
             # Might be able to remove newlines and headers from csv with a split or strip.
             # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
-            print(bug_list_splitted[2])
+            # print(bug_list_splitted[2])
             file_path = bug_list_splitted[2][i]
             file_name = bug_list_splitted[2][i].split('/')[-1]
             line_of_code = bug_list_splitted[3][i]
@@ -318,9 +352,9 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs):
             file_path = relevant_files_list[i][0]
             file_name = relevant_files_list[i][1]
             line_of_code = relevant_files_list[i][2]
-            print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
+            # print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
             if commit_index == 1:
-                print(file_path)
+                # print(file_path)
                 copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
             else:
                 copy_to_new_folder(relevant_files_list[i][0])
