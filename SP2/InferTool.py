@@ -82,12 +82,13 @@ def inferAnalysisAndroid(appDir, commitIndex):
 # Infer analysis for iOS apps
 def inferAnalysisIOS(commitIndex):
 	appName = findProjectName()
+	rewrittenAppName = rewriteSpacesInProjectName(appName)
 	if appName != "false":
-		callString = 'infer run --no-xcpretty -- xcodebuild -target ' + appName + ' -configuration Debug -sdk iphonesimulator'
-		test = 'infer run --no-xcpretty -- xcodebuild  -workspace Telegram.xcworkspace -scheme Telegram'
+		callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator'
+		test = 'infer run --no-xcpretty -- xcodebuild -target Two\ Tap\ -\ iOS\ Example -configuration Debug -sdk iphonesimulator'
 		FNULL = open(os.devnull, 'w')
 		print("Initializing analysis of " + appName + " ...")
-		subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+		subprocess.call(callString, shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 		readBugReport(appName, commitIndex)
 
 	else: 
@@ -190,6 +191,21 @@ def findProjectName():
 		if file.endswith('.xcodeproj'):
 			return str(file[0:-10])
 	return "false"
+
+# Rewrites the project name of an iOS app, in a way that it can be used by Infer
+def rewriteSpacesInProjectName(appName):
+	splitApp = appName.split(" ")
+	numberOfWords = len(splitApp)
+	if numberOfWords <= 1:
+		return appName
+	else:
+		newString = ""
+		for i in range(numberOfWords):
+			if i != (numberOfWords - 1):
+				newString = newString + splitApp[i] + "\ "
+			else:
+				newString = newString + splitApp[i] + " "
+		return newString
 
 if __name__ == '__main__':
     main()
