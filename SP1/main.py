@@ -147,7 +147,15 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
         # print(changed_files)
         splitted_git_log.append([commit_from_git_log, author_from_git_log, unix_date_from_git_log, message_from_commit])
     changed_files = get_file_changes_for_commit(git_log_file_changes, i)
+    # for i in range(len(splitted_git_log)):
+    #     print(splitted_git_log[i][0])
+    print(changed_files)
+    # for i in range(len(changed_files)):
+    #     print(changed_files)
+        # for e in range(len(changed_files[0])):
+        #     print(changed_files[i][e][0][0])
 
+    # if splitted_git_log[0] == changed_files[0]
     return splitted_git_log
 
 
@@ -200,7 +208,7 @@ def get_file_changes_for_commit(git_log_file_changes, i):
                     files_renamed.append([commit, i])
 
             elif i[0][:1] == "'":
-                commit = i
+                commit = i[0].split("'")[1]
     return [files_modified, files_added, files_deleted, files_renamed]
 
 
