@@ -144,9 +144,9 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
         message_from_commit = git_log_string[i+1].split('    ')[-1]
 
         # Files (STILL WORKING ON THIS)
-        changed_files = get_file_changes_for_commit(git_log_file_changes, i)
         # print(changed_files)
         splitted_git_log.append([commit_from_git_log, author_from_git_log, unix_date_from_git_log, message_from_commit])
+    changed_files = get_file_changes_for_commit(git_log_file_changes, i)
 
     return splitted_git_log
 
@@ -178,43 +178,30 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
 #     return file_changes
 
 def get_file_changes_for_commit(git_log_file_changes, i):
-    file_changes = []
-    commit_counter = 0
-    # print(git_log_file_changes)
-    files_log_per_commit = git_log_file_changes.split('\n\n')  # Still need to add at which commit file was changed.
-    # print(files_log_per_commit, sep="\n")
+    files_deleted = []
+    files_added = []
+    files_renamed = []
+    files_modified = []
+    files_log_per_commit = git_log_file_changes.split('\n\n')
     for e in range(0, len(files_log_per_commit)):
-        # print(files_log_per_commit)
-        # print(e)
-        # commits = count(i[0][:1] == "'")
         for i in files_log_per_commit[e].splitlines():
-            if i.lower().endswith(('.java', '.c', '.cc', '.cpp', '.m', '.xml')):
-                # This could be optimized since extensions include for example .cfg or .csv
-                print(i)
+            i = i.split('\t')
+            if i[-1].lower().endswith(('.java', '.c', '.cc', '.cpp', '.m', '.xml')):
+                # Returns if those interesting infer files are modified/added/deleted/renamed.
+                # print(i)
                 if i[0][:1] == 'M':
-                    file_was = 'modified'
+                    files_modified.append([commit, i])
                 elif i[0][:1] == 'A':
-                    file_was = 'added'
+                    files_added.append([commit, i])
                 elif i[0][:1] == 'D':
-                    file_was = 'deleted'
+                    files_deleted.append([commit, i])
                 elif i[0][:1] == 'R':
-                    file_was = 'renamed'
-                print(file_was)
+                    # i[0] = 'R'
+                    files_renamed.append([commit, i])
+
             elif i[0][:1] == "'":
-                commit_counter += 1
-                file_was = 'commit'
-                print(file_was, i)
-                file_changes.append(i)
-            # print(i)
-    # print(os.getcwd())
-                # elif i[0][:1] == "'":
-                #     print(i)
-                #     # commit.append(i[0])
-
-                # print(sum(range(len(commit))))
-                # print(i, file_was)
-    return file_changes
-
+                commit = i
+    return [files_modified, files_added, files_deleted, files_renamed]
 
 
 
