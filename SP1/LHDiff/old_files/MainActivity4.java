@@ -13,7 +13,11 @@ public class MainActivity4 extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    
+    //edhdbcvhsd
+
+
+
+
     //fbehdbcdhbchd
     // bhdbhfbc
     // ebfhbc
@@ -26,6 +30,7 @@ public class MainActivity4 extends AppCompatActivity {
  	public static void foo2 () throws IOException {
     	FileOutputStream fos2 = new FileOutputStream(new File("whatever.txt"));
     	fos2.write(7);   //DOH! What if exception?
+        fos2.write(8);
     	fos2.close();
  }
 

@@ -179,7 +179,7 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
 
 def get_file_changes_for_commit(git_log_file_changes, i):
     file_changes = []
-    commit = []
+    commit_counter = 0
     # print(git_log_file_changes)
     files_log_per_commit = git_log_file_changes.split('\n\n')  # Still need to add at which commit file was changed.
     # print(files_log_per_commit, sep="\n")
@@ -189,9 +189,11 @@ def get_file_changes_for_commit(git_log_file_changes, i):
         # commits = count(i[0][:1] == "'")
         for i in files_log_per_commit[e].splitlines():
             i = i.split('\t')
-            print(i)
-            if any(extension in i[-1][-5:] for extension in extensions):
+            # print(i)
+            # if any(extension in i[-1][-5:] for extension in extensions):
+            if i[-1].lower().endswith(('.java', '.c', '.cc', '.cpp', '.m', '.xml')):
                 # This could be optimized since extensions include for example .cfg or .csv
+                print(i)
                 if i[0][:1] == 'M':
                     file_was = 'modified'
                 elif i[0][:1] == 'A':
@@ -200,8 +202,14 @@ def get_file_changes_for_commit(git_log_file_changes, i):
                     file_was = 'deleted'
                 elif i[0][:1] == 'R':
                     file_was = 'renamed'
-
+                print(file_was)
+            elif i[0][:1] == "'":
+                commit_counter += 1
+                file_was = 'commit'
+                print(file_was, i)
                 file_changes.append(i)
+            # print(i)
+    # print(os.getcwd())
                 # elif i[0][:1] == "'":
                 #     print(i)
                 #     # commit.append(i[0])
@@ -267,9 +275,9 @@ def mine_repositories():
     for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
         if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
             repository_path = get_repository_path(subdir, dirs)
-            a_repo = git.Repo(repository_path, search_parent_directories=True, odbt=git.GitCmdObjectDB)
+            a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
             g = git.Git(repository_path)
-
+            # print(os.getcwd(), subdir, dirs, files)
             commit_author_date_message_changedfiles = get_git_log_data(g)
             # print(commit_author_date_message_changedfiles)                  # STILL NEED TO WORK THIS OUT
 
@@ -421,7 +429,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs):
             line_of_code = bug_list_splitted[3][i]
             relevant_files_list.append([file_path, file_name, line_of_code])
 
-
         for i in range(len(relevant_files_list)):
             file_path = relevant_files_list[i][0]
             file_name = relevant_files_list[i][1]
@@ -448,10 +455,10 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs):
                 #     call_lhdiff(file_name, line_of_code)
                 print(line_of_code)
                 copy_to_new_folder(relevant_files_list[i][0])
-                call_lhdiff(file_name, line_of_code)
-
                 # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-            #if there_are_files_in_new_files_folder():
+                # if there_are_files_in_new_files_folder():
+                #     call_lhdiff(file_name, line_of_code)
+
 
         # PUT DATA IN bugs.csv
         # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
