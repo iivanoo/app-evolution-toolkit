@@ -188,10 +188,7 @@ def get_file_changes_for_commit(git_log_file_changes, i):
         # print(e)
         # commits = count(i[0][:1] == "'")
         for i in files_log_per_commit[e].splitlines():
-            i = i.split('\t')
-            # print(i)
-            # if any(extension in i[-1][-5:] for extension in extensions):
-            if i[-1].lower().endswith(('.java', '.c', '.cc', '.cpp', '.m', '.xml')):
+            if i.lower().endswith(('.java', '.c', '.cc', '.cpp', '.m', '.xml')):
                 # This could be optimized since extensions include for example .cfg or .csv
                 print(i)
                 if i[0][:1] == 'M':
