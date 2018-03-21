@@ -174,8 +174,8 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 	#os.chdir(BUGFILEDIR)
 	os.chdir("..")
 	cwd = os.getcwd()
-	print(cwd)
-	csvFileString = cwd.split('/')[-1] + '_' + commitIndex + ".csv"
+	csvFileString = os.pardir + "/" + cwd.split('/')[-1] + '_' + commitIndex + ".csv"
+	print(csvFileString)
 
 	with open(csvFileString, 'a', newline='') as csvfile:
 		fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']

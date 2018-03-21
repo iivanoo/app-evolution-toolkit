@@ -383,11 +383,12 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc 
 def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
+    #print((list(a_repo.iter_commits())))
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
-
+        g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
+        print(commit)
         # RUN INFER AND CREATE CSV
-        # InferTool.inferAnalysis("Android", str(commit_index))
+        InferTool.inferAnalysis("Android", str(commit_index))
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
