@@ -154,7 +154,7 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
                 if splitted_git_log[o][0] == changed_files[i][e][0]:    # If the commmit equals the other commit
                     # print(splitted_git_log[o], changed_files[i][e][1:][0])
                     splitted_git_log[o].append(changed_files[i][e][1:][0])
-    splitted_git_log.reverse()  # Do this to reverse from last commit first to first commit first.
+    splitted_git_log.reverse()  # Do this to reverse the list from last commit first to first commit first.
     return splitted_git_log
 
 
@@ -363,15 +363,28 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc 
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
         # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
+#
+# def check_file(changed_files_for_this_commit):
+#     if changed_files_for_this_commit[e][0][0] == 'R':
+#         is_renamed_file = True
+#         return is_renamed_file
+#
+#     if changed_files_for_this_commit[e][0][0] == 'A':
+#         is_added_file = True
+#         return is_added_file
+#     if changed_files_for_this_commit[e][0][0] == 'D':
+#         is_removed_file = True
+#         return is_removed_file
+#     if changed_files_for_this_commit[e][0][0] == 'M':
+#         is_modified_file = True
+#         return is_modified_file
+#
 
 def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        # print(commit)
         # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
-
-        # print(commit)
 
         # RUN INFER AND CREATE CSV
         # InferTool.inferAnalysis("Android", str(commit_index))
@@ -395,7 +408,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                 timestamp_for_this_commit = commit_author_date_message_changedfiles[i][2]
                 message_for_this_commit = commit_author_date_message_changedfiles[i][3]
                 changed_files_for_this_commit = commit_author_date_message_changedfiles[i][4:]
-                # print(changed_files_for_this_commit)
+                print(changed_files_for_this_commit)
 
         # COPY RELEVANT FILES IN OLD-FOLDER
         relevant_files_list = []
@@ -428,15 +441,17 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                 for e in range(len(changed_files_for_this_commit)):
                     print(changed_files_for_this_commit[e][0][0])
                     if changed_files_for_this_commit[e][0][0] == 'R':
-                        old_file = changed_files_for_this_commit[e][1]     # THIS NEEDS TO BE EQUAL TO INFERFILE
+                        # if changed_files_for_this_commit[e][1] == relevant_files_list[i][0]:
+                        print(changed_files_for_this_commit[e][1], relevant_files_list[i][0])
+                        # old_file = changed_files_for_this_commit[e][1]     # THIS NEEDS TO BE EQUAL TO INFERFILE
                         # print(old_file)
-                        renamed_file = changed_files_for_this_commit[e][2]
-                        copy_to_new_folder(renamed_file)
-                        renamed_file = renamed_file.split('/')[-1]
+                        # renamed_file = changed_files_for_this_commit[e][2]
+                        # copy_to_new_folder(renamed_file)
+                        # renamed_file = renamed_file.split('/')[-1]
                         # print(renamed_file)
                         # if old_file == relevant_files_list[i][0]:
                         # print(old_file, new_file)
-                        call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
+                        # call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
                     elif changed_files_for_this_commit[e][0][0] == 'A':
                         new_file_to_be_copied = changed_files_for_this_commit[e][1]
                         copy_to_new_folder(new_file_to_be_copied)
@@ -472,7 +487,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
         # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
         # CLEAR OLD_FOLDER
         if commit_index >= 2:
-            clear_old_files_folder()
+            clear_old_files_folder()    # This is needed for storage purposes.
         # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
         copy_new_files_to_old_files_folder()
         # CLEAR NEW_FOLDER
