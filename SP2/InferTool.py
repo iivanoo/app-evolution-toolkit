@@ -74,6 +74,7 @@ def inferAnalysisAndroid(appDir, commitIndex):
 	writeLocalProperties()
 	FNULL = open(os.devnull, 'w')
 	print("Initializing analysis of " + appDir + " ...")
+	subprocess.call('find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done', shell=True)
 	subprocess.call('./gradlew clean', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 	subprocess.call('infer run -- ./gradlew build', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 	readBugReport(appDir, commitIndex)
@@ -189,7 +190,13 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 def findProjectName():
 	for file in os.listdir('.'):
 		if file.endswith('.xcodeproj'):
-			return str(file[0:-10])
+			try:
+				output_string = subprocess.check_output('xcodebuild -list', shell=True)
+			except subprocess.CalledProcessError:
+				return "false"
+
+			first_target = output_string.decode().split("Targets:\n")[1].split("\n")[0].replace('        ','')
+			return first_target
 	return "false"
 
 # Rewrites the project name of an iOS app, in a way that it can be used by Infer
