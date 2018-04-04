@@ -182,8 +182,9 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 		writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
 		for bug in bugs_array:
 			bug.writeBugs(writer)
+	shutil.rmtree(BUGDIRECTORY)
+	#copy_to_parent_folder()
 
-	#removeInferOutFolder()
 	#####os.chdir(currentDirectory)
 
 def findProjectName():
@@ -212,6 +213,18 @@ def rewriteSpacesInProjectName(appName):
 			else:
 				newString = newString + splitApp[i] + " "
 		return newString
+
+def copy_to_parent_folder():
+	root = os.getcwd()
+	os.chdir("..")
+	os.mkdir(BUGDIRECTORY)
+	os.chdir(root)
+
+	for filename in os.listdir(os.path.join(root, BUGDIRECTORY)):
+		shutil.move(os.path.join(root, BUGDIRECTORY, filename), os.path.join(os.pardir + "/" + BUGDIRECTORY, filename))
+
+	print(BUILDDIRECTORY)
+	#rmdir(BUGDIRECTORY)
 
 if __name__ == '__main__':
     main()

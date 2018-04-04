@@ -383,7 +383,8 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc 
 def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
-    #print((list(a_repo.iter_commits())))
+    print(len(list(a_repo.iter_commits())))
+
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
@@ -482,6 +483,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                 # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
                 # if there_are_files_in_new_files_folder():
                 #     call_lhdiff(file_name, line_of_code)
+
 
 
         # PUT DATA IN bugs.csv
