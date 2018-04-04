@@ -16,6 +16,7 @@ BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 BUGDIRECTORY = "infer-out/"
 BUGFILE = "bugs.txt"
 BUILDDIRECTORY = "build"
+RESOURCE_LEAK = "RESOURCE_LEAK"
 
 
 def main():
@@ -85,7 +86,7 @@ def inferAnalysisIOS(commitIndex):
 	appName = findProjectName()
 	rewrittenAppName = rewriteSpacesInProjectName(appName)
 	if appName != "false":
-		callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator'
+		callString = 'infer run -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator'
 		test = 'infer run --no-xcpretty -- xcodebuild -target Two\ Tap\ -\ iOS\ Example -configuration Debug -sdk iphonesimulator'
 		FNULL = open(os.devnull, 'w')
 		print("Initializing analysis of " + appName + " ...")
@@ -153,13 +154,11 @@ def readBugReport(appName, commitIndex):
 				# Bug description
 				bugDescription = bugsArray[1]
 
-				newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
-				bugsToCSVArray.append(newBug)
+				if bugType == RESOURCE_LEAK:
+					newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
+					bugsToCSVArray.append(newBug)
 
-				#bugsToCSVArray.append([uniqueID, bugType, filePath, lineNumber, bugDescription])
-
-
-				bugIndex+=1
+					bugIndex+=1
 		
 		
 		writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
@@ -184,7 +183,7 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 		for bug in bugs_array:
 			bug.writeBugs(writer)
 
-	removeInferOutFolder()
+	#removeInferOutFolder()
 	#####os.chdir(currentDirectory)
 
 def findProjectName():
