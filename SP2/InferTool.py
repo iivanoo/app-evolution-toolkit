@@ -5,7 +5,7 @@ Assumes Gradle build. SDK folder must be defined in local.properties in
 the app folder. SDK and Build tools versions must match the app.
 """
 
-import os, sys, subprocess, shutil, csv, time
+import os, sys, subprocess, shutil, csv, time, glob, re
 import classes
 #from classes import Bug
 
@@ -71,7 +71,11 @@ def inferAnalysis(appDir, commitIndex):
 
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir, commitIndex):
-
+	homeDirectory = os.getcwd()
+	root_folder = find_root_folder("Android")
+	
+	os.chdir(root_folder)
+	
 	writeLocalProperties()
 	FNULL = open(os.devnull, 'w')
 	print("Initializing analysis of " + appDir + " ...")
@@ -79,10 +83,17 @@ def inferAnalysisAndroid(appDir, commitIndex):
 	subprocess.call('./gradlew clean', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 	subprocess.call('infer run -- ./gradlew build', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 	readBugReport(appDir, commitIndex)
+
+	os.chdir(homeDirectory)
 	#readBugReport(appDir, "Android")
 
 # Infer analysis for iOS apps
 def inferAnalysisIOS(commitIndex):
+	homeDirectory = os.getcwd()
+	root_folder = find_root_folder("IOS")
+	
+	os.chdir(root_folder)
+
 	appName = findProjectName()
 	rewrittenAppName = rewriteSpacesInProjectName(appName)
 	if appName != "false":
@@ -223,9 +234,33 @@ def copy_to_parent_folder():
 	for filename in os.listdir(os.path.join(root, BUGDIRECTORY)):
 		shutil.move(os.path.join(root, BUGDIRECTORY, filename), os.path.join(os.pardir + "/" + BUGDIRECTORY, filename))
 
-	print(BUILDDIRECTORY)
 	#rmdir(BUGDIRECTORY)
 
+def find_root_folder(mode):
+
+	if mode == "Android":
+		fileArray = []
+		for filename in glob.iglob('**/gradlew', recursive=True):
+			folder = str(filename).split("gradlew")
+			fileArray.append(folder[0])
+		
+		if fileArray[0] != "":
+			return fileArray[0]
+		else:
+			return os.getcwd()
+			
+	elif mode == "IOS":
+		fileArray = []
+		for filename in glob.iglob('**/*.xcodeproj', recursive=True):
+			fileArray.append(filename)
+		path = re.split('\w*.xcodeproj', fileArray[0])[0]
+		if path != "":
+			return path
+		else:
+			return "/"
+
+
+   	
 if __name__ == '__main__':
     main()
 
