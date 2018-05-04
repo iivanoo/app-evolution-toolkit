@@ -389,7 +389,9 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
         # RUN INFER AND CREATE CSV
-        InferTool.inferAnalysis("Android", str(commit_index))
+
+        InferTool.inferAnalysisAndroid("Android", str(commit_index))
+
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
