@@ -253,7 +253,9 @@ def get_commit_csv_name(repository_path, subdir, commit_index):
 
 
 def read_repository_csv_location(repository_path, subdir, commit_index):
-    DATA_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    #DATA_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    # THIS WAS ADJUSTED TO BE ABLE TO WORK WITH NEW DIR STRUCTURE, NOT SURE IF BEST WAY
+    DATA_PATH = os.path.abspath(os.getcwd())
     path = str(DATA_PATH) + str(get_commit_csv_name(repository_path, subdir, commit_index))
     return path
 
@@ -499,6 +501,9 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
         clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
         commit_index += 1
+        ### QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
+        subprocess.call('ls', shell=True)
+        os.chdir(repository_path.split("/")[-1])
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()

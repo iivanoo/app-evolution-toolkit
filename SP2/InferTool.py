@@ -12,7 +12,13 @@ import classes
 
 # Constants
 LOCALPROPERTIES = "local.properties"
-SDKPATH = "sdk.dir=/Users/sylviastolwijk/Library/Android/sdk"
+
+# BOB SDKPATH
+#SDKPATH = "sdk.dir=/Users/sylviastolwijk/Library/Android/sdk"
+
+# CHRIS SDKPATH
+SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
+
 BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 BUGDIRECTORY = "infer-out/"
 BUGFILE = "bugs.txt"
@@ -83,11 +89,13 @@ def inferAnalysisAndroid(appDir, commitIndex):
         FNULL = open(os.devnull, 'w')
         print("Initializing analysis of " + appDir + " ...")
         subprocess.call('find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done', shell=True)
+        subprocess.call('chmod +x gradlew', shell=True)
         subprocess.call('./gradlew clean', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
         subprocess.call('infer run -- ./gradlew build', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
-        readBugReport(appDir, commitIndex)
+        # readBugReport(appDir, commitIndex)
 
-        os.chdir(homeDirectory)
+    os.chdir(homeDirectory)
+    readBugReport(appDir, commitIndex)
 
 
 # readBugReport(appDir, "Android")
@@ -97,8 +105,8 @@ def inferAnalysisIOS(commitIndex):
     homeDirectory = os.getcwd()
     root_folder = find_root_folder("IOS")
     if root_folder == "empty":
-        print("No xcodeproj found, no working app")
-        print(homeDirectory)
+        print("- No xcodeproj found, no working app")
+
     else:
         os.chdir(root_folder)
 
@@ -112,10 +120,11 @@ def inferAnalysisIOS(commitIndex):
             print("Initializing analysis of " + appName + " ...")
             subprocess.call(cleanString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
             subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-            readBugReport(appName, commitIndex)
+            # readBugReport(appName, commitIndex)
 
         else: 
-            print("No working app found")
+            print("- No working app found")
+    readBugReport(appName, commitIndex)
 
 
 # Rewrites local.properties in order to make android builds work
@@ -142,54 +151,65 @@ def removeInferOutFolder():
 # reads the bug report, prepares it so it can be exported to csv file
 def readBugReport(appName, commitIndex):
     timestamp = str(time.time())
-    os.chdir(BUGDIRECTORY)
+    bugsToCSVArray = []
     currDir = os.getcwd()
-    if os.path.isfile(BUGFILE):
-        bugreport = open(BUGFILE, "r")
-        bugsToCSVArray = []
-        bugreportText = bugreport.read()
+    if os.path.isdir(BUGDIRECTORY):
+        os.chdir(BUGDIRECTORY)
+        
+        
+        if os.path.isfile(BUGFILE):
+            bugreport = open(BUGFILE, "r")
+            
+            bugreportText = bugreport.read()
 
-        # splits bugs.txt so that only the bugs are in the array
-        splitReport = bugreportText.split('\n\n')
-        splitReport = splitReport[1:-2]
+            # splits bugs.txt so that only the bugs are in the array
+            splitReport = bugreportText.split('\n\n')
+            splitReport = splitReport[1:-2]
 
-        # index for unique id
-        bugIndex = 1
+            # index for unique id
+            bugIndex = 1
 
-        # separates the bug into different parts
-        for bug in splitReport:
-            bugsArray = bug.split('\n')
-            bugBundle = bugsArray[0].split(" error: ")
-            if len(bugBundle) > 1:
+            # separates the bug into different parts
+            for bug in splitReport:
+                bugsArray = bug.split('\n')
+                bugBundle = bugsArray[0].split(" error: ")
+                if len(bugBundle) > 1:
 
-                bugPath = bugBundle[0].split(":")
+                    bugPath = bugBundle[0].split(":")
 
-                # Unique ID
-                uniqueID = timestamp + "___" + str(bugIndex)
+                    # Unique ID
+                    uniqueID = timestamp + "___" + str(bugIndex)
 
-                # Bug File path
-                filePath = bugPath[0]
+                    # Bug File path
+                    filePath = bugPath[0]
 
-                # Bug line number
-                lineNumber = bugPath[1]
+                    # Bug line number
+                    lineNumber = bugPath[1]
 
-                # Bug type
-                bugType = bugBundle[1]
+                    # Bug type
+                    bugType = bugBundle[1]
 
-                # Bug description
-                bugDescription = bugsArray[1]
+                    # Bug description
+                    bugDescription = bugsArray[1]
 
-                if bugType == RESOURCE_LEAK:
-                    newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
-                    bugsToCSVArray.append(newBug)
+                    if bugType == RESOURCE_LEAK:
+                        newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
+                        bugsToCSVArray.append(newBug)
 
-                    bugIndex += 1
+                        bugIndex += 1
 
-        writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
-        print("+ Analysis complete for " + appName)
+            #writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
+            print("+ Analysis complete for " + appName)
 
-    else:
-        print("- Analysis failed for " + appName)
+        else:
+            print("- Analysis failed for " + appName)
+
+
+
+        os.chdir("..")
+        subprocess.call("ls", shell=True)
+        shutil.rmtree(BUGDIRECTORY)
+    writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
 
 
 ###os.chdir("..")
@@ -198,17 +218,17 @@ def readBugReport(appName, commitIndex):
 
 def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
     # os.chdir(BUGFILEDIR)
-    os.chdir("..")
-    cwd = os.getcwd()
-    csvFileString = os.pardir + "/" + cwd.split('/')[-1] + '_' + commitIndex + ".csv"
+    #cwd = os.getcwd()
+    #print(cwd)
+    csvFileString = os.pardir + "/" + currentDirectory.split('/')[-1] + '_' + commitIndex + ".csv"
     print(csvFileString)
-
     with open(csvFileString, 'a', newline='') as csvfile:
         fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         for bug in bugs_array:
             bug.writeBugs(writer)
-    shutil.rmtree(BUGDIRECTORY)
+    os.chdir("..")
+        
 
 
 # copy_to_parent_folder()
