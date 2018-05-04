@@ -74,17 +74,20 @@ def inferAnalysisAndroid(appDir, commitIndex):
     homeDirectory = os.getcwd()
     root_folder = find_root_folder("Android")
 
-    os.chdir(root_folder)
+    if root_folder == "empty":
+        print("- No gradlew file found, no working app")
+    else:
+        os.chdir(root_folder)
 
-    writeLocalProperties()
-    FNULL = open(os.devnull, 'w')
-    print("Initializing analysis of " + appDir + " ...")
-    subprocess.call('find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done', shell=True)
-    subprocess.call('./gradlew clean', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
-    subprocess.call('infer run -- ./gradlew build', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
-    readBugReport(appDir, commitIndex)
+        writeLocalProperties()
+        FNULL = open(os.devnull, 'w')
+        print("Initializing analysis of " + appDir + " ...")
+        subprocess.call('find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done', shell=True)
+        subprocess.call('./gradlew clean', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('infer run -- ./gradlew build', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
+        readBugReport(appDir, commitIndex)
 
-    os.chdir(homeDirectory)
+        os.chdir(homeDirectory)
 
 
 # readBugReport(appDir, "Android")
@@ -93,21 +96,26 @@ def inferAnalysisAndroid(appDir, commitIndex):
 def inferAnalysisIOS(commitIndex):
     homeDirectory = os.getcwd()
     root_folder = find_root_folder("IOS")
-
-    os.chdir(root_folder)
-
-    appName = findProjectName()
-    rewrittenAppName = rewriteSpacesInProjectName(appName)
-    if appName != "false":
-        callString = 'infer run -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator'
-        test = 'infer run --no-xcpretty -- xcodebuild -target Two\ Tap\ -\ iOS\ Example -configuration Debug -sdk iphonesimulator'
-        FNULL = open(os.devnull, 'w')
-        print("Initializing analysis of " + appName + " ...")
-        subprocess.call(callString, shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
-        readBugReport(appName, commitIndex)
-
+    if root_folder == "empty":
+        print("No xcodeproj found, no working app")
+        print(homeDirectory)
     else:
-        print("No working app found")
+        os.chdir(root_folder)
+
+        appName = findProjectName()
+        rewrittenAppName = rewriteSpacesInProjectName(appName)
+        if appName != "false":
+            cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator -arch i386 clean'
+            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator -arch i386'
+            test = 'infer run --no-xcpretty -- xcodebuild -target Two\ Tap\ -\ iOS\ Example -configuration Debug -sdk iphonesimulator'
+            FNULL = open(os.devnull, 'w')
+            print("Initializing analysis of " + appName + " ...")
+            subprocess.call(cleanString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+            readBugReport(appName, commitIndex)
+
+        else: 
+            print("No working app found")
 
 
 # Rewrites local.properties in order to make android builds work
@@ -261,17 +269,20 @@ def find_root_folder(mode):
             else:
                 return os.getcwd()
         else:
-            return os.getcwd()
+            return "empty"
 
     elif mode == "IOS":
         fileArray = []
         for filename in glob.iglob('**/*.xcodeproj', recursive=True):
             fileArray.append(filename)
-        path = re.split('\w*.xcodeproj', fileArray[0])[0]
-        if path != "":
-            return path
+        if len(fileArray) > 0:
+            path = re.split('\w*.xcodeproj', fileArray[0])[0]
+            if path != "":
+                return path
+            else:
+                return os.getcwd()
         else:
-            return "/"
+            return "empty"
 
 
 if __name__ == '__main__':
