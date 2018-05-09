@@ -143,8 +143,7 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
         # Message
         message_from_commit = git_log_string[i+1].split('    ')[-1]
 
-        # Files (STILL WORKING ON THIS)
-        # print(changed_files)
+        # Files
         splitted_git_log.append([commit_from_git_log, author_from_git_log, unix_date_from_git_log, message_from_commit])
     changed_files = get_file_changes_for_commit(git_log_file_changes, i)
 
@@ -154,35 +153,9 @@ def get_commit_author_date_message_changed_files(git_log_string, git_log_file_ch
                 if splitted_git_log[o][0] == changed_files[i][e][0]:    # If the commmit equals the other commit
                     # print(splitted_git_log[o], changed_files[i][e][1:][0])
                     splitted_git_log[o].append(changed_files[i][e][1:][0])
-    splitted_git_log.reverse()  # Do this to reverse the list from last commit first to first commit first.
+    splitted_git_log.reverse()  # Do this to reverse the list: last commit first -> initial commit first.
     return splitted_git_log
 
-
-# def get_file_changes_for_commit(git_log_file_changes, i):
-#     file_changes = []
-#     # print(git_log_file_changes)
-#     files_log_per_commit = git_log_file_changes.split('\n\n')     # Still need to add at which commit file was changed.
-#     # print(files_log_per_commit, sep="\n")
-#     for e in range(0, len(files_log_per_commit)):
-#         # print(files_log_per_commit)
-#         # print(e)
-#         for i in files_log_per_commit[e].splitlines():
-#             i = i.split('\t')
-#             if any(extension in i[-1][-5:] for extension in extensions):
-#                 # This could be optimized since extensions include for example .cfg or .csv
-#                 if i[0][:1] == 'M':
-#                     file_was = 'modified'
-#                 elif i[0][:1] == 'A':
-#                     file_was = 'added'
-#                 elif i[0][:1] == 'D':
-#                     file_was = 'deleted'
-#                 elif i[0][:1] == 'R':
-#                     file_was = 'renamed'
-#             elif i[0][:1] == "'":
-#
-#                 print(i, file_was)
-#                 file_changes.append(i)
-#     return file_changes
 
 def get_file_changes_for_commit(git_log_file_changes, i):
     files_deleted = []
@@ -249,14 +222,14 @@ def get_repository_name(repository_path):
 
 def get_commit_csv_name(repository_path, subdir, commit_index):
     repository_name = repository_path.split(subdir)
-    return str(repository_name[-1]) + '_' + str(commit_index) + '.csv'  # For example repo_1.csv -> HelloWorld_1.csv
+    return Path(str(repository_name[-1]) + '_' + str(commit_index) + '.csv')  # For example repo_1.csv -> HelloWorld_1.csv
 
 
 def read_repository_csv_location(repository_path, subdir, commit_index):
-    #DATA_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    # DATA_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     # THIS WAS ADJUSTED TO BE ABLE TO WORK WITH NEW DIR STRUCTURE, NOT SURE IF BEST WAY
-    DATA_PATH = os.path.abspath(os.getcwd())
-    path = str(DATA_PATH) + str(get_commit_csv_name(repository_path, subdir, commit_index))
+    DATA_PATH = os.path.abspath(Path(os.getcwd()).parent)
+    path = Path(str(DATA_PATH) + str(get_commit_csv_name(repository_path, subdir, commit_index)))
     return path
 
 
@@ -277,7 +250,7 @@ def bug_list_splitter(bug_list):
     file_path = []
     line_number = []
     bug_description = []
-    for data in bug_list[1:]:
+    for data in bug_list:
         data = data.split(',')
         bug_id.append(data[0])
         bug_type.append(data[1])
@@ -318,11 +291,11 @@ def clear_old_files_folder():
 def clear_file_from_old_files_folder(file):
     os.remove(file)
 
+
 def clear_new_files_folder():
     files = glob.glob(str(Path(LHDIFF_NEW_PATH + '/*')))
     for file in files:
         os.remove(file)
-
 
 def copy_new_files_to_old_files_folder():
     files = glob.glob(str(Path(LHDIFF_NEW_PATH + '/*')))
@@ -385,22 +358,20 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc 
 def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
-    print(len(list(a_repo.iter_commits())))
+    # print(len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
 
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
+        # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
         # RUN INFER AND CREATE CSV
-
-        InferTool.inferAnalysisAndroid("Android", str(commit_index))
-
+        # InferTool.inferAnalysisAndroid("Android", str(commit_index))
 
         # GET CSV PATH AND READ CSV
         get_commit_csv_name(repository_path, dirs, commit_index)
         bug_list = read_commit_csv(repository_path, dirs, commit_index)
         # print(bug_list)
         bug_list_splitted = bug_list_splitter(bug_list)
-
+        # print(bug_list_splitted)
         # READ FROM bug_list FILE_PATH
 
         # IF COMMIT == COMMIT WITH CHANGED FILE FUNCTION
@@ -414,7 +385,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                 timestamp_for_this_commit = commit_author_date_message_changedfiles[i][2]
                 message_for_this_commit = commit_author_date_message_changedfiles[i][3]
                 changed_files_for_this_commit = commit_author_date_message_changedfiles[i][4:]
-                print(changed_files_for_this_commit)
+                # print(changed_files_for_this_commit)
 
         # COPY RELEVANT FILES IN OLD-FOLDER
         relevant_files_list = []
@@ -423,20 +394,18 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
             # For i in all bugs found in the csv
             # Might be able to remove newlines and headers from csv with a split or strip.
             # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
-            # print(bug_list_splitted[2])
             file_path = bug_list_splitted[2][i]
             file_name = bug_list_splitted[2][i].split('/')[-1]
             line_of_code = bug_list_splitted[3][i]
             relevant_files_list.append([file_path, file_name, line_of_code])
 
-        # print(relevant_files_list)
         print(relevant_files_list)
         for i in range(len(relevant_files_list)):
             file_path = relevant_files_list[i][0]
             # print(file_path)
             file_name = relevant_files_list[i][1]
             line_of_code = relevant_files_list[i][2]
-            # print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
+            print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
             if commit_index == 1:
                 # print(file_path)
                 copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
@@ -446,6 +415,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                 # print(changed_files_for_this_commit)
                 for e in range(len(changed_files_for_this_commit)):
                     print(changed_files_for_this_commit[e][0][0])
+                    print(changed_files_for_this_commit[e][1], relevant_files_list[i][0])
+
                     if changed_files_for_this_commit[e][0][0] == 'R':
                         # if changed_files_for_this_commit[e][1] == relevant_files_list[i][0]:
                         print(changed_files_for_this_commit[e][1], relevant_files_list[i][0])
@@ -459,15 +430,20 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                         # print(old_file, new_file)
                         # call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
                     elif changed_files_for_this_commit[e][0][0] == 'A':
-                        new_file_to_be_copied = changed_files_for_this_commit[e][1]
-                        copy_to_new_folder(new_file_to_be_copied)
+                        new_file_to_be_checked = changed_files_for_this_commit[e][1] # NEEDS EQUALS RELEVANT FILE? THEN
+                        print('tijdelijk iets')
+                        # copy_to_new_folder(new_file_to_be_copied)
                     elif changed_files_for_this_commit[e][0][0] == 'D':
                         old_file_that_is_to_be_removed = changed_files_for_this_commit[e][1]  # Clean the file from old_files
                         clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
                     elif changed_files_for_this_commit[e][0][0] == 'M':
                         copy_to_new_folder(relevant_files_list[i][0])        # Just copy the things that infer returned
+                    # elif changed_files_for_this_commit[e][0][0] == 'R':     # Get new filename path from git log and run lhdiff.
+                        # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
+                        # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
 
-                # if file_was_renamed():
+
+                # file_was_renamed():
                 #     relevant_file = relevant_files_list[i - 1][0] # DIT KLOPT NIET -> Moet uit git log de renamed file halen
                 #     renamed_file = relevant_files_list[i][0]
                 #     call_lhdiff_for_renamed_file(relevant_file, renamed_file, line_of_code)
@@ -503,7 +479,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
         commit_index += 1
         ### QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
         subprocess.call('ls', shell=True)
-        os.chdir(repository_path.split("/")[-1])
+        # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()
@@ -594,5 +570,32 @@ analyzer: the path in the file system where to find the main Python script for r
         #     bug_id += 1
         # else:
         #     continue
+
+
+# def get_file_changes_for_commit(git_log_file_changes, i):
+#     file_changes = []
+#     # print(git_log_file_changes)
+#     files_log_per_commit = git_log_file_changes.split('\n\n')     # Still need to add at which commit file was changed.
+#     # print(files_log_per_commit, sep="\n")
+#     for e in range(0, len(files_log_per_commit)):
+#         # print(files_log_per_commit)
+#         # print(e)
+#         for i in files_log_per_commit[e].splitlines():
+#             i = i.split('\t')
+#             if any(extension in i[-1][-5:] for extension in extensions):
+#                 # This could be optimized since extensions include for example .cfg or .csv
+#                 if i[0][:1] == 'M':
+#                     file_was = 'modified'
+#                 elif i[0][:1] == 'A':
+#                     file_was = 'added'
+#                 elif i[0][:1] == 'D':
+#                     file_was = 'deleted'
+#                 elif i[0][:1] == 'R':
+#                     file_was = 'renamed'
+#             elif i[0][:1] == "'":
+#
+#                 print(i, file_was)
+#                 file_changes.append(i)
+#     return file_changes
 
 '''
