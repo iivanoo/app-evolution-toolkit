@@ -1,2 +1,0 @@
-1522955503.69832___1,RESOURCE_LEAK,app/src/main/java/com/example/chris/infertestappandroid/MainActivity.java,27,   resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 24 is not released after line 27
-1522955503.69832___2,RESOURCE_LEAK,app/src/main/java/com/example/chris/infertestappandroid/MainActivity.java,21,   resource of type `java.io.FileOutputStream` acquired to `fos2` by call to `FileOutputStream(...)` at line 18 is not released after line 21

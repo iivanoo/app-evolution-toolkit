@@ -353,7 +353,11 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc 
 #     if changed_files_for_this_commit[e][0][0] == 'M':
 #         is_modified_file = True
 #         return is_modified_file
-#
+
+
+def relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, relevant_file_path, e, i):
+    return changed_files_for_this_commit[e][1] == relevant_file_path[i][0]
+
 
 def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_date_message_changedfiles):
     commit_index = 1
@@ -398,8 +402,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
             file_name = bug_list_splitted[2][i].split('/')[-1]
             line_of_code = bug_list_splitted[3][i]
             relevant_files_list.append([file_path, file_name, line_of_code])
+        # print(relevant_files_list)
 
-        print(relevant_files_list)
         for i in range(len(relevant_files_list)):
             file_path = relevant_files_list[i][0]
             # print(file_path)
@@ -410,37 +414,41 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                 # print(file_path)
                 copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
             else:
-                print(relevant_files_list[i][0])    # HERE PUT IF FILE IS CHANGED
-                # print(changed_files_for_this_commit[0][2])
+                # print(relevant_files_list[i][0])    # HERE PUT IF FILE IS CHANGED
                 # print(changed_files_for_this_commit)
                 for e in range(len(changed_files_for_this_commit)):
-                    print(changed_files_for_this_commit[e][0][0])
-                    print(changed_files_for_this_commit[e][1], relevant_files_list[i][0])
+                    if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, relevant_files_list, e, i):
+                        this_file_was = changed_files_for_this_commit[e][0][0]
+                        print(this_file_was)  # Shows letter (Added Deleted Modified Renamed)
+                        if this_file_was == 'R':    # Renamed
+                            print('RENAMED')
+                            # old_file = changed_files_for_this_commit[e][1]     # THIS NEEDS TO BE EQUAL TO INFERFILE
+                            # print(old_file)
+                            # renamed_file = changed_files_for_this_commit[e][2]
+                            # copy_to_new_folder(renamed_file)
+                            # renamed_file = renamed_file.split('/')[-1]
+                            # print(renamed_file)
+                            # if old_file == relevant_files_list[i][0]:
+                            # print(old_file, new_file)
+                            # call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
+                        elif this_file_was == 'A':  # Added
+                            print('ADDED')
+                            new_file_to_be_checked = changed_files_for_this_commit[e][1] # NEEDS EQUALS RELEVANT FILE? THEN
+                            # copy_to_new_folder(new_file_to_be_copied)
 
-                    if changed_files_for_this_commit[e][0][0] == 'R':
-                        # if changed_files_for_this_commit[e][1] == relevant_files_list[i][0]:
-                        print(changed_files_for_this_commit[e][1], relevant_files_list[i][0])
-                        # old_file = changed_files_for_this_commit[e][1]     # THIS NEEDS TO BE EQUAL TO INFERFILE
-                        # print(old_file)
-                        # renamed_file = changed_files_for_this_commit[e][2]
-                        # copy_to_new_folder(renamed_file)
-                        # renamed_file = renamed_file.split('/')[-1]
-                        # print(renamed_file)
-                        # if old_file == relevant_files_list[i][0]:
-                        # print(old_file, new_file)
-                        # call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
-                    elif changed_files_for_this_commit[e][0][0] == 'A':
-                        new_file_to_be_checked = changed_files_for_this_commit[e][1] # NEEDS EQUALS RELEVANT FILE? THEN
-                        print('tijdelijk iets')
-                        # copy_to_new_folder(new_file_to_be_copied)
-                    elif changed_files_for_this_commit[e][0][0] == 'D':
-                        old_file_that_is_to_be_removed = changed_files_for_this_commit[e][1]  # Clean the file from old_files
-                        clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
-                    elif changed_files_for_this_commit[e][0][0] == 'M':
-                        copy_to_new_folder(relevant_files_list[i][0])        # Just copy the things that infer returned
-                    # elif changed_files_for_this_commit[e][0][0] == 'R':     # Get new filename path from git log and run lhdiff.
-                        # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
-                        # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
+                        elif this_file_was == 'D':  # Deleted
+                            print('DELETED')
+                            old_file_that_is_to_be_removed = changed_files_for_this_commit[e][1]  # Clean the file from old_files
+                            clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
+
+                        elif this_file_was == 'M':  # Modified
+                            print('MODIFIED')
+                            copy_to_new_folder(relevant_files_list[i][0])        # Just copy the things that infer returned
+                        # elif changed_files_for_this_commit[e][0][0] == 'R':     # Get new filename path from git log and run lhdiff.
+                            # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
+                            # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
+
+
 
 
                 # file_was_renamed():
@@ -477,8 +485,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
         clear_new_files_folder()
         # RESTART ON NEXT COMMIT IN FOR-LOOP
         commit_index += 1
-        ### QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
-        subprocess.call('ls', shell=True)
+        # QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
+        # subprocess.call('ls', shell=True)
         # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
 
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.

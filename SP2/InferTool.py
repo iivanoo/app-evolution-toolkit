@@ -14,12 +14,12 @@ import classes
 LOCALPROPERTIES = "local.properties"
 
 # BOB SDKPATH
-#SDKPATH = "sdk.dir=/Users/sylviastolwijk/Library/Android/sdk"
+SDKPATH = "sdk.dir=/Users/sylviastolwijk/Library/Android/sdk"
+BUGFILEDIR = "/Users/sylviastolwijk/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 
 # CHRIS SDKPATH
-SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
-
-BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
+# SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
+# BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 BUGDIRECTORY = "infer-out/"
 BUGFILE = "bugs.txt"
 BUILDDIRECTORY = "build"
@@ -124,7 +124,7 @@ def inferAnalysisIOS(commitIndex):
 
         else: 
             print("- No working app found")
-    readBugReport(appName, commitIndex)
+    # readBugReport(appName, commitIndex)
 
 
 # Rewrites local.properties in order to make android builds work
@@ -233,7 +233,7 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
 
 # copy_to_parent_folder()
 
-#####os.chdir(currentDirectory)
+# os.chdir(currentDirectory)
 
 def findProjectName():
     for file in os.listdir('.'):
