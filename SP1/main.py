@@ -321,17 +321,17 @@ def call_lhdiff(relevant_file, relevant_files_loc):
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
             # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
-def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc ):
+def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc):
     oldfile = str(Path(LHDIFF_OLD_PATH + '/' + relevant_file))
     newfile = str(Path(LHDIFF_NEW_PATH + '/' + renamed_file))
     lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
-    for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
+    for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff tool.
         # print(old_and_new_loc)
         old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
         # print(old_and_new_loc)
-        old_file_loc = int(old_and_new_loc[0])
-        new_file_loc = int(old_and_new_loc[1])
+        old_file_loc = int(old_and_new_loc[0])  # Line of code in old file
+        new_file_loc = int(old_and_new_loc[1])  # Line of code in new file
         # if old_file_loc == relevant_files_loc:  # This needs to be changed into new_file_loc or relevant_files_loc?
         #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
         # else:
@@ -410,7 +410,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
             file_name = relevant_files_list[i][1]
             line_of_code = relevant_files_list[i][2]
             print('Scanning file: %s with bug in loc %s' % (file_name, line_of_code))
-            if commit_index == 1:
+            if commit_index == 1:                     # Not first commit, LHDiff needs two versions of a file to compare to.
                 # print(file_path)
                 copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
             else:
@@ -424,16 +424,16 @@ def commit_checkout_iterator(g, a_repo, repository_path, dirs, commit_author_dat
                             print('RENAMED')
                             # old_file = changed_files_for_this_commit[e][1]     # THIS NEEDS TO BE EQUAL TO INFERFILE
                             # print(old_file)
-                            # renamed_file = changed_files_for_this_commit[e][2]
+                            renamed_file = changed_files_for_this_commit[e][2]
                             # copy_to_new_folder(renamed_file)
-                            # renamed_file = renamed_file.split('/')[-1]
-                            # print(renamed_file)
+                            renamed_file = renamed_file.split('/')[-1]
+                            print(renamed_file)
                             # if old_file == relevant_files_list[i][0]:
                             # print(old_file, new_file)
-                            # call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
+                            call_lhdiff_for_renamed_file(file_name, renamed_file, line_of_code)
                         elif this_file_was == 'A':  # Added
                             print('ADDED')
-                            new_file_to_be_checked = changed_files_for_this_commit[e][1] # NEEDS EQUALS RELEVANT FILE? THEN
+                            # new_file_to_be_checked = changed_files_for_this_commit[e][1]
                             # copy_to_new_folder(new_file_to_be_copied)
 
                         elif this_file_was == 'D':  # Deleted
