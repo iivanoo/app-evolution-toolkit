@@ -389,7 +389,12 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
         # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
         # RUN INFER AND CREATE CSV
-        # InferTool.inferAnalysisAndroid("Android", str(commit_index))
+        infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
+
+        if infer_success:
+            print("HoeraHoeraHoeraHoeraHoeraHoeraHoeraHoeraHoeraHoeraHoera")
+        else:
+            print("BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
         # Read out the git log file:
         for i in range(len(commit_author_date_message_changedfiles)):

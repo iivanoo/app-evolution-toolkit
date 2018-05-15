@@ -14,21 +14,26 @@ import classes
 LOCALPROPERTIES = "local.properties"
 
 # BOB SDKPATH
-SDKPATH = "sdk.dir=/Users/sylviastolwijk/Library/Android/sdk"
-BUGFILEDIR = "/Users/sylviastolwijk/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
+# SDKPATH = "sdk.dir=/Users/sylviastolwijk/Library/Android/sdk"
+# BUGFILEDIR = "/Users/sylviastolwijk/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 
 # CHRIS SDKPATH
-# SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
-# BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
+SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
+BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 BUGDIRECTORY = "infer-out/"
 BUGFILE = "bugs.txt"
 BUILDDIRECTORY = "build"
+
+#Bug attributes
+BUG_TYPE = "bugType"
+UNIQUE_ID = "uniqueID"
+FILE_PATH = "filePath"
+LINE_NUMBER = "lineNumber"
+BUG_DESCRIPTION = "bugDescription"
 RESOURCE_LEAK = "RESOURCE_LEAK"
 
 
 def main():
-    appDir = sys.argv[1]
-    # inferAnalysis(appDir)
     loopedAnalysis()
 
 
@@ -39,7 +44,7 @@ def loopedAnalysis():
     for dirs in os.listdir("."):
         if os.path.isdir(dirs):
             os.chdir(dirs)
-            inferAnalysisAndroid(dirs, "1")
+            infer_success_android = inferAnalysisAndroid(dirs, "1")
             os.chdir("..")
 
     os.chdir("..")
@@ -47,7 +52,7 @@ def loopedAnalysis():
     for dirs in os.listdir("."):
         if os.path.isdir(dirs):
             os.chdir(dirs)
-            inferAnalysisIOS("1")
+            infer_success_ios = inferAnalysisIOS("1")
             os.chdir("..")
     os.chdir("..")
 
@@ -59,29 +64,25 @@ def loopedAnalysis():
 def inferAnalysis(appDir, commitIndex):
     start = time.time()
     removePreviousBuild()
-    # if appDir[0:3] == "IOS":
-    # 	inferAnalysisIOS()
-
-    # elif appDir[0:3] == "And":
-    # 	inferAnalysisAndroid(appDir)
 
     if os.path.exists("gradlew"):
-        inferAnalysisAndroid(appDir, commitIndex)
+        infer_success = inferAnalysisAndroid(appDir, commitIndex)
 
     else:  # assumes if not android, it is ios, in ios analysis a check will be made to see if it is really an ios app
-        inferAnalysisIOS(commitIndex)
+        infer_success = inferAnalysisIOS(commitIndex)
 
     end = time.time()
     print("Time elapsed: " + str(end - start) + " seconds")
-
 
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir, commitIndex):
     homeDirectory = os.getcwd()
     root_folder = find_root_folder("Android")
+    removePreviousBuild()
 
     if root_folder == "empty":
         print("- No gradlew file found, no working app")
+        return False
     else:
         os.chdir(root_folder)
 
@@ -92,10 +93,10 @@ def inferAnalysisAndroid(appDir, commitIndex):
         subprocess.call('chmod +x gradlew', shell=True)
         subprocess.call('./gradlew clean', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
         subprocess.call('infer run -- ./gradlew build', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
-        # readBugReport(appDir, commitIndex)
 
     os.chdir(homeDirectory)
-    readBugReport(appDir, commitIndex)
+    infer_success = readBugReport(appDir, commitIndex)
+    return infer_success
 
 
 # readBugReport(appDir, "Android")
@@ -106,25 +107,31 @@ def inferAnalysisIOS(commitIndex):
     root_folder = find_root_folder("IOS")
     if root_folder == "empty":
         print("- No xcodeproj found, no working app")
-
+        return False
     else:
         os.chdir(root_folder)
 
         appName = findProjectName()
         rewrittenAppName = rewriteSpacesInProjectName(appName)
         if appName != "false":
-            cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator -arch i386 clean'
-            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator -arch i386'
-            test = 'infer run --no-xcpretty -- xcodebuild -target Two\ Tap\ -\ iOS\ Example -configuration Debug -sdk iphonesimulator'
+            
+            # OPTIONS: Add options to end of cleanString and callString
+            # -arch i386 to change used architecture (can also be armv7, armv7s, etc)
+            # IPHONEOS_DEPLOYMENT_TARGET=8.0 (to change deployment target, which helps for older apps)
+
+            cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator clean'
+            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator'
+            
             FNULL = open(os.devnull, 'w')
             print("Initializing analysis of " + appName + " ...")
             subprocess.call(cleanString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
             subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-            # readBugReport(appName, commitIndex)
 
         else: 
             print("- No working app found")
-    # readBugReport(appName, commitIndex)
+            return False
+    infer_success = readBugReport(appName, commitIndex)
+    return infer_success
 
 
 # Rewrites local.properties in order to make android builds work
@@ -171,45 +178,29 @@ def readBugReport(appName, commitIndex):
 
             # separates the bug into different parts
             for bug in splitReport:
-                bugsArray = bug.split('\n')
-                bugBundle = bugsArray[0].split(" error: ")
-                if len(bugBundle) > 1:
+                bug_info = parse_bug(bug, bugIndex, timestamp)
+                if len(bug_info) > 0:
+                    if bug_info[BUG_TYPE] == RESOURCE_LEAK:
 
-                    bugPath = bugBundle[0].split(":")
-
-                    # Unique ID
-                    uniqueID = timestamp + "___" + str(bugIndex)
-
-                    # Bug File path
-                    filePath = bugPath[0]
-
-                    # Bug line number
-                    lineNumber = bugPath[1]
-
-                    # Bug type
-                    bugType = bugBundle[1]
-
-                    # Bug description
-                    bugDescription = bugsArray[1]
-
-                    if bugType == RESOURCE_LEAK:
-                        newBug = classes.Bug(uniqueID, bugType, filePath, lineNumber, bugDescription)
+                        newBug = classes.Bug(bug_info[UNIQUE_ID], bug_info[BUG_TYPE], bug_info[FILE_PATH], bug_info[LINE_NUMBER], bug_info[BUG_DESCRIPTION])
                         bugsToCSVArray.append(newBug)
 
                         bugIndex += 1
+                else:
+                    print("No bugs found in this commit! \n")
 
             #writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
             print("+ Analysis complete for " + appName)
+            success = True
 
         else:
             print("- Analysis failed for " + appName)
-
-
+            success = False
 
         os.chdir("..")
-        subprocess.call("ls", shell=True)
         shutil.rmtree(BUGDIRECTORY)
     writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
+    return success
 
 
 ###os.chdir("..")
@@ -218,8 +209,6 @@ def readBugReport(appName, commitIndex):
 
 def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
     # os.chdir(BUGFILEDIR)
-    #cwd = os.getcwd()
-    #print(cwd)
     csvFileString = os.pardir + "/" + currentDirectory.split('/')[-1] + '_' + commitIndex + ".csv"
     print(csvFileString)
     with open(csvFileString, 'a', newline='') as csvfile:
@@ -227,13 +216,48 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         for bug in bugs_array:
             bug.writeBugs(writer)
-    os.chdir("..")
-        
+    os.chdir("..")        
 
 
 # copy_to_parent_folder()
 
 # os.chdir(currentDirectory)
+
+def parse_bug(bug, bugIndex, timestamp):
+
+    bugsArray = bug.split('\n')
+    bugBundle = bugsArray[0].split(" error: ")
+    
+    if len(bugBundle) <= 0:
+        bugBundle = bugsArray[0].split(" warning: ")
+
+    if len(bugBundle) > 1:
+        bug_info = create_bug_info(bugIndex, timestamp, bugBundle, bugsArray)
+    else: 
+        bug_info = {}
+    return bug_info
+
+def create_bug_info(bugIndex, timestamp, bugBundle, bugsArray):
+    bug_info = {}
+    
+    bugPath = bugBundle[0].split(":")
+
+    # Unique ID
+    bug_info[UNIQUE_ID] = timestamp + "___" + str(bugIndex)
+
+    # Bug File path
+    bug_info[FILE_PATH] = bugPath[0]
+
+    # Bug line number
+    bug_info[LINE_NUMBER] = bugPath[1]
+
+    # Bug type
+    bug_info[BUG_TYPE] = bugBundle[1]
+
+    # Bug description
+    bug_info[BUG_DESCRIPTION] = bugsArray[1]
+
+    return bug_info
 
 def findProjectName():
     for file in os.listdir('.'):
