@@ -1,5 +1,6 @@
 '''
 This file will iterate through repositories from GitHub.
+
 Made by:
 Bob van den Berg
 Vrije Universiteit Amsterdam
@@ -341,6 +342,7 @@ def call_lhdiff(relevant_file, relevant_files_loc):
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
             # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
+
 def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc):
     oldfile = str(Path(LHDIFF_OLD_PATH + '/' + relevant_file))
     newfile = str(Path(LHDIFF_NEW_PATH + '/' + renamed_file))
@@ -358,22 +360,6 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc)
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
         # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
-#
-# def check_file(changed_files_for_this_commit):
-#     if changed_files_for_this_commit[e][0][0] == 'R':
-#         is_renamed_file = True
-#         return is_renamed_file
-#
-#     if changed_files_for_this_commit[e][0][0] == 'A':
-#         is_added_file = True
-#         return is_added_file
-#     if changed_files_for_this_commit[e][0][0] == 'D':
-#         is_removed_file = True
-#         return is_removed_file
-#     if changed_files_for_this_commit[e][0][0] == 'M':
-#         is_modified_file = True
-#         return is_modified_file
-
 
 def relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path, e):
     return changed_files_for_this_commit[e][1] == file_path
@@ -382,19 +368,18 @@ def relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, fil
 def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
-    print(len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
+    # print('Amount of commits to scan:', len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
 
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
         # RUN INFER AND CREATE CSV
-        infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
-
+        # infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
         # LHDIFF conditionals can be placed here:
-        if infer_success:
-            print("Hoera Hoera")
-        else:
-            print("Booooo")
+        # if infer_success:
+        #     print("Hoera Hoera") # Hier lhdiff code
+        # else:
+        #     print("Booooo")   # Hier commit_index+=1 (in einde van code
 
         # Read out the git log file:
         for i in range(len(commit_author_date_message_changedfiles)):
@@ -407,20 +392,15 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
                 changed_files_for_this_commit = commit_author_date_message_changedfiles[i][4:]
                 # print(changed_files_for_this_commit)
 
-        # GET CSV PATH AND READ CSV
-        get_commit_csv_name(repository_path, subdir, commit_index)
-        bug_list = read_commit_csv(repository_path, subdir, commit_index)
-        # print(bug_list)
-        bug_list_splitted = bug_list_splitter(bug_list)
-        # print(bug_list_splitted)
-
-        # IF COMMIT == COMMIT WITH CHANGED FILE FUNCTION
-
         start_commit_id = commit  # This is just for the naming of write_bugs(), can just be rewritten as commit.
         repository = repository_path.split('repo_subfolder\\')[-1]
 
-        # COPY RELEVANT FILES IN OLD-FOLDER
+        # GET CSV PATH AND READ CSV
+        get_commit_csv_name(repository_path, subdir, commit_index)
+        bug_list = read_commit_csv(repository_path, subdir, commit_index)
+        bug_list_splitted = bug_list_splitter(bug_list)
 
+        # COPY RELEVANT FILES IN OLD-FOLDER
         for i in range(len(bug_list_splitted[0])):
             # For i in all bugs found in the csv
             # Might be able to remove newlines and headers from csv with a split or strip.
@@ -440,16 +420,14 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
 
             if commit_index == 1:                     # Not first commit, LHDiff needs two versions of a file to compare to.
                 # print(file_path)
-                copy_to_old_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
+                copy_to_new_folder(file_path)         # possible bug: Need to check if this works with the repo_subfolder walk.
             else:
-                # print(relevant_files_list[i][0])    # HERE PUT IF FILE IS CHANGED
-                # print(changed_files_for_this_commit)
-                for e in range(len(changed_files_for_this_commit)):
-                    if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path, e):
+                for e in range(len(changed_files_for_this_commit)):     # For every bug in the git log that was changed in some way...
+                    if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path, e):      # Check if the bug-file Infer returned is the same.
                         this_file_was = changed_files_for_this_commit[e][0][0]
-                        print(this_file_was)  # Shows letter (Added Deleted Modified Renamed)
+                        # if this file was Renamed / Added / Deleted / Modified
                         if this_file_was == 'R':    # Renamed
-                            print('RENAMED')
+                            print(file_name, 'has a bug and was RENAMED in this commit')
                             # old_file = changed_files_for_this_commit[e][1]     # THIS NEEDS TO BE EQUAL TO INFERFILE
                             # print(old_file)
                             renamed_file = changed_files_for_this_commit[e][2]
@@ -460,22 +438,47 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
                             # print(old_file, new_file)
                             call_lhdiff_for_renamed_file(file_name, renamed_file, line_number)
                         elif this_file_was == 'A':  # Added
-                            print('ADDED')
+                            print(file_name, 'has a bug and was ADDED in this commit')
                             # new_file_to_be_checked = changed_files_for_this_commit[e][1]
                             # copy_to_new_folder(new_file_to_be_copied)
 
                         elif this_file_was == 'D':  # Deleted
-                            print('DELETED')
+                            print(file_name, 'has a bug and was DELETED in this commit')
                             old_file_that_is_to_be_removed = changed_files_for_this_commit[e][1]  # Clean the file from old_files
                             clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
 
                         elif this_file_was == 'M':  # Modified
-                            print('MODIFIED')
+                            print(file_name, 'has a bug and was MODIFIED in this commit')
                             # copy_to_new_folder(file_path[i][0])       #CHECK IF CORRECT # Just copy the things that infer returned
                         # elif changed_files_for_this_commit[e][0][0] == 'R':     # Get new filename path from git log and run lhdiff.
                             # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
                             # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
+                            # call_lhdiff(file_name, line_number)
 
+        # PUT DATA IN bugs.csv
+        # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
+        # CLEAR OLD_FOLDER
+        if commit_index >= 2:
+            clear_old_files_folder()    # This is needed for storage purposes.
+        # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
+        copy_new_files_to_old_files_folder()
+        # CLEAR NEW_FOLDER
+        clear_new_files_folder()
+        # RESTART ON NEXT COMMIT IN FOR-LOOP
+        commit_index += 1
+        # QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
+        # subprocess.call('ls', shell=True)
+        # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
+
+# read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
+# write_csv_header_for_bugs_csv()
+# search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
+mine_repositories()     # Mining repositories
+
+
+
+'''
+#APPENDIX (Don't need this code anymore)
 
 
 
@@ -502,43 +505,31 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
 
 
 
-        # PUT DATA IN bugs.csv
-        # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-        # CLEAR OLD_FOLDER
-        if commit_index >= 2:
-            clear_old_files_folder()    # This is needed for storage purposes.
-        # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
-        copy_new_files_to_old_files_folder()
-        # CLEAR NEW_FOLDER
-        clear_new_files_folder()
-        # RESTART ON NEXT COMMIT IN FOR-LOOP
-        commit_index += 1
-        # QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
-        # subprocess.call('ls', shell=True)
-        # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
-
-# read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
-# write_csv_header_for_bugs_csv()
-# search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
-mine_repositories()     # Mining repositories
 
 
 
-'''
-#APPENDIX (Don't need this code anymore)
+
+
+
 for extension in extensions:
     #glob repositories
     
 def search_files():
     for i in extensions:
         IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all infer-compatible files recursively in the repo_subfolder.
+
+
 import subprocess
 sys.path.insert(0, '../SP2')
+
+
+
 class IterateThroughFiles:
     # Thanks to: https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
     # Find file extensions (java/c/cc/cpp/m) that can be analysed by Infer.
     def __init__(self):
         self.files = []
+
     # Find Java, C, CC, CPP and M files
     def find_infer_files(self, extensions):
         file_list = []
@@ -549,6 +540,8 @@ class IterateThroughFiles:
             path_in_str = str(path)
             file_list.append(path_in_str)
         print(file_list)
+
+
 #    def append_infer_files_list(self, path_in_str):
 #        with open('csv/infer_files_list', "wb", encoding="utf8") as infer_files_list:
 #            infer_files_list.append(path_in_str)
@@ -567,9 +560,13 @@ repository: GitHub repository in the form <username>/<repository_id>
 Example: “duckduckgo/Android”
 DONE
 repository_subfolder: path within the repository to focus on (and recursively on all its subfolders). For example, in the DuckDuckGo GitHub repository, we want to focus on the “app/src/main” folder because the source code of the Android app is there, all the other folders contain other resources that we do not care about
+
 keep_temp_data: boolean, if true, all the intermediate files and data produced by the static analyzer will be kept in a dedicated folder
+
 output_path: the path in the file system where the output bugs.csv file will be created
+
 output_folder_path: the folder in the file system where to put all the other generated files which may be useful
+
 analyzer: the path in the file system where to find the main Python script for running the static analyzer
 (Infer in the case of SP2, but it can be any)
 '''
@@ -591,6 +588,8 @@ analyzer: the path in the file system where to find the main Python script for r
         #     bug_id += 1
         # else:
         #     continue
+
+
 # def get_file_changes_for_commit(git_log_file_changes, i):
 #     file_changes = []
 #     # print(git_log_file_changes)
@@ -616,4 +615,5 @@ analyzer: the path in the file system where to find the main Python script for r
 #                 print(i, file_was)
 #                 file_changes.append(i)
 #     return file_changes
+
 '''
