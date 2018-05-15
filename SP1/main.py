@@ -1,6 +1,5 @@
 '''
 This file will iterate through repositories from GitHub.
-
 Made by:
 Bob van den Berg
 Vrije Universiteit Amsterdam
@@ -391,10 +390,11 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
         # RUN INFER AND CREATE CSV
         infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
 
+        # LHDIFF conditionals can be placed here:
         if infer_success:
-            print("HoeraHoeraHoeraHoeraHoeraHoeraHoeraHoeraHoeraHoeraHoera")
+            print("Hoera Hoera")
         else:
-            print("BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+            print("Booooo")
 
         # Read out the git log file:
         for i in range(len(commit_author_date_message_changedfiles)):
@@ -526,28 +526,19 @@ mine_repositories()     # Mining repositories
 
 '''
 #APPENDIX (Don't need this code anymore)
-
-
-
 for extension in extensions:
     #glob repositories
     
 def search_files():
     for i in extensions:
         IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all infer-compatible files recursively in the repo_subfolder.
-
-
 import subprocess
 sys.path.insert(0, '../SP2')
-
-
-
 class IterateThroughFiles:
     # Thanks to: https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
     # Find file extensions (java/c/cc/cpp/m) that can be analysed by Infer.
     def __init__(self):
         self.files = []
-
     # Find Java, C, CC, CPP and M files
     def find_infer_files(self, extensions):
         file_list = []
@@ -558,8 +549,6 @@ class IterateThroughFiles:
             path_in_str = str(path)
             file_list.append(path_in_str)
         print(file_list)
-
-
 #    def append_infer_files_list(self, path_in_str):
 #        with open('csv/infer_files_list', "wb", encoding="utf8") as infer_files_list:
 #            infer_files_list.append(path_in_str)
@@ -578,13 +567,9 @@ repository: GitHub repository in the form <username>/<repository_id>
 Example: “duckduckgo/Android”
 DONE
 repository_subfolder: path within the repository to focus on (and recursively on all its subfolders). For example, in the DuckDuckGo GitHub repository, we want to focus on the “app/src/main” folder because the source code of the Android app is there, all the other folders contain other resources that we do not care about
-
 keep_temp_data: boolean, if true, all the intermediate files and data produced by the static analyzer will be kept in a dedicated folder
-
 output_path: the path in the file system where the output bugs.csv file will be created
-
 output_folder_path: the folder in the file system where to put all the other generated files which may be useful
-
 analyzer: the path in the file system where to find the main Python script for running the static analyzer
 (Infer in the case of SP2, but it can be any)
 '''
@@ -606,8 +591,6 @@ analyzer: the path in the file system where to find the main Python script for r
         #     bug_id += 1
         # else:
         #     continue
-
-
 # def get_file_changes_for_commit(git_log_file_changes, i):
 #     file_changes = []
 #     # print(git_log_file_changes)
@@ -633,5 +616,4 @@ analyzer: the path in the file system where to find the main Python script for r
 #                 print(i, file_was)
 #                 file_changes.append(i)
 #     return file_changes
-
 '''
