@@ -216,7 +216,7 @@ def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         for bug in bugs_array:
             bug.writeBugs(writer)
-    os.chdir("..")        
+    #os.chdir("..")        
 
 
 # copy_to_parent_folder()

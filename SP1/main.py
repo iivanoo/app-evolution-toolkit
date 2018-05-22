@@ -306,6 +306,8 @@ def copy_to_new_folder(relevant_file):
     if not os.path.exists(LHDIFF_NEW_PATH):                 # If this folder doesn't exist: create it.
         os.makedirs(LHDIFF_NEW_PATH)
     src = Path(relevant_file)
+    cwd = os.getcwd()
+    print(cwd)
     copy(src, LHDIFF_NEW_PATH)
 
 
@@ -433,10 +435,10 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
 
 
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-        # g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
+        g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
         # RUN INFER AND CREATE CSV
-        # infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
+        infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
         # LHDIFF conditionals can be placed here:
         # if infer_success:
         #     print("Hoera Hoera") # Hier lhdiff code
