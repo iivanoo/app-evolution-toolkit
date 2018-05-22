@@ -387,6 +387,45 @@ def this_file_is_changed_and_has_a_resource_leak(changed_file_git, file_path_inf
         return True
 
 
+def renamed_file_case_function(file_name, renamed_file, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
+    # print(changed_files_for_this_commit[e][1])
+    # old_file = changed_files_for_this_commit[e][1]
+    # print(old_file)
+    copy_to_new_folder(renamed_file)
+    renamed_file = renamed_file.split('/')[-1]
+    print(renamed_file)
+    # if old_file == relevant_files_list[i][0]:
+    # print(old_file, new_file)
+    call_lhdiff_for_renamed_file(file_name, renamed_file, line_number)
+    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number,
+          bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg,
+          start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
+          'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG',
+          'REMOVAL_COMMIT_TIMESTAMP')
+
+def added_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
+    new_file_to_be_checked = changed_files_for_this_commit
+    copy_to_new_folder(new_file_to_be_checked)  # But don't run lhdiff yet, as there should be nothing to compare.
+    # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
+    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING',
+          start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
+          'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+
+
+def deleted_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
+    print(changed_files_for_this_commit)
+    old_file_that_is_to_be_removed = changed_files_for_this_commit  # Clean the file from old_files
+    clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
+    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')  # Here I should add end/removal data.
+
+
+def modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
+    print('do something')
+    # copy_to_new_folder(file_path[i][0])  # Just copy the things that infer returned
+    # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
+    # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
+    # call_lhdiff(file_name, line_number)
+
 def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
@@ -457,52 +496,19 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
                         print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0]))
-
+                        print(file_name)
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
                             if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
                                 this_file_was = changed_files_for_this_commit[e][0][0]
                                 # if this file was Renamed / Added / Deleted / Modified
                                 if this_file_was == 'R':    # Renamed
-                                    # print(changed_files_for_this_commit[e][1])
-                                    # old_file = changed_files_for_this_commit[e][1]
-                                    # print(old_file)
-                                    renamed_file = changed_files_for_this_commit[e][2]
-                                    copy_to_new_folder(renamed_file)
-                                    renamed_file = renamed_file.split('/')[-1]
-                                    print(renamed_file)
-                                    # if old_file == relevant_files_list[i][0]:
-                                    # print(old_file, new_file)
-                                    call_lhdiff_for_renamed_file(file_name, renamed_file, line_number)
-                                    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number,
-                                          bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg,
-                                          start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
-                                          'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG',
-                                          'REMOVAL_COMMIT_TIMESTAMP')
-
+                                    renamed_file_case_function(file_name, changed_files_for_this_commit[e][2], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'A':  # Added
-                                    new_file_to_be_checked = changed_files_for_this_commit[e][1]
-                                    copy_to_new_folder(new_file_to_be_checked) # But don't run lhdiff yet, as there should be nothing to compare.
-                                    # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-                                    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number,
-                                          bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg,
-                                          start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
-                                          'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG',
-                                          'REMOVAL_COMMIT_TIMESTAMP')
+                                    added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'D':  # Deleted
-                                    print(changed_files_for_this_commit[e][1])
-                                    old_file_that_is_to_be_removed = changed_files_for_this_commit[e][1]  # Clean the file from old_files
-                                    clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
-                                    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number,
-                                          bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg,
-                                          start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
-                                          'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG',
-                                          'REMOVAL_COMMIT_TIMESTAMP')  # Here I should add end/removal data.
+                                    deleted_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'M':  # Modified
-                                    print('do something')
-                                    # copy_to_new_folder(file_path[i][0])  # Just copy the things that infer returned
-                                    # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
-                                    # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
-                                    # call_lhdiff(file_name, line_number)
+                                    modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
