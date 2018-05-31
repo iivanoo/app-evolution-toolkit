@@ -228,24 +228,42 @@ def get_git_log_data(g):
 
 
 def mine_repositories():
-    rootdir = 'repo_subfolder'
+    sub_problem_dir = str(os.path.abspath('app-evolution-toolkit/SP1'))
+    rootdir = str(Path('repo_subfolder'))
     write_csv_header_for_bugs_csv()
-    for subdir, dirs, files in os.walk(rootdir):    # We do a walk in order to get the repository name.
-        if subdir.count(os.sep) <= 1 and subdir.count(os.sep) > 0:  # If there are subdirectories...
-            repository_path = get_repository_path(subdir, dirs)
-            a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
-            g = git.Git(repository_path)
-            # print(os.getcwd(), subdir, dirs, files)
-            commit_author_date_message_changedfiles = get_git_log_data(g)
-            # print(commit_author_date_message_changedfiles)     # STILL NEED TO WORK THIS OUT NEATLY
+    list_of_authors = os.listdir(rootdir)
+    # print(list_of_authors)
+    for author in list_of_authors:
+        author_path = Path(rootdir + '/' + author)
+        if author != list_of_authors[0]: #  and os.path.isdir(author_path)
+            print('DIT WERKT')
+            os.chdir(Path(os.getcwd()).parents[2]) # Need this to go back to the rootdir to continue on the next author.
+        if os.path.isdir(author_path):
+            print(author_path)
+            repositories_list = os.listdir(author_path)
+            for directory in repositories_list:
+                repository_path = Path(str(author_path) + '/' + directory)
+                if os.path.isdir(repository_path):
+                    if directory != repositories_list[0]:  # and os.path.isdir(directory)
+                        os.chdir(Path(os.getcwd()).parents[1])  # Need this to go back to author to continue to next repo.
+                    print("We're now in the repository: {}".format(repository_path))
+                    repository_path = str(repository_path)
+                    a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
+                    g = git.Git(repository_path)
+                    # print(os.getcwd(), subdir, dirs, files)
+                    commit_author_date_message_changedfiles = get_git_log_data(g)
+                    # print(commit_author_date_message_changedfiles)     # STILL NEED TO WORK THIS OUT NEATLY
 
-            os.chdir(repository_path)
-            # print(a_repo)
-            commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
+                    os.chdir(repository_path)
+                    print(os.getcwd())
+                    # commit_checkout_iterator(g, a_repo, repository_path, str(author_path), commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
 
 
-def get_repository_path(subdir, dirs):
-    repository_path = str(Path(subdir + '/' + dirs[0]))
+def get_repository_path(item):
+
+    repository_path = str(Path(item + '/' + os.listdir(item)))
+    # repository_path = str(Path(subdir + '/' + dirs[0]))
+    # print(repository_path)
     # repository_path = str(subdir) + '\\' + str(dirs[0])  # Here we have the git folder string equal to repository.
     return repository_path
 
@@ -438,7 +456,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
         # RUN INFER AND CREATE CSV
-        infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
+        # infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
         # LHDIFF conditionals can be placed here:
         # if infer_success:
         #     print("Hoera Hoera") # Hier lhdiff code
@@ -469,6 +487,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
 
         file_set_for_files_that_have_not_changed = {file[-1] for file in changed_files_for_this_commit}
 
+
+
         for i in range(len(bug_list_splitted[0])):
             # For i in all bugs found in the csv
             # Might be able to remove newlines and headers from csv with a split or strip.
@@ -482,7 +502,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
             bug_description = bug_list_splitted[4][i]
             print('Scanning file: %s with bug in loc %s' % (file_name, line_number))
             # print(file_path, file_name, line_number, bug_type, bug_description)
-
+            print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
             # This should go down when we have more data. (LHDIFF line tracing for example.) print is for giving examples showing which data is put in the bugs.csv
             # This is the header of bugs.csv: ID,REPO_ID,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION,LHDIFF_LINE_TRACING,START_COMMIT_ID,START_COMMIT_MSG,START_COMMIT_TIMESTAMP
             # write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
@@ -494,6 +514,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
             else:
                 # print(len(changed_files_for_this_commit), changed_files_for_this_commit)
                 # print(changed_files_for_this_commit)
+
+
 
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
