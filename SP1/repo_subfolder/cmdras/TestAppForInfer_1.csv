@@ -1,0 +1,1 @@
+1528199834.243412___1,RESOURCE_LEAK,app/src/main/java/com/example/chris/testappforinfer/MainActivity.java,19,   resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 16 is not released after line 19

@@ -1,0 +1,3 @@
+1526994946.473095___1,RESOURCE_LEAK,app/src/main/java/com/example/chris/inferapptest/MainActivity.java,27,   resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 24 is not released after line 27
+1526994946.473095___2,RESOURCE_LEAK,app/src/main/java/com/example/chris/inferapptest/MainActivity.java,19,   resource of type `java.io.FileOutputStream` acquired to `fos2` by call to `FileOutputStream(...)` at line 16 is not released after line 19
+1526994946.473095___3,RESOURCE_LEAK,app/src/main/java/com/example/chris/inferapptest/foobar3.java,14,   resource of type `java.io.FileOutputStream` acquired to `fos` by call to `FileOutputStream(...)` at line 10 is not released after line 14
