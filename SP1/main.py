@@ -19,6 +19,8 @@ import sys
 import glob
 import time
 import dateutil.parser
+import pandas as pd
+
 sys.path.insert(0, '../SP2')
 import InferTool    # Might give an error outside IDE
 
@@ -75,7 +77,7 @@ def clone_repositories(url, path):
 
 
 fieldnames = [
-    'ID',
+    'BUG_ID',
     'REPO_ID',
     'BUG_TYPE',
     'FILE_PATH',
@@ -95,9 +97,11 @@ fieldnames = [
 
 
 def bugs_csv_location():
-    cwd = os.getcwd()
-    DATA_FOLDER = Path(cwd + "/csv")
-    return DATA_FOLDER / "bugs.csv"
+    # cwd = os.getcwd()
+    # DATA_FOLDER = Path(cwd + "/csv")
+    # return DATA_FOLDER / "bugs.csv"
+    return Path('C:/Users/BovandenBerg/Documents/Vrije Universiteit/Bachelor Project IMM/app-evolution-toolkit/SP1/csv/bugs.csv')
+
 
 
 def write_csv_header_for_bugs_csv():
@@ -105,7 +109,7 @@ def write_csv_header_for_bugs_csv():
     file_to_open = bugs_csv_location()
     with open(file_to_open, 'w') as csvfile:
         fieldnames = [
-            'ID',
+            'BUG_ID',
             'REPO_ID',
             'BUG_TYPE',
             'FILE_PATH',
@@ -126,6 +130,17 @@ def write_csv_header_for_bugs_csv():
         writer.writeheader()
 
 
+def read_bugs():
+    file_to_open = bugs_csv_location()
+    df = pd.read_csv(file_to_open)
+    saved_column = df['REPO_ID']  # you can also use df['column_name']
+    print(saved_column)
+    # with open(file_to_open, 'r') as csvfile:
+    #     for row in reader:
+    #         content = list(row[i] for i in included_cols)
+    #     print(content)
+
+
 def write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp, end_commit_msg, end_commit_timestamp, end_commit_id, removal_commit_id, removal_commit_msg, removal_commit_timestamp):
     file_to_open = bugs_csv_location()
     with open(file_to_open, 'a') as csvfile:
@@ -133,7 +148,7 @@ def write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_descrip
         # FOR FUTURE NEED, we use InferTool.readBugReport now.
         # Write the data.
         writer.writerow({
-            'ID': bug_id,
+            'BUG_ID': bug_id,
             'REPO_ID': repository,
             'BUG_TYPE': bug_type,
             'FILE_PATH': file_path,
@@ -236,28 +251,29 @@ def mine_repositories():
     for author in list_of_authors:
         author_path = Path(rootdir + '/' + author)
         if author != list_of_authors[0]: #  and os.path.isdir(author_path)
-            print('DIT WERKT')
             os.chdir(Path(os.getcwd()).parents[2]) # Need this to go back to the rootdir to continue on the next author.
         if os.path.isdir(author_path):
-            print(author_path)
             repositories_list = os.listdir(author_path)
             for directory in repositories_list:
                 repository_path = Path(str(author_path) + '/' + directory)
+                # print(repository_path)
                 if os.path.isdir(repository_path):
-                    if directory != repositories_list[0]:  # and os.path.isdir(directory)
-                        os.chdir(Path(os.getcwd()).parents[1])  # Need this to go back to author to continue to next repo.
+                    print(repository_path)
+                    # os.chdir(Path(os.getcwd()))  # Need this to go back to author to continue to next repo.
                     print("We're now in the repository: {}".format(repository_path))
                     repository_path = str(repository_path)
+
                     a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
                     g = git.Git(repository_path)
                     # print(os.getcwd(), subdir, dirs, files)
                     commit_author_date_message_changedfiles = get_git_log_data(g)
                     # print(commit_author_date_message_changedfiles)     # STILL NEED TO WORK THIS OUT NEATLY
-
                     os.chdir(repository_path)
-                    print(os.getcwd())
-                    # commit_checkout_iterator(g, a_repo, repository_path, str(author_path), commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
-
+                    # print(os.getcwd())
+                    commit_checkout_iterator(g, a_repo, repository_path, str(author_path), commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
+                    # print(os.getcwd())
+                    # os.chdir(Path(os.getcwd()).parent)        # BUG HERE, CAN'T ITERATE REPOS. NEED HELP. SOS.
+                    # print(os.getcwd())
 
 def get_repository_path(item):
 
@@ -423,14 +439,21 @@ def renamed_file_case_function(file_name, renamed_file, repository, bug_type, fi
           'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG',
           'REMOVAL_COMMIT_TIMESTAMP')
 
+
 def added_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
     new_file_to_be_checked = changed_files_for_this_commit
     copy_to_new_folder(new_file_to_be_checked)  # But don't run lhdiff yet, as there should be nothing to compare.
+    print('This file was Added and has a (new) resource leak.')
+    # read_bugs()
     # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING',
-          start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
-          'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+    # print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING',
+    #       start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
+    #       'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
+
+    # write_bugs('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL',
+    #       start_commit_id, start_commit_msg, start_commit_timestamp, 'NULL', 'NULL',
+    #       'NULL', 'NULL', 'NULL', 'NULL')
 
 def deleted_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
     print(changed_files_for_this_commit)
@@ -446,7 +469,7 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
     # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
     # call_lhdiff(file_name, line_number)
 
-def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_date_message_changedfiles):
+def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
     # print('Amount of commits to scan:', len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
@@ -478,8 +501,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
         repository = repository_path.split('repo_subfolder\\')[-1]
 
         # GET CSV PATH AND READ CSV
-        get_commit_csv_name(repository_path, subdir, commit_index)
-        bug_list = read_commit_csv(repository_path, subdir, commit_index)
+        get_commit_csv_name(repository_path, author_path, commit_index)
+        bug_list = read_commit_csv(repository_path, author_path, commit_index)
         bug_list_splitted = bug_list_splitter(bug_list)
         # print(bug_list)
         # COPY RELEVANT FILES IN OLD-FOLDER
@@ -502,7 +525,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
             bug_description = bug_list_splitted[4][i]
             print('Scanning file: %s with bug in loc %s' % (file_name, line_number))
             # print(file_path, file_name, line_number, bug_type, bug_description)
-            print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
+
             # This should go down when we have more data. (LHDIFF line tracing for example.) print is for giving examples showing which data is put in the bugs.csv
             # This is the header of bugs.csv: ID,REPO_ID,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION,LHDIFF_LINE_TRACING,START_COMMIT_ID,START_COMMIT_MSG,START_COMMIT_TIMESTAMP
             # write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
@@ -516,31 +539,37 @@ def commit_checkout_iterator(g, a_repo, repository_path, subdir, commit_author_d
                 # print(changed_files_for_this_commit)
 
 
-
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
                         print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0]))
-                        print(file_name)
+                        # print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
                             if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
                                 this_file_was = changed_files_for_this_commit[e][0][0]
+                                print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                                 # if this file was Renamed / Added / Deleted / Modified
                                 if this_file_was == 'R':    # Renamed
-                                    renamed_file_case_function(file_name, changed_files_for_this_commit[e][2], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
-                                elif this_file_was == 'A':  # Added
-                                    added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
-                                elif this_file_was == 'D':  # Deleted
-                                    deleted_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    print('RRRRRRRR')
+                                    # renamed_file_case_function(file_name, changed_files_for_this_commit[e][2], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'M':  # Modified
+                                    print('MMMMMMMMM')
                                     modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                elif this_file_was == 'A':  # Added
+                                    # print('AAAAAAAAA')
+                                    added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+
+                                # THIS NEEDS TO BE REMOVED AND PUT SOMEWHERE ELSE. A DELETED FILE NEVER HAS A RESOURCE LEAK...
+                                # elif this_file_was == 'D':  # Deleted
+                                #     print('DDDDDDDD')
+                                #     deleted_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
                     # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-                    print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description,
-                          'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg, start_commit_timestamp,
-                          'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID',
-                          'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+                    # print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description,
+                    #       'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg, start_commit_timestamp,
+                    #       'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID',
+                    #       'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
         # PUT DATA IN bugs.csv
         # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
