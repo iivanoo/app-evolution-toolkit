@@ -440,10 +440,13 @@ def renamed_file_case_function(file_name, renamed_file, repository, bug_type, fi
           'REMOVAL_COMMIT_TIMESTAMP')
 
 
-def added_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
+def added_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp, bug_counter):
     new_file_to_be_checked = changed_files_for_this_commit
     copy_to_new_folder(new_file_to_be_checked)  # But don't run lhdiff yet, as there should be nothing to compare.
     print('This file was Added and has a (new) resource leak.')
+    bug_id = repository + '_' + str(bug_counter)
+    bug_counter += 1
+    print(bug_id)
     # read_bugs()
     # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
     # print('BUG_ID', repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING',
@@ -471,9 +474,9 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
 
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
     commit_index = 1
+    bug_counter = 0
     # FOR LOOP HERE:
     # print('Amount of commits to scan:', len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
-
 
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
@@ -556,7 +559,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                     modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'A':  # Added
                                     # print('AAAAAAAAA')
-                                    added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp, bug_counter)
 
                                 # THIS NEEDS TO BE REMOVED AND PUT SOMEWHERE ELSE. A DELETED FILE NEVER HAS A RESOURCE LEAK...
                                 # elif this_file_was == 'D':  # Deleted
