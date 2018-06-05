@@ -91,8 +91,8 @@ def inferAnalysisAndroid(appDir, commitIndex):
         print("Initializing analysis of " + appDir + " ...")
         subprocess.call('find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done', shell=True)
         subprocess.call('chmod +x gradlew', shell=True)
-        subprocess.call('./gradlew clean', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
-        subprocess.call('infer run -- ./gradlew build', shell=True)  # , stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('./gradlew clean', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('infer run -- ./gradlew build', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
 
     os.chdir(homeDirectory)
     infer_success = readBugReport(appDir, commitIndex)
