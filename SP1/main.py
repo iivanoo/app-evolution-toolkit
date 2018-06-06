@@ -149,8 +149,7 @@ def read_bugs_for_lhdiff(relevant_file, old_file_loc):
     with open(BUGS_CSV_LOCATION, 'r') as csvfile:
         reader = csv.reader(csvfile, lineterminator='\n')
         for row in reader:  # MUST BE IN REVERSE
-            print(row)
-            if relevant_file == row[3] and old_file_loc == row[4]:
+            if relevant_file == str(split_file_from_full_path(row[3])) and str(old_file_loc) == str(row[4]):
                 print('same bug')
                 previous_bug_id = row[0]
                 return True, previous_bug_id
@@ -183,6 +182,9 @@ def write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_descrip
             'REMOVAL_COMMIT_TIMESTAMP': removal_commit_timestamp
             })
 
+def split_file_from_full_path(path):
+    split_path = path.split('/')
+    return split_path[-1]
 
 def get_commit_author_date_message_changed_files(git_log_string, git_log_file_changes):
     splitted_git_log = []
@@ -416,6 +418,8 @@ def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
                 # line_tracing = new_file_loc
             else:
                 print('verschillende bugs')
+
+
         #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
         # else:
         #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
@@ -502,7 +506,14 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
 
     # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
     # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
-    call_lhdiff_for_modified_case(file_name, line_number)
+    bug_id = call_lhdiff_for_modified_case(file_name, line_number)
+    if not bug_id: #If no previous bug id has been assigned, create new bug id
+        global bug_counter
+        bug_id = repository + '_' + str(bug_counter)
+        bug_counter += 1
+
+
+    write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
 
 
@@ -610,8 +621,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
             # PUT DATA IN bugs.csv
             # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
             # CLEAR OLD_FOLDER
-            if commit_index >= 2:
-                clear_old_files_folder()    # This is needed for storage purposes.
+            # if commit_index >= 2:
+            #     clear_old_files_folder()    # This is needed for storage purposes.
             # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
             copy_new_files_to_old_files_folder()
             # CLEAR NEW_FOLDER
