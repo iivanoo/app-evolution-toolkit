@@ -515,7 +515,14 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
 
     write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
-
+def files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles):
+    deleted_files = []
+    # print(commit_author_date_message_changedfiles)
+    for i in range(len(commit_author_date_message_changedfiles)):
+        if str(commit) == str(commit_author_date_message_changedfiles[i][0]):  # If the commit equals the commit of the git log
+            print(str(commit_author_date_message_changedfiles[i][4:]))
+            for e in range(len(commit_author_date_message_changedfiles[i][4:])):
+                print(commit_author_date_message_changedfiles[i][4:][e][0])
 
 
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
@@ -526,6 +533,18 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
+
+        # THIS NEEDS TO BE REMOVED AND PUT SOMEWHERE ELSE. A DELETED FILE NEVER HAS A RESOURCE LEAK... SO IT ALSO DOESN'T MATTER IF GRADLE/INFER RUNS OR NOT.
+        # print('DIT IS OOK EEN TEST')
+        # print('test' + str(commit), str(commit_author_date_message_changedfiles))
+        files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles)
+
+        # for file in
+        # elif this_file_was == 'D':  # Deleted
+        #     print('DDDDDDDD')
+        #     deleted_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+
+
         # RUN INFER AND CREATE CSV
         infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
         # LHDIFF conditionals can be placed here:
@@ -541,6 +560,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                     start_commit_msg = commit_author_date_message_changedfiles[i][3]  # message_for_this_commit
                     changed_files_for_this_commit = commit_author_date_message_changedfiles[i][4:]
                     # print(changed_files_for_this_commit)
+
 
             start_commit_id = commit  # This is just for the naming of write_bugs(), can just be rewritten as commit.
             repository = repository_path.split('repo_subfolder\\')[-1]
@@ -603,11 +623,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                 elif this_file_was == 'A':  # Added
                                     # print('AAAAAAAAA')
                                     added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
-
-                                # THIS NEEDS TO BE REMOVED AND PUT SOMEWHERE ELSE. A DELETED FILE NEVER HAS A RESOURCE LEAK...
-                                # elif this_file_was == 'D':  # Deleted
-                                #     print('DDDDDDDD')
-                                #     deleted_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
