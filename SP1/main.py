@@ -473,7 +473,7 @@ def renamed_file_case_function(file_name, renamed_file, repository, bug_type, fi
           'REMOVAL_COMMIT_TIMESTAMP')
 
 
-def added_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
+def added_file_case_function(g, changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
     new_file_to_be_checked = changed_files_for_this_commit
     copy_to_new_folder(new_file_to_be_checked)  # But don't run lhdiff yet, as there should be nothing to compare.
     print('This file was Added and has a (new) resource leak.')
@@ -481,6 +481,11 @@ def added_file_case_function(changed_files_for_this_commit, repository, bug_type
     bug_id = repository + '_' + str(bug_counter)
     bug_counter += 1
     print(bug_id)
+    print('***********')
+    print(new_file_to_be_checked)
+    print(g.log("--follow", "--name-status", "--format='%H'", str(os.path.abspath(new_file_to_be_checked))))
+    print("**********")
+
     # read_bugs()
     write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
     # print(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING',
@@ -647,7 +652,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
                         print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0]))
-                        print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
+                        #print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
                             if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
                                 this_file_was = changed_files_for_this_commit[e][0][0]
@@ -662,7 +667,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                     modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'A':  # Added
                                     # print('AAAAAAAAA')
-                                    added_file_case_function(changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    added_file_case_function(g, changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
