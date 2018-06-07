@@ -145,12 +145,12 @@ def read_bugs():
     #     print(content)
 
 def read_bugs_for_lhdiff(relevant_file, old_file_loc):
-    print(relevant_file, old_file_loc)
+    # print(relevant_file, old_file_loc)
     with open(BUGS_CSV_LOCATION, 'r') as csvfile:
         reader = csv.reader(csvfile, lineterminator='\n')
         for row in reader:  # MUST BE IN REVERSE
             if relevant_file == str(split_file_from_full_path(row[3])) and str(old_file_loc) == str(row[4]):
-                print('same bug')
+                # print('same bug')
                 previous_bug_id = row[0]
                 return True, previous_bug_id
 
@@ -407,13 +407,13 @@ def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
         # print(old_and_new_loc)
         old_file_loc = int(old_and_new_loc[0])
         new_file_loc = int(old_and_new_loc[1])
-        print(str(old_file_loc), str(new_file_loc), str(relevant_files_loc))
+        # print(str(old_file_loc), str(new_file_loc), str(relevant_files_loc))
         # IF OLD_FILE_LOC IS FOUND PREVIOUSLY IN BUGS.CSV, THEN IT IS THE SAME BUG. ELSE IT IS A NEW BUG.
         if str(new_file_loc) == str(relevant_files_loc):
-            print('JAAAA')# This needs to be changed into new_file_loc or relevant_files_loc?
+            # print('JAAAA')# This needs to be changed into new_file_loc or relevant_files_loc?
             this_is_the_same_bug_as_a_previous_bug, previous_bug_id = read_bugs_for_lhdiff(relevant_file, old_file_loc)
             if this_is_the_same_bug_as_a_previous_bug: # Search for old_file_location for file in bugs.csv, return boolean
-                print(previous_bug_id)
+                # print(previous_bug_id)
                 return previous_bug_id
                 # line_tracing = new_file_loc
             else:
@@ -539,6 +539,25 @@ def check_if_deleted_file_had_a_bug(deleted_file_list_for_this_commit):
         return removed_bugs_in_deleted_file
 
 
+def check_if_bugs_have_been_removed(bug_array, commit, end_commit_id, end_commit_timestamp, end_commit_msg):
+    not_removed_bugs_dict = {}
+    removed_bugs_array = []
+    with open(BUGS_CSV_LOCATION, 'r') as csvfile:
+        reader = csv.reader(csvfile, lineterminator='\n')
+        for row in reversed(list(reader)[1:]):
+            for i in range(len(bug_array[0])):
+                if str(row[3]) == str(bug_array[2][i]) and str(row[4]) == str(bug_array[3][i]):
+                    # print("*****\nBUG FOUND AGAIN \n*****")
+                    not_removed_bugs_dict[str(row[0])] = ""
+            if not str(row[0]) in not_removed_bugs_dict.keys():
+                # print('IK GA HEM NU TOEVOEGEN')
+                removed_bugs_array.append(row)
+        print(removed_bugs_array)
+        if len(removed_bugs_array) > 0:
+            for bug_row in removed_bugs_array:
+                dt = dateutil.parser.parse(str(commit.committed_datetime))
+                unix_date_for_removed_bug_in_modified_file = time.mktime(dt.timetuple())
+                write_bugs(bug_row[0], bug_row[1], bug_row[2], bug_row[3], bug_row[4], bug_row[5], bug_row[6], bug_row[7], bug_row[8], bug_row[9], end_commit_msg, end_commit_timestamp, end_commit_id, str(commit), str(commit.message).replace("\n", ""), str(unix_date_for_removed_bug_in_modified_file))
 
 
 
@@ -547,7 +566,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
     commit_index = 1
     # FOR LOOP HERE:
     # print('Amount of commits to scan:', len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
-
+    end_commit_id, end_commit_timestamp, end_commit_msg = '', '', ''  # To prevent reference error during analysis of first commit; This is OK because there will never be a removal of a bug in the first commit.
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
 
 
@@ -559,18 +578,12 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         deleted_file_list_for_this_commit = files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles)
         removed_bugs_in_deleted_file = check_if_deleted_file_had_a_bug(deleted_file_list_for_this_commit)
         for bug in removed_bugs_in_deleted_file.keys():
-            # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
             bug_row = removed_bugs_in_deleted_file[bug]
             dt = dateutil.parser.parse(str(commit.committed_datetime))
             unix_date_for_deleted_file = time.mktime(dt.timetuple())
             write_bugs(bug_row[0], bug_row[1], bug_row[2], bug_row[3], bug_row[4], bug_row[5], bug_row[6], bug_row[7], bug_row[8], bug_row[9], end_commit_msg, end_commit_timestamp, end_commit_id, str(commit), str(commit.message).replace("\n", ""), str(unix_date_for_deleted_file))
 
-        # This is for the END data in write_bugs(), now specifically for deleted case. Prone to be changed.
-        end_commit_msg = str(commit.message).replace("\n", "")
-        previous_dt = dateutil.parser.parse(str(commit.committed_datetime))
-        unix_date_previous_commit = time.mktime(previous_dt.timetuple())
-        end_commit_timestamp = str(unix_date_previous_commit)
-        end_commit_id = str(commit)
+
 
         # RUN INFER AND CREATE CSV
         infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
@@ -596,7 +609,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
             get_commit_csv_name(repository_path, author_path, commit_index)
             bug_list = read_commit_csv(repository_path, author_path, commit_index)
             bug_list_splitted = bug_list_splitter(bug_list)
-            # print(bug_list)
+            print(bug_list)
             # COPY RELEVANT FILES IN OLD-FOLDER
             # print(bug_list_splitted[2])
 
@@ -634,7 +647,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
                         print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0]))
-                        # print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
+                        print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
                             if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
                                 this_file_was = changed_files_for_this_commit[e][0][0]
@@ -660,6 +673,12 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                     #       'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID',
                     #       'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
+                # Check if any bugs are removed
+
+
+            check_if_bugs_have_been_removed(bug_list_splitted, commit, end_commit_id, end_commit_timestamp, end_commit_msg)
+
+
             # PUT DATA IN bugs.csv
             # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
             # CLEAR OLD_FOLDER
@@ -678,6 +697,12 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         else:
             print("Booooo")   # Hier commit_index+=1 (in einde van code
 
+        # This is for the END data in write_bugs(), now specifically for deleted case. Prone to be changed.
+        end_commit_msg = str(commit.message).replace("\n", "")
+        previous_dt = dateutil.parser.parse(str(commit.committed_datetime))
+        unix_date_previous_commit = time.mktime(previous_dt.timetuple())
+        end_commit_timestamp = str(unix_date_previous_commit)
+        end_commit_id = str(commit)
         
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()
