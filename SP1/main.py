@@ -487,8 +487,7 @@ def added_file_case_function(g, changed_files_for_this_commit, repository, bug_t
     copy_to_new_folder(new_file_to_be_checked)  # But don't run lhdiff yet, as there should be nothing to compare.
     # print('This file was Added and has a (new) resource leak.')
 
-    follow_log = g.log("--follow", "--name-status", "--format='%H'", str(os.path.abspath(new_file_to_be_checked))).split('\n\n')
-    changed_filename_tuple = parse_git_log_follow_output(follow_log, start_commit_id)
+    changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit, start_commit_id)
 
     if len(changed_filename_tuple) > 0:
         renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
@@ -604,6 +603,12 @@ def renamed_file_has_not_been_deleted(file_in_question):
     global  deleted_files_that_have_been_renamed, files_that_have_been_renamed
     return file_in_question not in deleted_files_that_have_been_renamed.keys() and file_in_question not in files_that_have_been_renamed.keys()
 
+def renamed_file_case_parsing(g, changed_files_for_this_commit, start_commit_id):
+    follow_log = g.log("--follow", "--name-status", "--format='%H'", str(os.path.abspath(changed_files_for_this_commit))).split('\n\n')
+    changed_filename_tuple = parse_git_log_follow_output(follow_log, start_commit_id)
+    return changed_filename_tuple
+
+
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
     commit_index = 1
     # FOR LOOP HERE:
@@ -686,8 +691,10 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                 # if this file was Renamed / Added / Deleted / Modified
                                 # print(file_path_bug_infer)
                                 if this_file_was == 'R':    # Renamed
-                                    print('RRRRRRRR')
-                                    # renamed_file_case_function(file_name, changed_files_for_this_commit[e][2], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    # print('RRRRRRRR')
+                                    changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit,start_commit_id)
+                                    if len(changed_filename_tuple) > 0:
+                                        renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'M':  # Modified
                                     # print('MMMMMMMMM')
                                     modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
