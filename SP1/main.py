@@ -34,6 +34,7 @@ bug_counter = 0
 bug_id = 1
 
 files_that_have_been_renamed = {}
+deleted_files_that_have_been_renamed = {}
 extensions = [
             '.java',
             '.c',
@@ -127,7 +128,7 @@ def read_bugs():
     file_to_open = BUGS_CSV_LOCATION
     df = pd.read_csv(file_to_open)
     saved_column = df['REPO_ID']  # you can also use df['column_name']
-    print(saved_column)
+    # print(saved_column)
     # with open(file_to_open, 'r') as csvfile:
     #     for row in reader:
     #         content = list(row[i] for i in included_cols)
@@ -405,8 +406,8 @@ def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
                 # print(previous_bug_id)
                 return previous_bug_id
                 # line_tracing = new_file_loc
-            else:
-                print('verschillende bugs')
+            # else:
+                # print('verschillende bugs')
 
 
         #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
@@ -434,8 +435,8 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc)
                 # print(previous_bug_id)
                 return previous_bug_id
                 # line_tracing = new_file_loc
-            else:
-                print('verschillende bugs')
+            # else:
+            #     print('verschillende bugs')
 
         # print(old_file_loc, new_file_loc, relevant_file_loc)
         # if old_file_loc == relevant_file_loc:  # This needs to be changed into new_file_loc or relevant_files_loc?
@@ -503,7 +504,6 @@ def added_file_case_function(g, changed_files_for_this_commit, repository, bug_t
         #     #         print('This is a renamed file!', g_log_for_file[commit_0_file_2 + 2])
 
         #[-1].split('\t')?
-        print("**********")
 
         write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
@@ -522,7 +522,7 @@ def deleted_file_case_function(changed_files_for_this_commit, repository, bug_ty
 
 
 def modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
-    print('DO SOMETHING FOR MODIFIED FILE CASE')
+    # print('DO SOMETHING FOR MODIFIED FILE CASE')
     copy_to_new_folder(Path(file_path_bug_infer))  # Just copy the things that infer returned
     file_name = file_path_bug_infer.split('/')[-1]
 
@@ -542,7 +542,7 @@ def files_that_were_deleted_this_commit(commit, commit_author_date_message_chang
     # print(commit_author_date_message_changedfiles)
     for i in range(len(commit_author_date_message_changedfiles)):
         if str(commit) == str(commit_author_date_message_changedfiles[i][0]):  # If the commit equals the commit of the git log
-            print(str(commit_author_date_message_changedfiles[i][4:]))
+            # print(str(commit_author_date_message_changedfiles[i][4:]))
             for e in range(len(commit_author_date_message_changedfiles[i][4:])):
                 if commit_author_date_message_changedfiles[i][4:][e][0] == 'D':
                     # print(commit_author_date_message_changedfiles[i][4:][e][0])
@@ -550,15 +550,21 @@ def files_that_were_deleted_this_commit(commit, commit_author_date_message_chang
     return deleted_files_for_this_commit
 
 def check_if_deleted_file_had_a_bug(deleted_file_list_for_this_commit):
-    global files_that_have_been_renamed
+    global files_that_have_been_renamed, deleted_files_that_have_been_renamed
     with open(BUGS_CSV_LOCATION, 'r') as csvfile:
         reader = csv.reader(csvfile, lineterminator='\n')
         removed_bugs_in_deleted_file = {}
+        # print("\n\n")
+        # print(deleted_file_list_for_this_commit)
+        counter = 1
         for row in list(reader)[1:]:
             # print(row)
             for deleted_file in deleted_file_list_for_this_commit:
                 if deleted_file == row[3] and deleted_file not in files_that_have_been_renamed.keys():
                     removed_bugs_in_deleted_file[row[0]] = row
+                    deleted_files_that_have_been_renamed[deleted_file] = ""
+            # print(removed_bugs_in_deleted_file.keys())
+            counter = counter + 1
         return removed_bugs_in_deleted_file
 
 
@@ -572,10 +578,9 @@ def check_if_bugs_have_been_removed(bug_array, commit, end_commit_id, end_commit
                 if str(row[3]) == str(bug_array[2][i]) and str(row[4]) == str(bug_array[3][i]):
                     # print("*****\nBUG FOUND AGAIN \n*****")
                     not_removed_bugs_dict[str(row[0])] = ""
-            if not str(row[0]) in not_removed_bugs_dict.keys():
+            if not str(row[0]) in not_removed_bugs_dict.keys() and renamed_file_has_not_been_deleted((str(row[3]))):
                 # print('IK GA HEM NU TOEVOEGEN')
                 removed_bugs_array.append(row)
-        print(removed_bugs_array)
         if len(removed_bugs_array) > 0:
             for bug_row in removed_bugs_array:
                 dt = dateutil.parser.parse(str(commit.committed_datetime))
@@ -589,11 +594,15 @@ def parse_git_log_follow_output(follow_log, start_commit_id):
             filename_change_log_value = follow_log[g_log_value].split("\t")
             previous_file_name = filename_change_log_value[1]
             new_file_name = filename_change_log_value[2].split("\n")[0]
-            print("FILENAME CHANGE: %s has been renamed to %s \n", previous_file_name, new_file_name)
+            print("FILENAME CHANGE: %s has been renamed to %s \n" % (previous_file_name, new_file_name))
             global files_that_have_been_renamed
             files_that_have_been_renamed[previous_file_name] = ""
             return [previous_file_name, new_file_name]
     return []
+
+def renamed_file_has_not_been_deleted(file_in_question):
+    global  deleted_files_that_have_been_renamed, files_that_have_been_renamed
+    return file_in_question not in deleted_files_that_have_been_renamed.keys() and file_in_question not in files_that_have_been_renamed.keys()
 
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
     commit_index = 1
@@ -613,7 +622,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
         # LHDIFF conditionals can be placed here:
         if infer_success:
-            print("Hoera Hoera") # Hier lhdiff code
             # Read out the git log file:
             for i in range(len(commit_author_date_message_changedfiles)):
                 # print(commit_author_date_message_changedfiles[i])
@@ -633,7 +641,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
             get_commit_csv_name(repository_path, author_path, commit_index)
             bug_list = read_commit_csv(repository_path, author_path, commit_index)
             bug_list_splitted = bug_list_splitter(bug_list)
-            print(bug_list)
             # COPY RELEVANT FILES IN OLD-FOLDER
             # print(bug_list_splitted[2])
 
@@ -682,7 +689,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                     print('RRRRRRRR')
                                     # renamed_file_case_function(file_name, changed_files_for_this_commit[e][2], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'M':  # Modified
-                                    print('MMMMMMMMM')
+                                    # print('MMMMMMMMM')
                                     modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'A':  # Added
                                     # print('AAAAAAAAA')
@@ -718,8 +725,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
             # subprocess.call('ls', shell=True)
             # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
 
-        else:
-            print("Booooo")   # Hier commit_index+=1 (in einde van code
+        # else:
+            # print("Booooo")   # Hier commit_index+=1 (in einde van code
 
         # A DELETED FILE NEVER HAS A RESOURCE LEAK... SO IT ALSO DOESN'T MATTER IF GRADLE/INFER RUNS OR NOT.
         deleted_file_list_for_this_commit = files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles)
