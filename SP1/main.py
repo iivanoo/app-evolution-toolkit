@@ -384,36 +384,38 @@ def copy_new_files_to_old_files_folder():
     for file in files:
         copy(Path(file), LHDIFF_OLD_PATH)
 
-
 def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
     oldfile = str(Path(LHDIFF_OLD_PATH + '/' + relevant_file))
     newfile = str(Path(LHDIFF_NEW_PATH + '/' + relevant_file))      # NEEDS TO BE BUGTESTED / CHANGED FOR MISSING BUG OR FILE.
     # BUG: Both files have to be named exactly the same. git log should be checked for name-changes.
-    lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
-    data = lhdiff_output.split()
-    for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
-        # print(old_and_new_loc)
-        old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
-        # print(old_and_new_loc)
-        old_file_loc = int(old_and_new_loc[0])
-        new_file_loc = int(old_and_new_loc[1])
-        # print(str(old_file_loc), str(new_file_loc), str(relevant_files_loc))
-        # IF OLD_FILE_LOC IS FOUND PREVIOUSLY IN BUGS.CSV, THEN IT IS THE SAME BUG. ELSE IT IS A NEW BUG.
-        if str(new_file_loc) == str(relevant_files_loc):
-            # print('JAAAA')# This needs to be changed into new_file_loc or relevant_files_loc?
-            this_is_the_same_bug_as_a_previous_bug, previous_bug_id = read_bugs_for_lhdiff(relevant_file, old_file_loc)
-            if this_is_the_same_bug_as_a_previous_bug: # Search for old_file_location for file in bugs.csv, return boolean
-                # print(previous_bug_id)
-                return previous_bug_id
-                # line_tracing = new_file_loc
+
+    if os.path.isfile(oldfile) and os.path.isfile(newfile):
+        lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
+        data = lhdiff_output.split()
+
+        for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff.
+            # print(old_and_new_loc)
+            old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
+            old_file_loc = str(old_and_new_loc[0])
+            new_file_loc = str(old_and_new_loc[1])
+            # print(str(old_file_loc), str(new_file_loc), str(relevant_files_loc))
+            # IF OLD_FILE_LOC IS FOUND PREVIOUSLY IN BUGS.CSV, THEN IT IS THE SAME BUG. ELSE IT IS A NEW BUG.
+            if new_file_loc == str(relevant_files_loc):
+                # print('JAAAA')# This needs to be changed into new_file_loc or relevant_files_loc?
+                this_is_the_same_bug_as_a_previous_bug, previous_bug_id = read_bugs_for_lhdiff(relevant_file, old_file_loc)
+                if this_is_the_same_bug_as_a_previous_bug: # Search for old_file_location for file in bugs.csv, return boolean
+                    # print(previous_bug_id)
+                    print("same bug")
+                    return previous_bug_id
+                    # line_tracing = new_file_loc
+                # else:
+                    # print('verschillende bugs')
+
+
+            #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
             # else:
-                # print('verschillende bugs')
-
-
-        #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
-        # else:
-        #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
-            # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
+            #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
+                # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
 
 
 def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc):
@@ -425,10 +427,10 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc)
         # print(old_and_new_loc)
         old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
         # print(old_and_new_loc)
-        old_file_loc = int(old_and_new_loc[0])  # Line of code in old file
-        new_file_loc = int(old_and_new_loc[1])  # Line of code in new file
+        old_file_loc = str(old_and_new_loc[0])  # Line of code in old file
+        new_file_loc = str(old_and_new_loc[1])  # Line of code in new file
 
-        if str(new_file_loc) == str(relevant_file_loc):
+        if new_file_loc == str(relevant_file_loc):
             # print('JAAAA')# This needs to be changed into new_file_loc or relevant_files_loc?
             this_is_the_same_bug_as_a_previous_bug, previous_bug_id = read_bugs_for_lhdiff(relevant_file, old_file_loc)
             if this_is_the_same_bug_as_a_previous_bug: # Search for old_file_location for file in bugs.csv, return boolean
@@ -611,12 +613,11 @@ def renamed_file_case_parsing(g, changed_files_for_this_commit, start_commit_id)
 
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
     commit_index = 1
+    x = []
     # FOR LOOP HERE:
     # print('Amount of commits to scan:', len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
     end_commit_id, end_commit_timestamp, end_commit_msg = '', '', ''  # To prevent reference error during analysis of first commit; This is OK because there will never be a removal of a bug in the first commit.
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
-
-
 
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
