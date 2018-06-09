@@ -119,8 +119,8 @@ def inferAnalysisIOS(commitIndex):
             # -arch i386 to change used architecture (can also be armv7, armv7s, etc)
             # IPHONEOS_DEPLOYMENT_TARGET=8.0 (to change deployment target, which helps for older apps)
 
-            cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator clean'
-            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator'
+            cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator clean IPHONEOS_DEPLOYMENT_TARGET=8.0'
+            callString = 'infer run -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=8.0'
             
             FNULL = open(os.devnull, 'w')
             print("Initializing analysis of " + appName + " ...")
@@ -327,7 +327,6 @@ def find_root_folder(mode):
                 return os.getcwd()
         else:
             return "empty"
-
 
 if __name__ == '__main__':
     main()

@@ -379,6 +379,11 @@ def clear_new_files_folder():
     for file in files:
         os.remove(file)
 
+def clear_old_files_folder():
+    files = glob.glob(str(Path(LHDIFF_OLD_PATH + '/*')))
+    for file in files:
+        os.remove(file)
+
 def copy_new_files_to_old_files_folder():
     files = glob.glob(str(Path(LHDIFF_NEW_PATH + '/*')))
     for file in files:
@@ -490,7 +495,7 @@ def added_file_case_function(g, changed_files_for_this_commit, repository, bug_t
     # print('This file was Added and has a (new) resource leak.')
 
     changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit, start_commit_id)
-
+    # if changed_filename_tuple is empty, it means that no filename change has occured
     if len(changed_filename_tuple) > 0:
         renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
     else:
@@ -605,10 +610,29 @@ def renamed_file_has_not_been_deleted(file_in_question):
     global  deleted_files_that_have_been_renamed, files_that_have_been_renamed
     return file_in_question not in deleted_files_that_have_been_renamed.keys() and file_in_question not in files_that_have_been_renamed.keys()
 
-def renamed_file_case_parsing(g, changed_files_for_this_commit, start_commit_id):
-    follow_log = g.log("--follow", "--name-status", "--format='%H'", str(os.path.abspath(changed_files_for_this_commit))).split('\n\n')
+def renamed_file_case_parsing(g, changed_file_for_this_commit, start_commit_id):
+    follow_log = g.log("--follow", "--name-status", "--format='%H'", str(os.path.abspath(changed_file_for_this_commit))).split('\n\n')
     changed_filename_tuple = parse_git_log_follow_output(follow_log, start_commit_id)
     return changed_filename_tuple
+
+# This for the case that if a Infer run fails, and there is renamed file with a bug in the repository
+def follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit_msg, start_commit_timestamp):
+    with open(BUGS_CSV_LOCATION, 'r') as csvfile:
+        reader = csv.reader(csvfile, lineterminator='\n')
+        for row in list(reader)[1:]:
+            bug_type = row[2]
+            file_path_bug_infer = row[3]
+            line_number = row[4]
+            bug_description = row[5]
+
+            changed_filename_tuple = renamed_file_case_parsing(g, file_path_bug_infer, start_commit_id)
+            file_name = changed_filename_tuple[0]
+            renamed_file = changed_filename_tuple[1]
+
+
+            if len(changed_filename_tuple) > 0:
+                renamed_file_case_function(file_name, renamed_file, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                copy_to_old_folder(renamed_file)
 
 
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
@@ -622,27 +646,27 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         g.checkout(commit)    # Checkout the commit of the version of the repo that we analyse.
         print(commit)
 
+        # Read out the git log file:
+        for i in range(len(commit_author_date_message_changedfiles)):
+            # print(commit_author_date_message_changedfiles[i])
+            if str(commit) == commit_author_date_message_changedfiles[i][
+                0]:  # If the commit equals the commit of the git log
+                # print(commit_author_date_message_changedfiles[i])
+                author_for_this_commit = commit_author_date_message_changedfiles[i][1]
+                start_commit_timestamp = commit_author_date_message_changedfiles[i][2]  # timestamp_for_this_commit
+                start_commit_msg = commit_author_date_message_changedfiles[i][3]  # message_for_this_commit
+                changed_files_for_this_commit = commit_author_date_message_changedfiles[i][4:]
+                # print(changed_files_for_this_commit)
 
+        start_commit_id = commit  # This is just for the naming of write_bugs(), can just be rewritten as commit.
+        repository = repository_path.split('repo_subfolder\\')[-1]
 
         # RUN INFER AND CREATE CSV
+
         infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
         # LHDIFF conditionals can be placed here:
+
         if infer_success:
-            # Read out the git log file:
-            for i in range(len(commit_author_date_message_changedfiles)):
-                # print(commit_author_date_message_changedfiles[i])
-                if str(commit) == commit_author_date_message_changedfiles[i][0]:  # If the commit equals the commit of the git log
-                    # print(commit_author_date_message_changedfiles[i])
-                    author_for_this_commit = commit_author_date_message_changedfiles[i][1]
-                    start_commit_timestamp = commit_author_date_message_changedfiles[i][2]  # timestamp_for_this_commit
-                    start_commit_msg = commit_author_date_message_changedfiles[i][3]  # message_for_this_commit
-                    changed_files_for_this_commit = commit_author_date_message_changedfiles[i][4:]
-                    # print(changed_files_for_this_commit)
-
-
-            start_commit_id = commit  # This is just for the naming of write_bugs(), can just be rewritten as commit.
-            repository = repository_path.split('repo_subfolder\\')[-1]
-
             # GET CSV PATH AND READ CSV
             get_commit_csv_name(repository_path, author_path, commit_index)
             bug_list = read_commit_csv(repository_path, author_path, commit_index)
@@ -694,6 +718,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                 if this_file_was == 'R':    # Renamed
                                     # print('RRRRRRRR')
                                     changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit,start_commit_id)
+                                    # if changed_filename_tuple is empty, it means that no filename change has occured
                                     if len(changed_filename_tuple) > 0:
                                         renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'M':  # Modified
@@ -733,8 +758,9 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
             # subprocess.call('ls', shell=True)
             # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
 
-        # else:
-            # print("Booooo")   # Hier commit_index+=1 (in einde van code
+        else:
+            # Hier commit_index+=1 (in einde van code
+            follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit_msg, start_commit_timestamp)
 
         # A DELETED FILE NEVER HAS A RESOURCE LEAK... SO IT ALSO DOESN'T MATTER IF GRADLE/INFER RUNS OR NOT.
         deleted_file_list_for_this_commit = files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles)
@@ -751,12 +777,13 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         unix_date_previous_commit = time.mktime(previous_dt.timetuple())
         end_commit_timestamp = str(unix_date_previous_commit)
         end_commit_id = str(commit)
+    clear_old_files_folder()
+    clear_new_files_folder()
         
 # read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
 # write_csv_header_for_bugs_csv()
 # search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
 mine_repositories()     # Mining repositories
-
 
 
 '''

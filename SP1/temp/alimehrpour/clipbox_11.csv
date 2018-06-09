@@ -1,1 +1,1 @@
-1525882212.547911___1,RESOURCE_LEAK,MaterialDialogs/src/main/java/com/afollestad/materialdialogs/MaterialDialog.java,93,  resource of type `android.content.res.TypedArray` acquired by call to `obtainStyledAttributes(...)` at line 83 is not released after line 93.
+1528451803.983999___1,RESOURCE_LEAK,MaterialDialogs/src/main/java/com/afollestad/materialdialogs/MaterialDialog.java,85,   resource of type `android.content.res.TypedArray` acquired to `a` by call to `obtainStyledAttributes(...)` at line 83 is not released after line 85
