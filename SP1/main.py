@@ -261,36 +261,30 @@ def get_git_log_data(g):
 def mine_repositories():
     sub_problem_dir = str(os.path.abspath('app-evolution-toolkit/SP1'))
     rootdir = str(Path('repo_subfolder'))
+    absolute_rootdir = Path(os.path.abspath(rootdir)).parent
     write_csv_header_for_bugs_csv()
     list_of_authors = os.listdir(rootdir)
-    # print(list_of_authors)
     for author in list_of_authors:
         author_path = Path(rootdir + '/' + author)
-        # if author != list_of_authors[0]: #  and os.path.isdir(author_path) This needs to be fixed if more authors
-        #     os.chdir(Path(os.getcwd()).parents[2]) # Need this to go back to the rootdir to continue on the next author.
         if os.path.isdir(author_path):
             repositories_list = os.listdir(author_path)
             for directory in repositories_list:
                 repository_path = Path(str(author_path) + '/' + directory)
-                # print(repository_path)
                 if os.path.isdir(repository_path):
-                    # print(repository_path)
-                    # os.chdir(Path(os.getcwd()))  # Need this to go back to author to continue to next repo.
                     print("We're now in the repository: {}".format(repository_path))
                     repository_path = str(repository_path)
-
-                    a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
-                    g = git.Git(repository_path)
-                    # print(os.getcwd(), subdir, dirs, files)
-                    commit_author_date_message_changedfiles = get_git_log_data(g)
-                    # print(commit_author_date_message_changedfiles)     # STILL NEED TO WORK THIS OUT NEATLY
-                    os.chdir(repository_path)
-                    # print(os.getcwd())
-
-                    commit_checkout_iterator(g, a_repo, repository_path, str(author_path), commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
-                    # print(os.getcwd())
-                    # os.chdir(Path(os.getcwd()).parent)        # BUG HERE, CAN'T ITERATE REPOS. NEED HELP. SOS.
-                    # print(os.getcwd())
+                    try:
+                        a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
+                        g = git.Git(repository_path)
+                        commit_author_date_message_changedfiles = get_git_log_data(g)
+                        os.chdir(repository_path)
+                        commit_checkout_iterator(g, a_repo, repository_path, str(author_path), commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
+                    # except Exception as e: print(e)
+                    except:
+                        print('{}: does not contain a git file in this folder or another error has occured.'.format(str(repository_path)))
+                        continue
+                os.chdir(absolute_rootdir)        # BUG HERE, CAN'T ITERATE REPOS. NEED HELP. SOS.+
+        os.chdir(absolute_rootdir)
 
 def get_repository_path(item):
 
@@ -739,11 +733,15 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
 
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
-                        print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0]))
+                        print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0][0]))
                         #print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
                             if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
-                                this_file_was = changed_files_for_this_commit[e][0][0]
+                                # THIS IS FOR A BUG WHERE THE STRING IN GIT LOG IS RXXX IN LINUX
+                                if changed_files_for_this_commit[e][0][0][0] == 'R':
+                                    this_file_was = 'R'
+                                else:
+                                    this_file_was = changed_files_for_this_commit[e][0][0]
                                 # print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                                 # if this file was Renamed / Added / Deleted / Modified
                                 # print(file_path_bug_infer)
@@ -759,6 +757,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                 elif this_file_was == 'A':  # Added
                                     # print('AAAAAAAAA')
                                     added_file_case_function(g, changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                else:
+                                    print('ERROR')
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
