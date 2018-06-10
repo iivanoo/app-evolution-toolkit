@@ -32,6 +32,8 @@ LINE_NUMBER = "lineNumber"
 BUG_DESCRIPTION = "bugDescription"
 RESOURCE_LEAK = "RESOURCE_LEAK"
 
+#Global files
+parent_directory = ""
 
 def main():
     loopedAnalysis()
@@ -76,7 +78,9 @@ def inferAnalysis(appDir, commitIndex):
 
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir, commitIndex):
-    homeDirectory = os.getcwd()
+    global parent_directory
+    home_directory = os.getcwd()
+    parent_directory = os.pardir
     root_folder = find_root_folder("Android")
     removePreviousBuild()
 
@@ -94,7 +98,7 @@ def inferAnalysisAndroid(appDir, commitIndex):
         subprocess.call('./gradlew clean', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
         subprocess.call('infer run -- ./gradlew build', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
 
-    os.chdir(homeDirectory)
+    os.chdir(home_directory)
     infer_success = readBugReport(appDir, commitIndex)
     return infer_success
 
@@ -103,7 +107,10 @@ def inferAnalysisAndroid(appDir, commitIndex):
 
 # Infer analysis for iOS apps
 def inferAnalysisIOS(commitIndex):
-    homeDirectory = os.getcwd()
+    global parent_directory
+
+    home_directory = os.getcwd()
+    parent_directory = os.pardir
     root_folder = find_root_folder("IOS")
     if root_folder == "empty":
         print("- No xcodeproj found, no working app")
@@ -124,8 +131,8 @@ def inferAnalysisIOS(commitIndex):
             
             FNULL = open(os.devnull, 'w')
             print("Initializing analysis of " + appName + " ...")
-            subprocess.call(cleanString, shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
-            subprocess.call(callString, shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(cleanString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
 
         else: 
             print("- No working app found")
@@ -208,8 +215,9 @@ def readBugReport(appName, commitIndex):
 # writes the bugs to the csv file
 
 def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
+    global parent_directory
     # os.chdir(BUGFILEDIR)
-    csvFileString = os.pardir + "/" + currentDirectory.split('/')[-1] + '_' + commitIndex + ".csv"
+    csvFileString = parent_directory + "/" + currentDirectory.split('/')[-1] + '_' + commitIndex + ".csv"
     print(csvFileString)
     with open(csvFileString, 'a', newline='') as csvfile:
         fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']

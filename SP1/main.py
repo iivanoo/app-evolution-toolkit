@@ -31,6 +31,7 @@ LHDIFF_NEW_PATH = str(Path(os.path.abspath("LHDiff/new_files/")))
 
 BUG_IS_ACTIVE = "active"
 BUG_IS_SOLVED = "solved"
+BUG_HAS_NOT_CHANGED = "Bug has not been changed"
 
 bug_counter = 0
 
@@ -416,7 +417,10 @@ def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
                 if this_is_the_same_bug_as_a_previous_bug: # Search for old_file_location for file in bugs.csv, return boolean
                     # print(previous_bug_id)
                     print("same bug")
-                    return previous_bug_id
+                    if old_file_loc != new_file_loc:
+                        return previous_bug_id
+                    else:
+                        return BUG_HAS_NOT_CHANGED
                     # line_tracing = new_file_loc
                 # else:
                     # print('verschillende bugs')
@@ -546,15 +550,16 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
     # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
     # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
     bug_id = call_lhdiff_for_modified_case(file_name, line_number)
-    if not bug_id: #If no previous bug id has been assigned, create new bug id
-        global bug_counter
-        bug_id = repository + '_' + str(bug_counter)
-        bug_counter += 1
+    if bug_id != BUG_HAS_NOT_CHANGED:
+        if not bug_id: #If no previous bug id has been assigned, create new bug id
+            global bug_counter
+            bug_id = repository + '_' + str(bug_counter)
+            bug_counter += 1
 
-    bug_tracking_dict[bug_id] = BUG_IS_ACTIVE
+        bug_tracking_dict[bug_id] = BUG_IS_ACTIVE
 
 
-    write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
 def files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles):
     deleted_files_for_this_commit = []
@@ -690,7 +695,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
 
         # RUN INFER AND CREATE CSV
 
-        infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
+        infer_success = InferTool.inferAnalysisIOS(str(commit_index))
         # LHDIFF conditionals can be placed here:
 
         if infer_success:
@@ -758,7 +763,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
                     copy_to_new_folder(file_path_bug_infer)
-                    if not bug_path_exists_in_csv(file_path_bug_infer)
+                    if not bug_path_exists_in_csv(file_path_bug_infer):
                         global bug_counter
                         bug_id = repository + '_' + str(bug_counter)
                         bug_counter += 1
