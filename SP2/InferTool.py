@@ -6,6 +6,7 @@ the app folder. SDK and Build tools versions must match the app.
 """
 
 import os, sys, subprocess, shutil, csv, time, glob, re
+from pathlib import Path
 import classes
 
 # from classes import Bug
@@ -34,6 +35,7 @@ RESOURCE_LEAK = "RESOURCE_LEAK"
 
 #Global files
 parent_directory = ""
+home_directory = ""
 
 def main():
     loopedAnalysis()
@@ -78,9 +80,10 @@ def inferAnalysis(appDir, commitIndex):
 
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir, commitIndex):
-    global parent_directory
+    global parent_directory, home_directory
     home_directory = os.getcwd()
-    parent_directory = os.pardir
+    parent_directory = Path(os.path.abspath(os.pardir))
+    print(parent_directory)
     root_folder = find_root_folder("Android")
     removePreviousBuild()
 
@@ -107,10 +110,9 @@ def inferAnalysisAndroid(appDir, commitIndex):
 
 # Infer analysis for iOS apps
 def inferAnalysisIOS(commitIndex):
-    global parent_directory
-
+    global parent_directory, home_directory
     home_directory = os.getcwd()
-    parent_directory = os.pardir
+    parent_directory = Path(os.path.abspath(os.pardir))
     root_folder = find_root_folder("IOS")
     if root_folder == "empty":
         print("- No xcodeproj found, no working app")
@@ -127,7 +129,7 @@ def inferAnalysisIOS(commitIndex):
             # IPHONEOS_DEPLOYMENT_TARGET=8.0 (to change deployment target, which helps for older apps)
 
             cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator clean IPHONEOS_DEPLOYMENT_TARGET=8.0'
-            callString = 'infer run -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator -arch i386 IPHONEOS_DEPLOYMENT_TARGET=8.0'
+            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=8.0'
             
             FNULL = open(os.devnull, 'w')
             print("Initializing analysis of " + appName + " ...")
@@ -138,6 +140,7 @@ def inferAnalysisIOS(commitIndex):
             print("- No working app found")
             return False
     infer_success = readBugReport(appName, commitIndex)
+    os.chdir(home_directory)
     return infer_success
 
 
@@ -206,7 +209,7 @@ def readBugReport(appName, commitIndex):
 
         os.chdir("..")
         shutil.rmtree(BUGDIRECTORY)
-    writeBugsToCSV(bugsToCSVArray, currDir, appName, commitIndex)
+    writeBugsToCSV(bugsToCSVArray, commitIndex)
     return success
 
 
@@ -214,17 +217,16 @@ def readBugReport(appName, commitIndex):
 
 # writes the bugs to the csv file
 
-def writeBugsToCSV(bugs_array, currentDirectory, appName, commitIndex):
-    global parent_directory
+def writeBugsToCSV(bugs_array, commitIndex):
+    global parent_directory, home_directory
     # os.chdir(BUGFILEDIR)
-    csvFileString = parent_directory + "/" + currentDirectory.split('/')[-1] + '_' + commitIndex + ".csv"
+    csvFileString = str(parent_directory) + "/" + str(home_directory).split('/')[-1] + '_' + commitIndex + ".csv"
     print(csvFileString)
     with open(csvFileString, 'a', newline='') as csvfile:
         fieldnames = ['ID', 'BUG_TYPE', 'FILE_PATH', 'LINE_NUMBER', 'BUG_DESCRIPTION']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         for bug in bugs_array:
             bug.writeBugs(writer)
-    #os.chdir("..")        
 
 
 # copy_to_parent_folder()

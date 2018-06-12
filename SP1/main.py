@@ -259,6 +259,7 @@ def get_git_log_data(g):
 
 
 def mine_repositories():
+    global bug_counter
     sub_problem_dir = str(os.path.abspath('app-evolution-toolkit/SP1'))
     rootdir = str(Path('repo_subfolder'))
     absolute_rootdir = Path(os.path.abspath(rootdir)).parent
@@ -284,6 +285,9 @@ def mine_repositories():
                         print('{}: does not contain a git file in this folder or another error has occured.'.format(str(repository_path)))
                         continue
                 os.chdir(absolute_rootdir)        # BUG HERE, CAN'T ITERATE REPOS. NEED HELP. SOS.+
+                #repo is done, reset bug counter
+                bug_counter = 0
+
         os.chdir(absolute_rootdir)
 
 def get_repository_path(item):
@@ -521,12 +525,6 @@ def added_file_case_function(g, changed_files_for_this_commit, repository, bug_t
 
         write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
-
-
-        # write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL',
-        #       start_commit_id, start_commit_msg, start_commit_timestamp, 'NULL', 'NULL',
-        #       'NULL', 'NULL', 'NULL', 'NULL')
-
 # THIS FUNCTION CAN BE REMOVED AS IT IS NOT USED ANYWHERE.
 def deleted_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
     # print(changed_files_for_this_commit)
@@ -552,8 +550,8 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
 
         bug_tracking_dict[bug_id] = BUG_IS_ACTIVE
 
-
-        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+        if not bug_id in solved_bug_archive:
+            write_bugs(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'NULL', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
 def files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles):
     deleted_files_for_this_commit = []
@@ -586,7 +584,7 @@ def check_if_deleted_file_had_a_bug(deleted_file_list_for_this_commit):
         return removed_bugs_in_deleted_file
 
 
-def check_if_bugs_have_been_removed(bug_array, commit, end_commit_id, end_commit_timestamp, end_commit_msg):
+def check_if_bugs_have_been_removed(bug_array, commit, end_commit_id, end_commit_timestamp, end_commit_msg, current_repo):
     not_removed_bugs_dict = {}
     removed_bugs_array = []
     global solved_bug_archive
@@ -594,14 +592,14 @@ def check_if_bugs_have_been_removed(bug_array, commit, end_commit_id, end_commit
     with open(BUGS_CSV_LOCATION, 'r') as csvfile:
         reader = csv.reader(csvfile, lineterminator='\n')
         for row in reversed(list(reader)[1:]):
-            for i in range(len(bug_array[0])):
-                if str(row[3]) == str(bug_array[2][i]) and str(row[4]) == str(bug_array[3][i]):
-                    # print("*****\nBUG FOUND AGAIN \n*****")
-                    not_removed_bugs_dict[str(row[0])] = ""
-            if not str(row[0]) in not_removed_bugs_dict.keys() and bug_tracking_dict[str(row[0])] != BUG_IS_SOLVED and renamed_file_has_not_been_deleted((str(row[3]))):
-                # print('IK GA HEM NU TOEVOEGEN')
-
-                removed_bugs_array.append(row)
+            if str(row[1] == str(current_repo)):
+                for i in range(len(bug_array[0])):
+                    if str(row[3]) == str(bug_array[2][i]) and str(row[4]) == str(bug_array[3][i]):
+                        # print("*****\nBUG FOUND AGAIN \n*****")
+                        not_removed_bugs_dict[str(row[0])] = ""
+                if not str(row[0]) in not_removed_bugs_dict.keys() and bug_tracking_dict[str(row[0])] != BUG_IS_SOLVED and renamed_file_has_not_been_deleted((str(row[3]))):
+                    # print('IK GA HEM NU TOEVOEGEN')
+                    removed_bugs_array.append(row)
         if len(removed_bugs_array) > 0:
             for bug_row in removed_bugs_array:
                 dt = dateutil.parser.parse(str(commit.committed_datetime))
@@ -773,7 +771,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                 # Check if any bugs are removed
 
 
-            check_if_bugs_have_been_removed(bug_list_splitted, commit, end_commit_id, end_commit_timestamp, end_commit_msg)
+            check_if_bugs_have_been_removed(bug_list_splitted, commit, end_commit_id, end_commit_timestamp, end_commit_msg, repository)
 
 
             # PUT DATA IN bugs.csv
@@ -791,9 +789,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
             # subprocess.call('ls', shell=True)
             # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
 
-        # else:
-        #     # Hier commit_index+=1 (in einde van code
-        #     follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit_msg, start_commit_timestamp)
+        else:
+            follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit_msg, start_commit_timestamp)
 
         # A DELETED FILE NEVER HAS A RESOURCE LEAK... SO IT ALSO DOESN'T MATTER IF GRADLE/INFER RUNS OR NOT.
         deleted_file_list_for_this_commit = files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles)
