@@ -315,7 +315,8 @@ def bug_list_splitter(bug_list):
 
 
 def copy_to_old_folder(relevant_file):
-    if not os.path.exists(LHDIFF_OLD_PATH):                 # If this folder doesn't exist: create it.
+    # If this folder doesn't exist: create it.
+    if not os.path.exists(LHDIFF_OLD_PATH):
         os.makedirs(LHDIFF_OLD_PATH)
     src = Path(relevant_file)
     copy(src, LHDIFF_OLD_PATH)
