@@ -37,6 +37,7 @@ RESOURCE_LEAK = "RESOURCE_LEAK"
 parent_directory = ""
 home_directory = ""
 
+
 def main():
     loopedAnalysis()
 
@@ -78,6 +79,7 @@ def inferAnalysis(appDir, commitIndex):
     end = time.time()
     print("Time elapsed: " + str(end - start) + " seconds")
 
+
 # Infer analysis for android apps
 def inferAnalysisAndroid(appDir, commitIndex):
     global parent_directory, home_directory
@@ -92,7 +94,6 @@ def inferAnalysisAndroid(appDir, commitIndex):
         return False
     else:
         os.chdir(root_folder)
-
         writeLocalProperties()
         FNULL = open(os.devnull, 'w')
         print("Initializing analysis of " + appDir + " ...")
@@ -105,8 +106,6 @@ def inferAnalysisAndroid(appDir, commitIndex):
     infer_success = readBugReport(appDir, commitIndex)
     return infer_success
 
-
-# readBugReport(appDir, "Android")
 
 # Infer analysis for iOS apps
 def inferAnalysisIOS(commitIndex):
@@ -213,10 +212,7 @@ def readBugReport(appName, commitIndex):
     return success
 
 
-###os.chdir("..")
-
 # writes the bugs to the csv file
-
 def writeBugsToCSV(bugs_array, commitIndex):
     global parent_directory, home_directory
     # os.chdir(BUGFILEDIR)
@@ -247,6 +243,7 @@ def parse_bug(bug, bugIndex, timestamp):
         bug_info = {}
     return bug_info
 
+
 def create_bug_info(bugIndex, timestamp, bugBundle, bugsArray):
     bug_info = {}
     
@@ -268,6 +265,7 @@ def create_bug_info(bugIndex, timestamp, bugBundle, bugsArray):
     bug_info[BUG_DESCRIPTION] = bugsArray[1]
 
     return bug_info
+
 
 def findProjectName():
     for file in os.listdir('.'):
@@ -307,8 +305,6 @@ def copy_to_parent_folder():
     for filename in os.listdir(os.path.join(root, BUGDIRECTORY)):
         shutil.move(os.path.join(root, BUGDIRECTORY, filename), os.path.join(os.pardir + "/" + BUGDIRECTORY, filename))
 
-
-# rmdir(BUGDIRECTORY)
 
 def find_root_folder(mode):
     if mode == "Android":
