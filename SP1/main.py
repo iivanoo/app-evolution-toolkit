@@ -163,9 +163,11 @@ def write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_descrip
             'REMOVAL_COMMIT_TIMESTAMP': removal_commit_timestamp
             })
 
+
 def split_file_from_full_path(path):
     split_path = path.split('/')
     return split_path[-1]
+
 
 def get_commit_author_date_message_changed_files(git_log_string, git_log_file_changes):
     splitted_git_log = []
@@ -463,6 +465,7 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
         if not bug_id in solved_bug_archive:
             write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
+
 def files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles):
     deleted_files_for_this_commit = []
     # print(commit_author_date_message_changedfiles)
@@ -474,6 +477,7 @@ def files_that_were_deleted_this_commit(commit, commit_author_date_message_chang
                     # print(commit_author_date_message_changedfiles[i][4:][e][0])
                     deleted_files_for_this_commit.append(commit_author_date_message_changedfiles[i][4:][e][1])
     return deleted_files_for_this_commit
+
 
 def check_if_deleted_file_had_a_bug(deleted_file_list_for_this_commit):
     global files_that_have_been_renamed, deleted_files_that_have_been_renamed
@@ -515,7 +519,6 @@ def check_if_bugs_have_been_removed(bug_array, commit, end_commit_id, end_commit
                 # If bug was not previously marked as solved
                 write_bugs(bug_row[0], bug_row[1], bug_row[2], bug_row[3], bug_tracking_dict[bug_row[0]][START_LINE], bug_row[5], bug_row[6], bug_tracking_dict[bug_row[0]][START_COMMIT_ID], bug_tracking_dict[bug_row[0]][START_COMMIT_MSG], bug_tracking_dict[bug_row[0]][START_COMMIT_TIMESTAMP], end_commit_msg, end_commit_timestamp, end_commit_id, str(commit), str(commit.message).replace("\n", ""), str(unix_date_for_removed_bug_in_modified_file))
                 solved_bug_archive.append(bug_row[0])
-
 
 
 def add_bug_to_tracking_dict(bug_id, start_commit_id, start_commit_msg, start_commit_timestamp, start_line_number, current_line_number):
@@ -588,7 +591,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
     commit_index = 1
     x = []
     global bug_tracking_dict
-    # FOR LOOP HERE:
     # print('Amount of commits to scan:', len(list(a_repo.iter_commits()))) # prints amount of commits in repository to go through.
     end_commit_id, end_commit_timestamp, end_commit_msg = '', '', ''  # To prevent reference error during analysis of first commit; This is OK because there will never be a removal of a bug in the first commit.
     for commit in reversed(list(a_repo.iter_commits())):  # NOTE: repo subfolder HAS to be empty. Else only last commit will be read.
@@ -624,8 +626,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
 
             file_set_for_files_that_have_not_changed = {file[-1] for file in changed_files_for_this_commit}
 
-
-
             for i in range(len(bug_list_splitted[0])):
                 # For i in all bugs found in the csv
                 file_path_bug_infer = bug_list_splitted[2][i]
@@ -639,7 +639,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
                         print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0][0]))
-                        #print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
                             if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
                                 # THIS IS FOR A BUG WHERE THE STRING IN GIT LOG IS RXXX IN LINUX
@@ -647,8 +646,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                     this_file_was = 'R'
                                 else:
                                     this_file_was = changed_files_for_this_commit[e][0][0]
+
                                 # if this file was Renamed / Added / Deleted / Modified
-                                # print(file_path_bug_infer)
                                 if this_file_was == 'R':    # Renamed
                                     changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit,start_commit_id)
                                     # if changed_filename_tuple is empty, it means that no filename change has occured
@@ -663,8 +662,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
-                    # print(changed_files_for_this_commit)
-                    # print(file_path_bug_infer)
                     copy_to_new_folder(file_path_bug_infer)
                     bug_found_in_csv, bug_id = bug_path_exists_in_csv(file_path_bug_infer, line_number)
                     if not bug_found_in_csv:
@@ -674,6 +671,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                         add_bug_to_tracking_dict(bug_id, start_commit_id, start_commit_msg, start_commit_timestamp, line_number, line_number)
                         write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG','REMOVAL_COMMIT_TIMESTAMP')
 
+                    # MAKE THIS COMMENT DIFFERENT
                     # For the case that for some reason a file has not been modified, but a line change has occured anyway:
                     if str(line_number) != bug_tracking_dict[bug_id][CURRENT_LINE]:
                         bug_tracking_dict[bug_id][CURRENT_LINE] = line_number
