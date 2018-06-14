@@ -2,7 +2,7 @@
 This file will iterate through repositories from GitHub.
 
 Made by:
-Bob van den Berg
+Bob van den Berg & Chris Ras
 Vrije Universiteit Amsterdam
 '''
 
