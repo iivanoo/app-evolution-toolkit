@@ -13,13 +13,11 @@ import git
 from git import Repo
 from pathlib import Path
 from shutil import copy
-import shutil
 import subprocess
 import sys
 import glob
 import time
 import dateutil.parser
-import pandas as pd
 
 sys.path.insert(0, '../SP2')
 import InferTool    # Might give an error outside IDE
@@ -101,15 +99,6 @@ fieldnames = [
 ]
 
 
-def bugs_csv_location():
-    cwd = os.getcwd()
-    DATA_FOLDER = Path(cwd + "/csv")
-    print(DATA_FOLDER)
-    return DATA_FOLDER / "bugs.csv"
-    # return Path('C:/Users/BovandenBerg/Documents/Vrije Universiteit/Bachelor Project IMM/app-evolution-toolkit/SP1/csv/bugs.csv')
-
-
-
 def write_csv_header_for_bugs_csv():
     # Write bugs.csv
     file_to_open = BUGS_CSV_LOCATION
@@ -135,16 +124,6 @@ def write_csv_header_for_bugs_csv():
         writer = csv.DictWriter(csvfile, fieldnames, lineterminator='\n')
         writer.writeheader()
 
-
-def read_bugs():
-    file_to_open = BUGS_CSV_LOCATION
-    df = pd.read_csv(file_to_open)
-    saved_column = df['REPO_ID']  # you can also use df['column_name']
-    # print(saved_column)
-    # with open(file_to_open, 'r') as csvfile:
-    #     for row in reader:
-    #         content = list(row[i] for i in included_cols)
-    #     print(content)
 
 def read_bugs_for_lhdiff(relevant_file, old_file_loc):
     # print(relevant_file, old_file_loc)
@@ -280,34 +259,17 @@ def mine_repositories():
                 if os.path.isdir(repository_path):
                     print("We're now in the repository: {}".format(repository_path))
                     repository_path = str(repository_path)
-                    #try:
                     a_repo = git.Repo(repository_path, odbt=git.GitCmdObjectDB)
                     g = git.Git(repository_path)
                     commit_author_date_message_changedfiles = get_git_log_data(g)
                     os.chdir(repository_path)
                     commit_checkout_iterator(g, a_repo, repository_path, str(author_path), commit_author_date_message_changedfiles)   # Iterate each commit of a repository.
-                    #except Exception as e: print(e)
-                    # except:
-                    #     print('{}: does not contain a git file in this folder or another error has occured.'.format(str(repository_path)))
-                    #     continue
-                os.chdir(absolute_rootdir)        # BUG HERE, CAN'T ITERATE REPOS. NEED HELP. SOS.+
-                #repo is done, reset bug counter
+                # Change back to root directory to continue iterating repositories.
+                os.chdir(absolute_rootdir)
+                # repo is done, reset bug counter
                 bug_counter = 0
 
         os.chdir(absolute_rootdir)
-
-def get_repository_path(item):
-
-    repository_path = str(Path(item + '/' + os.listdir(item)))
-    # repository_path = str(Path(subdir + '/' + dirs[0]))
-    # print(repository_path)
-    # repository_path = str(subdir) + '\\' + str(dirs[0])  # Here we have the git folder string equal to repository.
-    return repository_path
-
-
-def get_repository_name(repository_path):
-    repository_name = repository_path.split('repo_subfolder\\')
-    return str(repository_name[-1])
 
 
 def get_commit_csv_name(repository_path, subdir, commit_index):
@@ -358,30 +320,18 @@ def copy_to_old_folder(relevant_file):
 
 
 def copy_to_new_folder(relevant_file):
-    if not os.path.exists(LHDIFF_NEW_PATH):                 # If this folder doesn't exist: create it.
+    # If this folder doesn't exist: create it.
+    if not os.path.exists(LHDIFF_NEW_PATH):
         os.makedirs(LHDIFF_NEW_PATH)
     src = Path(relevant_file)
     cwd = os.getcwd()
-    # print(cwd)
     copy(src, LHDIFF_NEW_PATH)
-
-
-def there_are_files_in_new_files_folder():
-    files = glob.glob(LHDIFF_NEW_PATH + '*')
-    if len(files) >= 1:
-        return True
-    else:
-        print('no files in new folder')
 
 
 def clear_old_files_folder():
     files = glob.glob(str(Path(LHDIFF_OLD_PATH + '/*')))
     for file in files:
         os.remove(file)
-
-# THIS FUNCTION CAN BE REMOVED AS IT ISNT USED ANYWHERE
-def clear_file_from_old_files_folder(file):
-    os.remove(file)
 
 
 def clear_new_files_folder():
@@ -389,20 +339,22 @@ def clear_new_files_folder():
     for file in files:
         os.remove(file)
 
+
 def clear_old_files_folder():
     files = glob.glob(str(Path(LHDIFF_OLD_PATH + '/*')))
     for file in files:
         os.remove(file)
+
 
 def copy_new_files_to_old_files_folder():
     files = glob.glob(str(Path(LHDIFF_NEW_PATH + '/*')))
     for file in files:
         copy(Path(file), LHDIFF_OLD_PATH)
 
+
 def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
     oldfile = str(Path(LHDIFF_OLD_PATH + '/' + relevant_file))
-    newfile = str(Path(LHDIFF_NEW_PATH + '/' + relevant_file))      # NEEDS TO BE BUGTESTED / CHANGED FOR MISSING BUG OR FILE.
-    # BUG: Both files have to be named exactly the same. git log should be checked for name-changes.
+    newfile = str(Path(LHDIFF_NEW_PATH + '/' + relevant_file))
 
     if os.path.isfile(oldfile) and os.path.isfile(newfile):
         lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
@@ -424,15 +376,8 @@ def call_lhdiff_for_modified_case(relevant_file, relevant_files_loc):
                         return previous_bug_id
                     else:
                         return BUG_HAS_NOT_CHANGED
-                    # line_tracing = new_file_loc
                 # else:
-                    # print('verschillende bugs')
-
-
-            #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
-            # else:
-            #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_files_loc, old_file_loc, new_file_loc))
-                # write back to bugs.csv or return values?. # NEEDS TO BE BUGTESTED
+                    # print('Different bugs')
 
 
 def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc):
@@ -441,34 +386,20 @@ def call_lhdiff_for_renamed_file(relevant_file, renamed_file, relevant_file_loc)
     lhdiff_output = subprocess.check_output(['java', '-jar', LHDIFF_PATH, oldfile, newfile])
     data = lhdiff_output.split()
     for old_and_new_loc in data[9:]:  # From 9 to remove the introduction words from LHDiff tool.
-        # print(old_and_new_loc)
         old_and_new_loc = str(old_and_new_loc).strip('b').strip("'").split(',')  # To clean the returned LHDiff output.
-        # print(old_and_new_loc)
-        old_file_loc = str(old_and_new_loc[0])  # Line of code in old file
+        old_file_loc = str(old_and_new_loc[0])  # Line of code in old file is the same code as...
         new_file_loc = str(old_and_new_loc[1])  # Line of code in new file
 
         if new_file_loc == str(relevant_file_loc):
-            # print('JAAAA')# This needs to be changed into new_file_loc or relevant_files_loc?
             this_is_the_same_bug_as_a_previous_bug, previous_bug_id = read_bugs_for_lhdiff(relevant_file, old_file_loc)
             if this_is_the_same_bug_as_a_previous_bug: # Search for old_file_location for file in bugs.csv, return boolean
-                # print(previous_bug_id)
                 return previous_bug_id
-                # line_tracing = new_file_loc
             # else:
-            #     print('verschillende bugs')
+            #     print('Different bugs')
 
-        # print(old_file_loc, new_file_loc, relevant_file_loc)
-        # if old_file_loc == relevant_file_loc:  # This needs to be changed into new_file_loc or relevant_files_loc?
-        #     print('%s : line of code (input: %s) %s is the same as %s' % (relevant_file, relevant_file_loc, old_file_loc, new_file_loc))
-        # else:
-        #     print('%s : line of code (input: %s) %s has become %s' % (relevant_file, relevant_file_loc, old_file_loc, new_file_loc))
-    # return new_file_loc
 
 def relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path, e):
     return changed_files_for_this_commit[e][1] == file_path
-
-def relevant_file_is_not_in_git_log(changed_files_for_this_commit, bug_list_splitted, e):
-    return changed_files_for_this_commit[e][1] not in bug_list_splitted[2]
 
 
 def this_file_is_changed_and_has_a_resource_leak(changed_file_git, file_path_infer):
@@ -477,16 +408,10 @@ def this_file_is_changed_and_has_a_resource_leak(changed_file_git, file_path_inf
 
 
 def renamed_file_case_function(file_name, renamed_file, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
-    # print(changed_files_for_this_commit[e][1])
-    # old_file = changed_files_for_this_commit[e][1]
-    # print(old_file)
     global bug_tracking_dict
     copy_to_new_folder(renamed_file)
     file_name = file_name.split('/')[-1]
     renamed_file = renamed_file.split('/')[-1]
-    # print(renamed_file)
-    # if old_file == relevant_files_list[i][0]:
-    # print(old_file, new_file)
     bug_id = call_lhdiff_for_renamed_file(file_name, renamed_file, line_number)
     if not bug_id: #If no previous bug id has been assigned, create new bug id
         global bug_counter
@@ -496,15 +421,7 @@ def renamed_file_case_function(file_name, renamed_file, repository, bug_type, fi
 
     # Update LHDIFF Line tracing in existing bug
     bug_tracking_dict[bug_id][CURRENT_LINE] = line_number
-
     write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
-
-
-    # print(bug_id, repository, bug_type, file_path_bug_infer, line_number,
-    #       bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg,
-    #       start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP',
-    #       'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG',
-    #       'REMOVAL_COMMIT_TIMESTAMP')
 
 
 def added_file_case_function(g, changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
@@ -524,25 +441,14 @@ def added_file_case_function(g, changed_files_for_this_commit, repository, bug_t
         add_bug_to_tracking_dict(bug_id, start_commit_id, start_commit_msg, start_commit_timestamp, line_number, line_number)
         write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
-# THIS FUNCTION CAN BE REMOVED AS IT IS NOT USED ANYWHERE.
-def deleted_file_case_function(changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
-    # print(changed_files_for_this_commit)
-    old_file_that_is_to_be_removed = changed_files_for_this_commit  # Clean the file from old_files
-    clear_file_from_old_files_folder(old_file_that_is_to_be_removed)
-    # print(bug_id, repository, bug_type, file_path_bug_infer, line_number, bug_description, 'LHDIFF_LINE_TRACING', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')  # Here I should add end/removal data.
-
 
 def modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
-    # print('DO SOMETHING FOR MODIFIED FILE CASE')
     global bug_tracking_dict
     copy_to_new_folder(Path(file_path_bug_infer))  # Just copy the things that infer returned
     file_name = file_path_bug_infer.split('/')[-1]
-
-    # old_file_path_in_git_log = changed_files_for_this_commit[e][1]
-    # new_file_path_in_git_log = changed_files_for_this_commit[e][2]
     bug_id = call_lhdiff_for_modified_case(file_name, line_number)
     if bug_id != BUG_HAS_NOT_CHANGED:
-        if not bug_id: #If no previous bug id has been assigned, create new bug id
+        if not bug_id:  # If no previous bug id has been assigned, create new bug id
             global bug_counter
             bug_id = repository + '_' + str(bug_counter)
             bug_counter += 1
@@ -552,7 +458,6 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
 
         # Update LHDIFF Line tracing in existing bug
         bug_tracking_dict[bug_id][CURRENT_LINE] = line_number
-
         bug_tracking_dict[bug_id][BUG_STATE] = BUG_IS_ACTIVE
 
         if not bug_id in solved_bug_archive:
@@ -575,11 +480,8 @@ def check_if_deleted_file_had_a_bug(deleted_file_list_for_this_commit):
     with open(BUGS_CSV_LOCATION, 'r') as csvfile:
         reader = csv.reader(csvfile, lineterminator='\n')
         removed_bugs_in_deleted_file = {}
-        # print("\n\n")
-        # print(deleted_file_list_for_this_commit)
         counter = 1
         for row in list(reader)[1:]:
-            # print(row)
             for deleted_file in deleted_file_list_for_this_commit:
                 if deleted_file == row[3] and deleted_file not in files_that_have_been_renamed.keys():
                     removed_bugs_in_deleted_file[row[0]] = row
@@ -639,9 +541,11 @@ def parse_git_log_follow_output(follow_log, start_commit_id):
             return [previous_file_name, new_file_name]
     return []
 
+
 def renamed_file_has_not_been_deleted(file_in_question):
     global  deleted_files_that_have_been_renamed, files_that_have_been_renamed
     return file_in_question not in deleted_files_that_have_been_renamed.keys() and file_in_question not in files_that_have_been_renamed.keys()
+
 
 def renamed_file_case_parsing(g, changed_file_for_this_commit, start_commit_id):
     if os.path.isfile(changed_file_for_this_commit):
@@ -650,6 +554,7 @@ def renamed_file_case_parsing(g, changed_file_for_this_commit, start_commit_id):
         return changed_filename_tuple
     else:
         return []
+
 
 # This for the case that if a Infer run fails, and there is renamed file with a bug in the repository
 def follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit_msg, start_commit_timestamp):
@@ -669,6 +574,7 @@ def follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit
                 renamed_file_case_function(file_name, renamed_file, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                 copy_to_old_folder(renamed_file)
 
+
 def bug_path_exists_in_csv(bug_path, line_number):
     with open(BUGS_CSV_LOCATION, 'r') as csvfile:
         reader = csv.reader(csvfile, lineterminator='\n')
@@ -676,6 +582,7 @@ def bug_path_exists_in_csv(bug_path, line_number):
             if str(row[3]) == str(bug_path) and str(row[6]) == str(line_number):
                 return True, str(row[0])
         return False, "NULL"
+
 
 def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_author_date_message_changedfiles):
     commit_index = 1
@@ -702,11 +609,10 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
 
         start_commit_id = commit  # This is just for the naming of write_bugs(), can just be rewritten as commit.
         repository = repository_path.split('repo_subfolder\\')[-1]
+        app_name = repository.split("/")[-1]
 
         # RUN INFER AND CREATE CSV
-
-        infer_success = InferTool.inferAnalysisAndroid("Android", str(commit_index))
-        # LHDIFF conditionals can be placed here:
+        infer_success = InferTool.inferAnalysisAndroid(app_name, str(commit_index))
 
         if infer_success:
             # GET CSV PATH AND READ CSV
@@ -722,30 +628,13 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
 
             for i in range(len(bug_list_splitted[0])):
                 # For i in all bugs found in the csv
-                # Might be able to remove newlines and headers from csv with a split or strip.
-                # I want to have a list with paths, loc and files. Possible bug when there are more or less bugs in old/new
                 file_path_bug_infer = bug_list_splitted[2][i]
-                # file_path_list = []
-                # file_path_list.append(bug_list_splitted[2][i])
                 file_name = bug_list_splitted[2][i].split('/')[-1]
                 line_number = bug_list_splitted[3][i]
                 bug_type = bug_list_splitted[1][i]
                 bug_description = bug_list_splitted[4][i]
                 print('Scanning file: %s with bug in loc %s' % (file_name, line_number))
                 # print(file_path, file_name, line_number, bug_type, bug_description)
-
-                # This should go down when we have more data. (LHDIFF line tracing for example.) print is for giving examples showing which data is put in the bugs.csv
-                # This is the header of bugs.csv: ID,REPO_ID,FILE_PATH,LINE_NUMBER,BUG_DESCRIPTION,LHDIFF_LINE_TRACING,START_COMMIT_ID,START_COMMIT_MSG,START_COMMIT_TIMESTAMP
-                # write_bugs(bug_id, repository, bug_type, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-                # print(bug_id, repository, bug_type, file_path, line_number, bug_description, 'lhdiff_line_tracing', start_commit_id, start_commit_msg, start_commit_timestamp, 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
-
-                # if commit_index == 1:      LEGACY               # Not first commit, LHDiff needs two versions of a file to compare to.
-                    # print(file_path) LEGACY
-                    # copy_to_new_folder(file_path_bug_infer)         # possible bug: Need to check if this works with the repo_subfolder walk.
-                # else: LEGACY
-                    # print(len(changed_files_for_this_commit), changed_files_for_this_commit)
-                    # print(changed_files_for_this_commit)
-
 
                 for changed_file_in_git_log in changed_files_for_this_commit:
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
@@ -758,30 +647,24 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                                     this_file_was = 'R'
                                 else:
                                     this_file_was = changed_files_for_this_commit[e][0][0]
-                                # print(str(g.log("--follow", "--name-status", "--format='%H'", file_path_bug_infer)))
                                 # if this file was Renamed / Added / Deleted / Modified
                                 # print(file_path_bug_infer)
                                 if this_file_was == 'R':    # Renamed
-                                    # print('RRRRRRRR')
                                     changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit,start_commit_id)
                                     # if changed_filename_tuple is empty, it means that no filename change has occured
                                     if len(changed_filename_tuple) > 0:
                                         renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'M':  # Modified
-                                    # print('MMMMMMMMM')
                                     modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 elif this_file_was == 'A':  # Added
-                                    # print('AAAAAAAAA')
                                     added_file_case_function(g, changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
                                 else:
                                     print('ERROR')
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))
-                    print("****")
-                    print(changed_files_for_this_commit)
-                    print(file_path_bug_infer)
-                    print("****")
+                    # print(changed_files_for_this_commit)
+                    # print(file_path_bug_infer)
                     copy_to_new_folder(file_path_bug_infer)
                     bug_found_in_csv, bug_id = bug_path_exists_in_csv(file_path_bug_infer, line_number)
                     if not bug_found_in_csv:
@@ -790,35 +673,24 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                         bug_counter += 1
                         add_bug_to_tracking_dict(bug_id, start_commit_id, start_commit_msg, start_commit_timestamp, line_number, line_number)
                         write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG','REMOVAL_COMMIT_TIMESTAMP')
-                        print("RARE PEPE BRINGS GOOD FORTUNE")
 
                     # For the case that for some reason a file has not been modified, but a line change has occured anyway:
-
                     if str(line_number) != bug_tracking_dict[bug_id][CURRENT_LINE]:
                         bug_tracking_dict[bug_id][CURRENT_LINE] = line_number
                         write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
 
 
                 # Check if any bugs are removed
-
-
             check_if_bugs_have_been_removed(bug_list_splitted, commit, end_commit_id, end_commit_timestamp, end_commit_msg, repository)
 
-
-            # PUT DATA IN bugs.csv
-            # write_bugs(bug_id, repository, file_path, line_number, bug_description, lhdiff_line_tracing, start_commit_id, start_commit_msg, start_commit_timestamp)
-            # CLEAR OLD_FOLDER
-            # if commit_index >= 2:
-            #     clear_old_files_folder()    # This is needed for storage purposes.
             # PUT NEW_FOLDER CONTENTS IN OLD_FOLDER
             copy_new_files_to_old_files_folder()
+
             # CLEAR NEW_FOLDER
             clear_new_files_folder()
+
             # RESTART ON NEXT COMMIT IN FOR-LOOP
             commit_index += 1
-            # QUICK AND DIRTY FIX, TO BE CHANGED LATER ###
-            # subprocess.call('ls', shell=True)
-            # os.chdir(repository_path.split("/")[-1]) # Don't know why this was here..?
 
         else:
             follow_renamed_when_infer_fails(g, start_commit_id, repository, start_commit_msg, start_commit_timestamp)
@@ -836,7 +708,6 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                 solved_bug_archive.append(bug_row[0])
                 bug_tracking_dict[bug_row[0]][BUG_STATE] = BUG_IS_SOLVED
 
-
         # This is for the END data in write_bugs(), now specifically for deleted case. Prone to be changed.
         end_commit_msg = str(commit.message).replace("\n", "")
         previous_dt = dateutil.parser.parse(str(commit.committed_datetime))
@@ -845,150 +716,8 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         end_commit_id = str(commit)
     clear_old_files_folder()
     clear_new_files_folder()
-        
-# read_csv_and_clone_github_repositories()             # To read a csv with a list of repositories to clone and then iterate through. (Remove first #) repo_subfolder HAS to be empty.
-# write_csv_header_for_bugs_csv()
-# search_files()         # For finding all infer-compatible files recursively in the repo_subfolder.
+
+
+# To read a csv with a list of repositories to clone and iterate through. repo_subfolder HAS to be empty. (UNCOMMENT)
+# read_csv_and_clone_github_repositories()
 mine_repositories()     # Mining repositories
-
-
-'''
-#APPENDIX (Don't need this code anymore)
-
-
-
-                # file_was_renamed():
-                #     relevant_file = relevant_files_list[i - 1][0] # DIT KLOPT NIET -> Moet uit git log de renamed file halen
-                #     renamed_file = relevant_files_list[i][0]
-                #     call_lhdiff_for_renamed_file(relevant_file, renamed_file, line_of_code)
-                # elif file_was_removed():
-                #
-                # # AND DO SOMETHING FOR BUGS.CSV?
-                # elif file_was_added():
-                #     copy_to_new_folder(file_path)
-                #
-                # # AND DO SOMETHING FOR BUGS.CSV
-                # elif file_was_modified():
-                #     copy_to_new_folder(relevant_files_list[i][0])
-                #     call_lhdiff(file_name, line_of_code)
-
-                # print(line_of_code)
-                # copy_to_new_folder(relevant_files_list[i][0])
-                # IF NEW FOLDER IS FILLED OR DIFFERENT RUN LHDIFF
-                # if there_are_files_in_new_files_folder():
-                #     call_lhdiff(file_name, line_of_code)
-
-
-
-
-
-
-
-
-
-for extension in extensions:
-    #glob repositories
-    
-def search_files():
-    for i in extensions:
-        IterateThroughFiles.find_infer_files('repo_subfolder', i) # For finding all infer-compatible files recursively in the repo_subfolder.
-
-
-import subprocess
-sys.path.insert(0, '../SP2')
-
-
-
-class IterateThroughFiles:
-    # Thanks to: https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-    # Find file extensions (java/c/cc/cpp/m) that can be analysed by Infer.
-    def __init__(self):
-        self.files = []
-
-    # Find Java, C, CC, CPP and M files
-    def find_infer_files(self, extensions):
-        file_list = []
-        pathlist = Path('repo_subfolder/').glob('**/*.' + extensions)
-        for path in pathlist:
-            print(path)
-            # because path is object not string
-            path_in_str = str(path)
-            file_list.append(path_in_str)
-        print(file_list)
-
-
-#    def append_infer_files_list(self, path_in_str):
-#        with open('csv/infer_files_list', "wb", encoding="utf8") as infer_files_list:
-#            infer_files_list.append(path_in_str)
-'''
-
-'''
-write_back = input("Would you like to clone all repositories in this csv?")
-if write_back == y:
-    clone_repositories(url, path)
-else:
-    print("Quitting after saving url and path")
-'''
-
-'''
-repository: GitHub repository in the form <username>/<repository_id>
-Example: “duckduckgo/Android”
-DONE
-repository_subfolder: path within the repository to focus on (and recursively on all its subfolders). For example, in the DuckDuckGo GitHub repository, we want to focus on the “app/src/main” folder because the source code of the Android app is there, all the other folders contain other resources that we do not care about
-
-keep_temp_data: boolean, if true, all the intermediate files and data produced by the static analyzer will be kept in a dedicated folder
-
-output_path: the path in the file system where the output bugs.csv file will be created
-
-output_folder_path: the folder in the file system where to put all the other generated files which may be useful
-
-analyzer: the path in the file system where to find the main Python script for running the static analyzer
-(Infer in the case of SP2, but it can be any)
-'''
-
-'''
-        # g.checkout(commit)
-        # read_commit_csv(repository)
-        # csv.reader(repository + '/csv_for_app_evolution_toolkit_folder')
-        # write_bugs(bug_id,repository)
-        # print(commit)
-        # str(dirs[0])
-        # InferTool.inferAnalysis(str(dirs[0]), str(commit_index))
-        # commit_index += 1
-        # subprocess.call("C:/Users/Bob/PycharmProjects/app-evolution-toolkit/SP1/LHDiff/testscript.sh", shell=True)
-        # BUG TYPE
-        # BUG DESCRIPTION
-        # REMOVE write_bugs(bug_id, repository)
-        # if bug_has_been_found():
-        #     bug_id += 1
-        # else:
-        #     continue
-
-
-# def get_file_changes_for_commit(git_log_file_changes, i):
-#     file_changes = []
-#     # print(git_log_file_changes)
-#     files_log_per_commit = git_log_file_changes.split('\n\n')     # Still need to add at which commit file was changed.
-#     # print(files_log_per_commit, sep="\n")
-#     for e in range(0, len(files_log_per_commit)):
-#         # print(files_log_per_commit)
-#         # print(e)
-#         for i in files_log_per_commit[e].splitlines():
-#             i = i.split('\t')
-#             if any(extension in i[-1][-5:] for extension in extensions):
-#                 # This could be optimized since extensions include for example .cfg or .csv
-#                 if i[0][:1] == 'M':
-#                     file_was = 'modified'
-#                 elif i[0][:1] == 'A':
-#                     file_was = 'added'
-#                 elif i[0][:1] == 'D':
-#                     file_was = 'deleted'
-#                 elif i[0][:1] == 'R':
-#                     file_was = 'renamed'
-#             elif i[0][:1] == "'":
-#
-#                 print(i, file_was)
-#                 file_changes.append(i)
-#     return file_changes
-
-'''
