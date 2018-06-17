@@ -615,7 +615,11 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         app_name = repository.split("/")[-1]
 
         # RUN INFER AND CREATE CSV
-        infer_success = InferTool.inferAnalysisAndroid(app_name, str(commit_index))
+        # Android
+        # infer_success = InferTool.inferAnalysisAndroid(app_name, str(commit_index))
+
+        # IOS
+        infer_success = InferTool.inferAnalysisIOS(str(commit_index))
 
         if infer_success:
             # GET CSV PATH AND READ CSV
@@ -641,25 +645,32 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                     if this_file_is_changed_and_has_a_resource_leak(changed_file_in_git_log, file_path_bug_infer):      # So only files that are found by infer are checked here
                         print('resource leak found in {} that was {} this commit'.format(file_path_bug_infer, changed_file_in_git_log[0][0]))
                         for e in range(len(changed_files_for_this_commit)):     # For every file in the git log that was changed in some way...
-                            if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
-                                # THIS IS FOR A BUG WHERE THE STRING IN GIT LOG IS RXXX IN LINUX
-                                if changed_files_for_this_commit[e][0][0][0] == 'R':
-                                    this_file_was = 'R'
-                                else:
+                            if changed_files_for_this_commit[e][0][0][0] == 'R':
+                                if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):
+                                    this_file_was = changed_files_for_this_commit[e][0][0][0]
+                                    if this_file_was == 'R':
+                                        for hit in changed_files_for_this_commit:
+                                            if hit[0][0] == 'R' and hit[2] == file_path_bug_infer:
+                                                changed_filename_tuple = renamed_file_case_parsing(g, hit[2], start_commit_id)
+                                                if len(changed_filename_tuple) > 0:
+                                                    renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+
+                            else:
+                                if relevant_file_is_the_same_as_the_git_file(changed_files_for_this_commit, file_path_bug_infer, e):      # Check if the bug-file Infer returned is the same.
                                     this_file_was = changed_files_for_this_commit[e][0][0]
 
-                                # if this file was Renamed / Added / Deleted / Modified
-                                if this_file_was == 'R':    # Renamed
-                                    changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit,start_commit_id)
-                                    # if changed_filename_tuple is empty, it means that no filename change has occured
-                                    if len(changed_filename_tuple) > 0:
-                                        renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
-                                elif this_file_was == 'M':  # Modified
-                                    modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
-                                elif this_file_was == 'A':  # Added
-                                    added_file_case_function(g, changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
-                                else:
-                                    print('ERROR')
+                                    # if this file was Renamed / Added / Deleted / Modified
+                                    if this_file_was == 'R':    # Renamed
+                                        changed_filename_tuple = renamed_file_case_parsing(g, changed_files_for_this_commit,start_commit_id)
+                                        # if changed_filename_tuple is empty, it means that no filename change has occured
+                                        if len(changed_filename_tuple) > 0:
+                                            renamed_file_case_function(changed_filename_tuple[0], changed_filename_tuple[1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    elif this_file_was == 'M':  # Modified
+                                        modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    elif this_file_was == 'A':  # Added
+                                        added_file_case_function(g, changed_files_for_this_commit[e][1], repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp)
+                                    else:
+                                        print('ERROR')
 
                 if file_path_bug_infer not in file_set_for_files_that_have_not_changed:
                     print('No change found for: {}. This bug is still in the same place from a previous commit and file has not been changed in any way in this commit'.format(file_path_bug_infer))

@@ -128,7 +128,7 @@ def inferAnalysisIOS(commitIndex):
             # IPHONEOS_DEPLOYMENT_TARGET=8.0 (to change deployment target, which helps for older apps)
 
             cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator clean IPHONEOS_DEPLOYMENT_TARGET=8.0'
-            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=8.0'
+            callString = 'infer run -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=8.0'
             
             FNULL = open(os.devnull, 'w')
             print("Initializing analysis of " + appName + " ...")
