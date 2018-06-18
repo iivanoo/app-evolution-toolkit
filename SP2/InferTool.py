@@ -19,7 +19,7 @@ LOCALPROPERTIES = "local.properties"
 # BUGFILEDIR = "/Users/sylviastolwijk/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 
 # CHRIS SDKPATH
-SDKPATH = "sdk.dir=/Users/chris/Library/Android/sdk"
+SDKPATH = "sdk.dir=/Users/chris/app-evolution-toolkit/SP2/sdk"
 BUGFILEDIR = "/Users/chris/Downloads/app-evolution-toolkit/SP2/BUGFiles/"
 BUGDIRECTORY = "infer-out/"
 BUGFILE = "bugs.txt"
@@ -99,8 +99,8 @@ def inferAnalysisAndroid(appDir, commitIndex):
         print("Initializing analysis of " + appDir + " ...")
         subprocess.call('find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done', shell=True)
         subprocess.call('chmod +x gradlew', shell=True)
-        subprocess.call('./gradlew clean', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-        subprocess.call('infer run -- ./gradlew build -x lint', shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('./gradlew clean', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('infer run -- ./gradlew build -x lint', shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 
     os.chdir(home_directory)
     infer_success = readBugReport(appDir, commitIndex)

@@ -3,6 +3,7 @@ import csv
 from pathlib import Path
 import dateutil.relativedelta
 import datetime
+import statistics
 
 BUGS_CSV_LOCATION = str(Path(os.path.abspath("csv/bugs.csv")))
 START_COMMIT_TIMESTAMP = "START_COMMIT_TIMESTAMP"
@@ -36,4 +37,6 @@ for bug in bugs.keys():
 
 # Remove outlier
 # diff_time_stamps = diff_time_stamps[:-1]
-print(sum(diff_time_stamps)/len(diff_time_stamps))
+# print(sum(diff_time_stamps)/len(diff_time_stamps))
+print("Mean time spent is: " + str(statistics.mean(diff_time_stamps)))
+print("Median solving time is: " + str(statistics.median(diff_time_stamps)))
