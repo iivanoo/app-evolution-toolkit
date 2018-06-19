@@ -424,7 +424,7 @@ def renamed_file_case_function(file_name, renamed_file, repository, bug_type, fi
 
     # Update LHDIFF Line tracing in existing bug
     bug_tracking_dict[bug_id][CURRENT_LINE] = line_number
-    write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+    write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], '', '', '', '', '', '')
 
 
 def added_file_case_function(g, changed_files_for_this_commit, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
@@ -442,7 +442,7 @@ def added_file_case_function(g, changed_files_for_this_commit, repository, bug_t
         bug_id = repository + '_' + str(bug_counter)
         bug_counter += 1
         add_bug_to_tracking_dict(bug_id, start_commit_id, start_commit_msg, start_commit_timestamp, line_number, line_number)
-        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], '', '', '', '', '', '')
 
 
 def modified_file_case_function(changed_files_for_this_commit, e, repository, bug_type, file_path_bug_infer, line_number, bug_description, start_commit_id, start_commit_msg, start_commit_timestamp):
@@ -464,7 +464,7 @@ def modified_file_case_function(changed_files_for_this_commit, e, repository, bu
         bug_tracking_dict[bug_id][BUG_STATE] = BUG_IS_ACTIVE
 
         if not bug_id in solved_bug_archive:
-            write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+            write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], '', '', '', '', '', '')
 
 
 def files_that_were_deleted_this_commit(commit, commit_author_date_message_changedfiles):
@@ -681,13 +681,13 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
                         bug_id = repository + '_' + str(bug_counter)
                         bug_counter += 1
                         add_bug_to_tracking_dict(bug_id, start_commit_id, start_commit_msg, start_commit_timestamp, line_number, line_number)
-                        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG','REMOVAL_COMMIT_TIMESTAMP')
+                        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], '', '', '', '', '', '')
 
                     # MAKE THIS COMMENT DIFFERENT
                     # For the case that for some reason a file has not been modified, but a line change has occured anyway:
                     if str(line_number) != bug_tracking_dict[bug_id][CURRENT_LINE]:
                         bug_tracking_dict[bug_id][CURRENT_LINE] = line_number
-                        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], 'END_COMMIT_MSG', 'END_COMMIT_TIMESTAMP', 'END_COMMIT_ID', 'REMOVAL_COMMIT_ID', 'REMOVAL_COMMIT_MSG', 'REMOVAL_COMMIT_TIMESTAMP')
+                        write_bugs(bug_id, repository, bug_type, file_path_bug_infer, bug_tracking_dict[bug_id][START_LINE], bug_description, bug_tracking_dict[bug_id][CURRENT_LINE], bug_tracking_dict[bug_id][START_COMMIT_ID], bug_tracking_dict[bug_id][START_COMMIT_MSG], bug_tracking_dict[bug_id][START_COMMIT_TIMESTAMP], '', '', '', '', '', '')
 
 
                 # Check if any bugs are removed
