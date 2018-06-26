@@ -615,11 +615,7 @@ def commit_checkout_iterator(g, a_repo, repository_path, author_path, commit_aut
         app_name = repository.split("/")[-1]
 
         # RUN INFER AND CREATE CSV
-        # Android
-        # infer_success = InferTool.inferAnalysisAndroid(app_name, str(commit_index))
-
-        # IOS
-        infer_success = InferTool.inferAnalysisIOS(str(commit_index))
+        infer_success = InferTool.infer_analysis_sp1(app_name, str(commit_index))
 
         if infer_success:
             # GET CSV PATH AND READ CSV

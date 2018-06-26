@@ -39,45 +39,61 @@ home_directory = ""
 
 
 def main():
-    loopedAnalysis()
-
-
-# Analysis mode that will loop between 2 folders, IOS and Android
-def loopedAnalysis():
-    start = time.time()
-    os.chdir("Android")
-    for dirs in os.listdir("."):
-        if os.path.isdir(dirs):
-            os.chdir(dirs)
-            infer_success_android = inferAnalysisAndroid(dirs, "1")
-            os.chdir("..")
-
-    os.chdir("..")
-    os.chdir("IOS")
-    for dirs in os.listdir("."):
-        if os.path.isdir(dirs):
-            os.chdir(dirs)
-            infer_success_ios = inferAnalysisIOS("1")
-            os.chdir("..")
-    os.chdir("..")
-
-    end = time.time()
-    print("Time elapsed: " + str(end - start) + " seconds")
+    inferAnalysis()
 
 
 # Runs the infer analysis via terminal
-def inferAnalysis(appDir, commitIndex):
+def inferAnalysis():
     start = time.time()
-    removePreviousBuild()
-
-    if os.path.exists("gradlew"):
-        infer_success = inferAnalysisAndroid(appDir, commitIndex)
-
-    else:  # assumes if not android, it is ios, in ios analysis a check will be made to see if it is really an ios app
-        infer_success = inferAnalysisIOS(commitIndex)
+    os.chdir("repositories")
+    for dirs in os.listdir("."):
+        if os.path.isdir(dirs):
+            os.chdir(dirs)
+            project_type = find_project_type()
+            infer_success = select_analysis(project_type, str(dirs), "1")
+            print(infer_success)
+            os.chdir(os.pardir)
 
     end = time.time()
     print("Time elapsed: " + str(end - start) + " seconds")
+
+
+def infer_analysis_sp1(app_dir, commit_index):
+    project_type = find_project_type()
+    infer_success = select_analysis(project_type, app_dir, commit_index)
+    return infer_success
+
+
+def select_analysis(project_type, app_dir, commit_index):
+    if project_type == "android":
+        print("This is an Android project")
+        infer_success = inferAnalysisAndroid(app_dir, commit_index)
+        return infer_success
+    elif project_type == "ios":
+        print("This is an iOS project")
+        infer_success = inferAnalysisIOS(commit_index)
+        return infer_success
+    elif project_type == "both":
+        print("This project is both an Android as an iOS project. Infer will only analyse the Android project.")
+        print("\nPlease remove the Android project if you wish to analyse iOS")
+        infer_success_android = inferAnalysisAndroid(app_dir, commit_index)
+        return infer_success_android
+    else:
+        print("- No working project found, analysis failed")
+        return False
+
+
+def find_project_type():
+    is_android_project = find_root_folder("Android")
+    is_ios_project = find_root_folder("IOS")
+    if is_android_project != "empty" and is_ios_project != "empty":
+        return "both"
+    elif is_ios_project != "empty":
+        return "ios"
+    elif is_android_project != "empty":
+        return "android"
+    else:
+        return "none"
 
 
 # Infer analysis for android apps
@@ -128,12 +144,12 @@ def inferAnalysisIOS(commitIndex):
             # IPHONEOS_DEPLOYMENT_TARGET=8.0 (to change deployment target, which helps for older apps)
 
             cleanString = 'xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator clean IPHONEOS_DEPLOYMENT_TARGET=8.0'
-            callString = 'infer run -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=8.0'
+            callString = 'infer run --no-xcpretty -- xcodebuild -target ' + rewrittenAppName + ' -configuration Debug -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=8.0'
             
             FNULL = open(os.devnull, 'w')
             print("Initializing analysis of " + appName + " ...")
-            subprocess.call(cleanString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-            subprocess.call(callString, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(cleanString, shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(callString, shell=True)#, stdout=FNULL, stderr=subprocess.STDOUT)
 
         else: 
             print("- No working app found")
@@ -224,10 +240,6 @@ def writeBugsToCSV(bugs_array, commitIndex):
         for bug in bugs_array:
             bug.writeBugs(writer)
 
-
-# copy_to_parent_folder()
-
-# os.chdir(currentDirectory)
 
 def parse_bug(bug, bugIndex, timestamp):
 
@@ -334,5 +346,38 @@ def find_root_folder(mode):
         else:
             return "empty"
 
+
 if __name__ == '__main__':
     main()
+
+
+'''
+OLD CODE, NOT USED ANYMORE, GOOD FOR FUTURE REFERENCE I GUESS
+
+# Analysis mode that will loop between 2 folders, IOS and Android
+def loopedAnalysis():
+    start = time.time()
+    os.chdir("Android")
+    for dirs in os.listdir("."):
+        if os.path.isdir(dirs):
+            os.chdir(dirs)
+            infer_success_android = inferAnalysisAndroid(dirs, "1")
+            os.chdir("..")
+
+    os.chdir("..")
+    os.chdir("IOS")
+    for dirs in os.listdir("."):
+        if os.path.isdir(dirs):
+            os.chdir(dirs)
+            infer_success_ios = inferAnalysisIOS("1")
+            os.chdir("..")
+    os.chdir("..")
+
+    end = time.time()
+    print("Time elapsed: " + str(end - start) + " seconds")
+
+
+
+
+
+'''

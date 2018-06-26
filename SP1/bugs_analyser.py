@@ -21,7 +21,6 @@ with open(BUGS_CSV_LOCATION, 'r') as csvfile:
             bugs[id][END_COMMIT_TIMESTAMP] = str(row[15])
 
 # Code for date parsing adapted from: https://stackoverflow.com/questions/6574329/how-can-i-produce-a-human-readable-difference-when-subtracting-two-unix-timestam/6574789
-print(bugs)
 
 diff_time_stamps = []
 for bug in bugs.keys():
@@ -30,7 +29,7 @@ for bug in bugs.keys():
         dt2 = datetime.datetime.fromtimestamp(float(bugs[bug][END_COMMIT_TIMESTAMP]))
         rd = dateutil.relativedelta.relativedelta (dt2, dt1)
         diff_time_stamps.append(float(bugs[bug][END_COMMIT_TIMESTAMP]) - float(bugs[bug][START_COMMIT_TIMESTAMP]))
-
+        print("Solving time: \n")
         print (
         "%d years, %d months, %d days, %d hours, %d minutes and %d seconds" % (
         rd.years, rd.months, rd.days, rd.hours, rd.minutes, rd.seconds))
@@ -40,3 +39,4 @@ for bug in bugs.keys():
 # print(sum(diff_time_stamps)/len(diff_time_stamps))
 print("Mean time spent is: " + str(statistics.mean(diff_time_stamps)))
 print("Median solving time is: " + str(statistics.median(diff_time_stamps)))
+print("Standard deviation is: " + str(statistics.stdev(diff_time_stamps)))
